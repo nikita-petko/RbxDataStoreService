@@ -1,0 +1,27 @@
+{
+  "name": "rbxdatastoreservice",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/request": "^2.48.5",
+    "@types/request-promise": "^4.1.46",
+    "@typescript-eslint/eslint-plugin": "^4.8.1",
+    "@typescript-eslint/parser": "^4.8.1",
+    "eslint": "^7.14.0",
+    "eslint-config-prettier": "^6.15.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "prettier": "^2.2.0",
+    "request": "^2.88.2",
+    "typescript": "^4.1.2"
+  },
+  "dependencies": {
+    "request-promise": "^4.2.6"
+  }
+}
