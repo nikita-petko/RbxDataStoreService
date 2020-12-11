@@ -1,23 +1,25 @@
 {
-  "compilerOptions": {
-    "target": "es2020",
-    "module": "commonjs",
-    "jsx": "react",
-    "outDir": "lib",
-    "rootDir": "src",
-    "strict": false,
-    "noUnusedLocals": true,
-    "esModuleInterop": true,
-    "preserveSymlinks": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "suppressImplicitAnyIndexErrors": false,
-    "resolveJsonModule": true,
-    "stripInternal": true,
-    "declaration": true,
-    "allowJs": false,
-    "sourceMap": false,
-    "inlineSources": false,
-    "removeComments": true
-  }
+	"compilerOptions": {
+		"target": "es2020",
+		"module": "commonjs",
+		"jsx": "react",
+		"outDir": "lib",
+		"rootDir": "src",
+		"strict": false,
+		"noUnusedLocals": true,
+		"esModuleInterop": true,
+		"preserveSymlinks": true,
+		"skipLibCheck": true,
+		"forceConsistentCasingInFileNames": true,
+		"suppressImplicitAnyIndexErrors": false,
+		"resolveJsonModule": true,
+		"stripInternal": true,
+		"declaration": true,
+		"allowJs": false,
+		"sourceMap": false,
+		"inlineSources": false,
+		"removeComments": true,
+		"noImplicitAny": false,
+		"alwaysStrict": false
+	}
 }
