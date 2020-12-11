@@ -111,4 +111,5 @@ package-lock.json
 tests.ts
 lib
 .vscode
+.idea
 requests.http
