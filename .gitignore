@@ -113,3 +113,4 @@ lib
 .vscode
 .idea
 requests.http
+/http-client.private.env.json
