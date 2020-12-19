@@ -48,6 +48,9 @@ async function startApp () {
     await RBX.InitializeAsync("_|WARNING:-DO-NOT-SHARE-THIS.--Sharing-this-will-allow-someone-to-log-in-as-you-and-to-steal-your-ROBUX-and-items.|_...", 123)
     // Do everything else, calling functions and the like.
     let DataStoreService = RBX.DataStoreService;
+    let DataStore = DataStoreService.GetDataStore('Test', 'global');
+    let value = await DataStore.GetAsync('SomeKey');
+    console.log(value);
 }
 ```
 
