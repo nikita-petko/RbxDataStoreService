@@ -12,13 +12,18 @@ export abstract class DataStoreService {
 	private static readonly dataStores: DataStores = new Map<string, DataStore>();
 	private static readonly orderedDataStores: DataStores = new Map<string, DataStore>();
 
-	private static getDataStoreInternal(name: string, scope: string, legacy: boolean, ordered: boolean): DataStore {
+	private static getDataStoreInternal(
+		name: string,
+		scope: string,
+		legacy: boolean,
+		ordered: boolean,
+	): DataStore | OrderedDataStore {
 		if (globals.placeId === 0) {
 			if (DFFlag['GetGlobalDataStorePcallFix']) {
 				throw new Error('Place has to be opened with Edit button to access DataStores');
 			}
-			process.stderr.write('Place has to be opened with Edit button to access DataStores');
-			return;
+			console.error('Place has to be opened with Edit button to access DataStores');
+			return process.exit(1);
 		}
 		if (legacy) {
 			if (!this.legacyDataStore) {
@@ -87,9 +92,9 @@ export abstract class DataStoreService {
 		return this.getDataStoreInternal(name, scope, false, false);
 	}
 
-	public static GetOrderedDataStore(name: string, scope: string = 'global'): DataStore {
+	public static GetOrderedDataStore(name: string, scope: string = 'global'): OrderedDataStore {
 		checkNameAndScope(name, scope);
-		return this.getDataStoreInternal(name, scope, false, true);
+		return this.getDataStoreInternal(name, scope, false, true) as OrderedDataStore;
 	}
 
 	public static isUrlEncodingDisabled(): boolean {
