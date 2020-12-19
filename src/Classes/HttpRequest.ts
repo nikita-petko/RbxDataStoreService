@@ -3,7 +3,7 @@ import r from 'request-promise';
 import { DataStore } from './DataStore';
 import { RequestType } from '../util/constants';
 import { globals } from '../util/globals';
-import { DataStoreService } from '../Services/DataStoreService';
+import { _DataStoreService } from '../Services/DataStoreService';
 
 export class HttpRequest {
 	public key: string;
@@ -11,7 +11,7 @@ export class HttpRequest {
 	public postData: string;
 	public owner: DataStore;
 
-	public async execute(_dataStoreService: DataStoreService): Promise<Response> {
+	public async execute(_dataStoreService: _DataStoreService): Promise<Response> {
 		return new Promise((resolve, reject) => {
 			const http = {
 				headers: {
