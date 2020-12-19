@@ -3,7 +3,8 @@ import { checkAccess } from '../Helpers/Internal/checkAccess';
 import { DFInt, RequestType } from '../util/constants';
 import { globals } from '../util/globals';
 import { BuildGenericPersistenceUrl } from '../Helpers/Internal/BuildGenericPersistenceUrl';
-import { DataStoreService } from '../Services/DataStoreService';
+import { executeGet } from '../Helpers/Internal/executeGetInternal';
+import { executeSet } from '../Helpers/Internal/executeSetInternal';
 
 export class DataStore {
 	constructor(name: string, scope: string /*= 'global'*/, legacy: boolean) {
@@ -69,6 +70,19 @@ export class DataStore {
 			  ).toString()}&value=${delta}`;
 	}
 
+	private constructRemoveUrl(key: string): string {
+		const placeId = globals.placeId;
+		return this.isLegacy
+			? `${this.serviceUrl}remove?placeId=${placeId}&key=${this.urlEncodeIfNeeded(
+					key,
+			  ).toString()}&type=${this.getDataStoreTypeString()}&scope=${this.scopeUrlEncodedIfNeeded.toString()}&target=`
+			: `${
+					this.serviceUrl
+			  }remove?placeId=${placeId}&key=${this.nameUrlEncodedIfNeeded.toString()}&type=${this.getDataStoreTypeString()}&scope=${this.scopeUrlEncodedIfNeeded.toString()}&target=${this.urlEncodeIfNeeded(
+					key,
+			  ).toString()}`;
+	}
+
 	private createFetchNewKeyRequest(key: string, request: HttpRequest): void {
 		request.url = this.constructGetUrl();
 		request.postData = this.constructPostDataForKey(key);
@@ -86,7 +100,7 @@ export class DataStore {
 		return [hasJsonType, result];
 	}
 
-	private static deserializeVariant<Variant extends any>(webValue: string): [boolean, Variant | unknown] {
+	static deserializeVariant<Variant extends any>(webValue: string): [boolean, Variant | unknown] {
 		let result = '';
 		if (webValue.length === 0) return [true, result];
 		try {
@@ -106,12 +120,17 @@ export class DataStore {
 				const request = new HttpRequest();
 				this.createFetchNewKeyRequest(key, request);
 				request.requestType = RequestType.GET_ASYNC;
-				DataStoreService.executeGet(request).then((r) => {
+				executeGet(request).then((r) => {
 					const [success, res] = DataStore.deserializeVariant(r.body);
 					if (!success) return reject("Can't parse response");
 					let result: Variant;
 					try {
-						result = transformFunc(res['data'].length === 0 ? undefined : res['data'][0]['Value']);
+						console.log(res['data'].length, res['data'], res['data'][0]);
+						result = transformFunc(
+							res['data'].length === 0
+								? undefined
+								: (DataStore.deserializeVariant(res['data'][0]['Value'])[1] as Variant),
+						);
 					} catch (e) {
 						reject(e);
 					}
@@ -136,7 +155,7 @@ export class DataStore {
 					request.owner = this;
 					request.key = key;
 					request.requestType = RequestType.UPDATE_ASYNC;
-					DataStoreService.executeSet(request)
+					executeSet(request)
 						.then((r2) => {
 							const [success, res] = DataStore.deserializeVariant(r2.body);
 							if (!success) return reject("Can't parse response");
@@ -190,7 +209,7 @@ export class DataStore {
 				const request = new HttpRequest();
 				this.createFetchNewKeyRequest(key, request);
 				request.requestType = RequestType.GET_ASYNC;
-				DataStoreService.executeGet(request)
+				executeGet(request)
 					.then((r) => {
 						const [success, result] = DataStore.deserializeVariant(r.body);
 						if (!success) return reject("Can't parse response");
@@ -220,7 +239,7 @@ export class DataStore {
 				request.key = key;
 				request.requestType = RequestType.SET_ASYNC;
 				request.postData = `value=${this.urlEncodeIfNeeded(value.toString())}`.toString();
-				DataStoreService.executeSet(request)
+				executeSet(request)
 					.then((r) => {
 						const [success, res] = DataStore.deserializeVariant(r.body);
 						if (!success) return reject("Can't parse response");
@@ -247,7 +266,7 @@ export class DataStore {
 				request.owner = this;
 				request.key = key;
 				request.requestType = RequestType.INCREMENT_ASYNC;
-				DataStoreService.executeSet(request)
+				executeSet(request)
 					.then((r) => {
 						const [success, res] = DataStore.deserializeVariant(r.body);
 						if (!success) return reject("Can't parse response");
@@ -274,5 +293,27 @@ export class DataStore {
 				resolve(result);
 			},
 		);
+	}
+
+	public async RemoveAsync(key: string): Promise<void> {
+		return new Promise<void>((resolve, reject) => {
+			const [success, message] = checkAccess(key);
+			if (!success) return reject(message);
+			const request = new HttpRequest();
+			request.url = this.constructRemoveUrl(key);
+			request.owner = this;
+			request.key = key;
+			request.requestType = RequestType.SET_ASYNC;
+			executeSet(request)
+				.then((value) => {
+					const [success, res] = DataStore.deserializeVariant(value.body);
+					if (!success) return reject("Can't parse response");
+					console.log(res);
+					resolve();
+				})
+				.catch((e) => {
+					return reject(e);
+				});
+		});
 	}
 }
