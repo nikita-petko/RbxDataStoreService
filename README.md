@@ -3,7 +3,7 @@
 <p align="center">
     <a href="https://standardjs.com"><img src="https://img.shields.io/badge/code_style-standard-blue.svg?style=flat-square" alt="JavaScript Style Guide"/></a>
     <a href="https://discord.gg/EDXNdAT"><img src="https://img.shields.io/badge/discord-roblox%20api%20chat-blue.svg?style=flat-square" alt="Roblox API Discord"/></a>
-    <a href="https://npmjs.org/noblox.js"><img src="https://img.shields.io/npm/v/@mfd/rbxdatastoreservice.svg?style=flat-square" alt="NPM package"/></a>
+    <a href="https://npmjs.org/@mfd/rbxdatastoreservice"><img src="https://img.shields.io/npm/v/@mfd/rbxdatastoreservice.svg?style=flat-square" alt="NPM package"/></a>
 </p>
 <p align="center">
   <a href="#about">About</a> •
