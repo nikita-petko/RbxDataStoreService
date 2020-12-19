@@ -6,6 +6,13 @@ import { BuildGenericPersistenceUrl } from '../Helpers/Internal/BuildGenericPers
 import { executeGet } from '../Helpers/Internal/executeGetInternal';
 import { executeSet } from '../Helpers/Internal/executeSetInternal';
 
+/**
+ * A GlobalDataStore exposes functions for saving and loading data for the DataStoreService.
+ * See the Data Stores article for an in-depth guide on data structure,
+ * management,
+ * error handling,
+ * etc.
+ */
 export class DataStore {
 	constructor(name: string, scope: string /*= 'global'*/, legacy: boolean) {
 		this.isLegacy = legacy;
@@ -125,7 +132,6 @@ export class DataStore {
 					if (!success) return reject("Can't parse response");
 					let result: Variant;
 					try {
-						console.log(res['data'].length, res['data'], res['data'][0]);
 						result = transformFunc(
 							res['data'].length === 0
 								? undefined
@@ -139,10 +145,19 @@ export class DataStore {
 					}
 					// console.log(result);
 					if (!this.checkValueIsAllowed(result))
-						return reject(`${typeof result} is not allowed in DataStore`);
+						return reject(
+							`${typeof result} is not allowed in ${
+								this.getDataStoreTypeString() === 'standard' ? 'DataStore' : 'OrderedDataStore'
+							}`,
+						);
 
 					const [success2, newValue] = DataStore.serializeVariant(result);
-					if (!success2) return reject(`${typeof result} is not allowed in DataStore`);
+					if (!success2)
+						return reject(
+							`${typeof result} is not allowed in ${
+								this.getDataStoreTypeString() === 'standard' ? 'DataStore' : 'OrderedDataStore'
+							}`,
+						);
 					if (newValue.length > DFInt['DataStoreMaxValueSize']) return reject('Value is too large');
 					const expectedValue = res['data'].length === 0 ? '' : res['data'][0]['Value'];
 					const postData = `value=${this.urlEncodeIfNeeded(newValue)}&expectedValue=${this.urlEncodeIfNeeded(
@@ -197,6 +212,19 @@ export class DataStore {
 		return 'persistence';
 	}
 
+	/**
+	 * Returns the value of the entry in the data store with the given key.
+	 * This function returns the value of the entry in the GlobalDataStore with the given key.
+	 * If the key does not exist,
+	 * returns undefined.
+	 * This function used to cache for about 4 seconds,
+	 * so you couldn't be sure that it returns the current value saved on the Roblox servers.
+	 * If this function throws an error,
+	 * the error message will describe the problem.
+	 * Note that there are also limits that will soon apply to this function.
+	 * @param key The key identifying the entry being retrieved from the data store.
+	 * @yields This is a yielding function. When called, it will pause the JavaScript thread that called the function until a result is ready to be returned, without interrupting other scripts.
+	 */
 	public async GetAsync<Variant extends any>(key: string): Promise<Variant | unknown> {
 		return new Promise<Variant | unknown>(
 			(
@@ -224,21 +252,59 @@ export class DataStore {
 		);
 	}
 
+	/**
+	 *
+	 * Sets the value of the key.
+	 * This overwrites any existing data stored in the key.
+	 * ---
+	 * CRITICAL
+	 * --------
+	 * If the previous value of the key is important,
+	 * use UpdateAsync() instead.
+	 * Using GetAsync() to retrieve a value and then setting the key with SetAsync() is risky because GetAsync() sometimes returns cached data and other game servers may have modified the key.
+	 * ---
+	 * NOTICE
+	 * -------
+	 * Any string being stored in a data store must be valid UTF-8.
+	 * In UTF-8,
+	 * values greater than 127 are used exclusively for encoding multi-byte codepoints,
+	 * so a single byte greater than 127 will not be valid UTF-8 and the SetAsync() attempt will fail.
+	 * ---
+	 * If this function throws an error,
+	 * the error message will describe the problem.
+	 * Note that there are also limits that apply to this function.
+	 * See the Data Stores article for an in-depth guide on data structure,
+	 * management,
+	 * error handling, etc.
+	 * @param key The key identifying the entry being retrieved from the data store.
+	 * @param value The value of the entry in the data store with the given key.
+	 * @yields This is a yielding function. When called, it will pause the JavaScript thread that called the function until a result is ready to be returned, without interrupting other scripts.
+	 */
 	public async SetAsync<Variant extends any>(key: string, value: Variant): Promise<void> {
 		return new Promise<void>(
 			(resolve: (value: PromiseLike<void> | void) => void, reject: (reason?: any) => void) => {
 				const [success, message] = checkAccess(key);
 				if (!success) return reject(message);
-				if (!this.checkValueIsAllowed(value)) return reject(`${typeof value} is not allowed in DataStore`);
+				if (!this.checkValueIsAllowed(value))
+					return reject(
+						`${typeof value} is not allowed in ${
+							this.getDataStoreTypeString() === 'standard' ? 'DataStore' : 'OrderedDataStore'
+						}`,
+					);
 				const [success2, v] = DataStore.serializeVariant(value);
-				if (!success2) return reject(`${typeof value} is not allowed in DataStore`);
+				if (!success2)
+					return reject(
+						`${typeof value} is not allowed in ${
+							this.getDataStoreTypeString() === 'standard' ? 'DataStore' : 'OrderedDataStore'
+						}`,
+					);
 				if (v.length > DFInt['DataStoreMaxValueSize']) return reject('Value is too large');
 				const request = new HttpRequest();
 				request.url = this.constructSetUrl(key, v.length);
 				request.owner = this;
 				request.key = key;
 				request.requestType = RequestType.SET_ASYNC;
-				request.postData = `value=${this.urlEncodeIfNeeded(value.toString())}`.toString();
+				request.postData = `value=${this.urlEncodeIfNeeded(v.toString())}`.toString();
 				executeSet(request)
 					.then((r) => {
 						const [success, res] = DataStore.deserializeVariant(r.body);
@@ -256,9 +322,24 @@ export class DataStore {
 		);
 	}
 
-	public async IncrementAsync(key: string, delta: number): Promise<void> {
-		return new Promise<void>(
-			(resolve: (value: PromiseLike<void> | void) => void, reject: (reason?: any) => void) => {
+	/**
+	 * Increments the value of a particular key and returns the incremented value.
+	 * Only works on values that are integers.
+	 * Note that you can use OnUpdate() - Not Implemented - to execute a function every time the database updates the key’s value,
+	 * such as after calling this function.
+	 * If this function throws an error,
+	 * the error message will describe the problem.
+	 * Note that there are also limits that apply to this function.
+	 * See the Data Stores article for an in-depth guide on data structure,
+	 * management,
+	 * error handling, etc.
+	 * @param key The key identifying the entry being retrieved from the data store.
+	 * @param delta The increment amount.
+	 * @yields This is a yielding function. When called, it will pause the JavaScript thread that called the function until a result is ready to be returned, without interrupting other scripts.
+	 */
+	public async IncrementAsync(key: string, delta: number = 1): Promise<number> {
+		return new Promise<number>(
+			(resolve: (value: PromiseLike<number> | number) => void, reject: (reason?: any) => void) => {
 				const [success, message] = checkAccess(key);
 				if (!success) return reject(message);
 				const request = new HttpRequest();
@@ -272,7 +353,7 @@ export class DataStore {
 						if (!success) return reject("Can't parse response");
 						if (!res['data'])
 							return reject('Unable to increment key as it may be anything other than a number');
-						resolve();
+						resolve(parseFloat(res['data']) || 0);
 					})
 					.catch((reason) => {
 						return reject(reason);
@@ -281,6 +362,47 @@ export class DataStore {
 		);
 	}
 
+	/**
+	 * Retrieves the value of a key from a data store and updates it with a new value.
+	 * This function retrieves the value of a key from a data store and updates it with a new value.
+	 * Since this function validates the data,
+	 * it should be used in favor of SetAsync() when there’s a chance that more than one server can edit the same data at the same time.
+	 * The second parameter is a function which you need to provide.
+	 * The function takes the key’s old value as input and returns the new value,
+	 * with these exceptions:
+	 * - If the key does not exist, the old value passed to the function will be nil.
+	 * - If the function returns nil, the update is cancelled.
+	 * The value returned by this function is the new value,
+	 * returned once the altered data is properly saved.
+	 * ---
+	 * INFO
+	 * -----
+	 * In cases where another game server updated the key in the short timespan between retrieving the key's current value and setting the key's value,
+	 * UpdateAsync() will call the function again to ensure that no data is overwritten.
+	 * The function will be called as many times as needed until the data is saved.
+	 * ---
+	 * CRITICAL
+	 * ---------
+	 * The function you define as the second parameter of UpdateAsync() cannot yield,
+	 * so do not include calls like setTimeout().
+	 * ---
+	 * NOTICE
+	 * -------
+	 * Any string being stored in a data store must be valid UTF-8.
+	 * In UTF-8,
+	 * values greater than 127 are used exclusively for encoding multi-byte codepoints,
+	 * so a single byte greater than 127 will not be valid UTF-8 and the SetAsync() attempt will fail.
+	 * ---
+	 * If this function throws an error,
+	 * the error message will describe the problem.
+	 * Note that there are also limits that apply to this function.
+	 * See the Data Stores article for an in-depth guide on data structure,
+	 * management,
+	 * error handling, etc.
+	 * @param key The key identifying the entry being retrieved from the data store.
+	 * @param transformFunc A function which you need to provide. The function takes the key’s old value as input and returns the new value.
+	 * @yields This is a yielding function. When called, it will pause the JavaScript thread that called the function until a result is ready to be returned, without interrupting other scripts.
+	 */
 	public async UpdateAsync<Variant extends any>(
 		key: string,
 		transformFunc: (previousValue: Variant) => Variant,
@@ -295,8 +417,22 @@ export class DataStore {
 		);
 	}
 
-	public async RemoveAsync(key: string): Promise<void> {
-		return new Promise<void>((resolve, reject) => {
+	/**
+	 * Removes the given key from the data store and returns the value associated with that key.
+	 * This function removes the given key from the provided GlobalDataStore and returns the value that was associated with that key.
+	 * If the key is not found in the data store,
+	 * this function returns undefined.
+	 * If this function throws an error,
+	 * the error message will describe the problem.
+	 * Note that there are also limits that apply to this function.
+	 * See the Data Stores article for an in-depth guide on data structure,
+	 * management,
+	 * error handling, etc.
+	 * @param key The key identifying the entry being retrieved from the data store.
+	 * @yields This is a yielding function. When called, it will pause the JavaScript thread that called the function until a result is ready to be returned, without interrupting other scripts.
+	 */
+	public async RemoveAsync<Variant extends any>(key: string): Promise<Variant> {
+		return new Promise<Variant>((resolve, reject) => {
 			const [success, message] = checkAccess(key);
 			if (!success) return reject(message);
 			const request = new HttpRequest();
@@ -309,7 +445,7 @@ export class DataStore {
 					const [success, res] = DataStore.deserializeVariant(value.body);
 					if (!success) return reject("Can't parse response");
 					console.log(res);
-					resolve();
+					resolve(DataStore.deserializeVariant(res['data'])[1] as Variant);
 				})
 				.catch((e) => {
 					return reject(e);

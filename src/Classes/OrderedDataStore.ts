@@ -3,6 +3,11 @@ import { DataStorePages } from './DataStorePages';
 import { globals } from '../util/globals';
 import { DFInt } from '../util/constants';
 
+/**
+ * A OrderedDataStore is essentially a GlobalDataStore with the exception that stored values must be positive integers.
+ * It exposes a method GetSortedAsync() which allows inspection of the entries in sorted order using a DataStorePages object.
+ * See the Data Stores article for an overview on using ordered data stores.
+ */
 export class OrderedDataStore extends DataStore {
 	constructor(name: string, scope: string) {
 		super(name, scope, false);
@@ -33,6 +38,19 @@ export class OrderedDataStore extends DataStore {
 		return 'sorted';
 	}
 
+	/**
+	 * Returns a DataStorePages object.
+	 * The sort order is determined by ascending,
+	 * the length of each page by pageSize,
+	 * and minValue/maxValue are optional parameters which filter the results.
+	 * If this function throws an error,
+	 * the error message will describe the problem.
+	 * @param isAscending A boolean indicating whether the returned data pages are in ascending order.
+	 * @param pagesize The length of each page.
+	 * @param minValue Optional parameter. If set, data pages with a value less than than minValue will be excluded.
+	 * @param maxValue Optional parameter. If set, data pages with a value greater than maxValue will be excluded.
+	 * @yields This is a yielding function. When called, it will pause the Lua thread that called the function until a result is ready to be returned, without interrupting other scripts.
+	 */
 	public async GetSortedAsync<Variant extends any>(
 		isAscending: boolean,
 		pagesize: number,
@@ -49,7 +67,7 @@ export class OrderedDataStore extends DataStore {
 				if (pagesize > DFInt['DataStoreMaxPageSize']) return reject('PageSize is too large');
 				const url: string = this.constructGetSortedUrl(isAscending, pagesize, minValue, maxValue);
 				const pagination: DataStorePages = new DataStorePages(this, url);
-				await pagination.FetchNextChunk();
+				await pagination.AdvanceToNextPageAsync();
 				return resolve(pagination);
 			},
 		);

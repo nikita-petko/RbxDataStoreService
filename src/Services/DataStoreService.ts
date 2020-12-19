@@ -1,3 +1,5 @@
+// NOTICE Tag internal members as @internal or pull them out.
+
 import { DataStores } from '../util/customTypes';
 import { DataStore } from '../Classes/DataStore';
 import { globals } from '../util/globals';
@@ -8,7 +10,8 @@ import { Response } from 'request';
 import { checkNameAndScope } from '../Helpers/Internal/checkNameAndScope';
 
 // TODO: Convert this to a namespace?
-export abstract class DataStoreService {
+
+export abstract class _DataStoreService {
 	private static readonly dataStores: DataStores = new Map<string, DataStore>();
 	private static readonly orderedDataStores: DataStores = new Map<string, DataStore>();
 
@@ -83,20 +86,44 @@ export abstract class DataStoreService {
 
 	// private static dataStoreJob: DataStoreJob;
 
+	/**
+	 * Returns the default data store.
+	 * This function returns the default GlobalDataStore.
+	 * If you want to access a specific named data store instead,
+	 * you should use the GetDataStore() function.
+	 */
 	public static GetGlobalDataStore(): DataStore {
 		return this.getDataStoreInternal('', 'u', true, false);
 	}
 
+	/**
+	 * Get a GlobalDataStore given a name and optional scope.
+	 * This method returns a GlobalDataStore by name/scope.
+	 * Subsequent calls to this method with the same name/scope will return the same object.
+	 * @param name The name of the DataStore you wish to get.
+	 * @param scope The scope of the DataStore you wish to get, global by default
+	 */
 	public static GetDataStore(name: string, scope: string = 'global'): DataStore {
 		checkNameAndScope(name, scope);
 		return this.getDataStoreInternal(name, scope, false, false);
 	}
 
+	/**
+	 * Get an OrderedDataStore given a name and optional scope.
+	 * This method returns an OrderedDataStore,
+	 * similar to the way GetDataStore() does with GlobalDataStores.
+	 * Subsequent calls to this method with the same name/scope will return the same object.
+	 * @param name The name of the OrderedDataStore you wish to get.
+	 * @param scope The scope of the OrderedDataStore you wish to get, global by default
+	 */
 	public static GetOrderedDataStore(name: string, scope: string = 'global'): OrderedDataStore {
 		checkNameAndScope(name, scope);
 		return this.getDataStoreInternal(name, scope, false, true) as OrderedDataStore;
 	}
 
+	/**
+	 * @internal
+	 */
 	public static isUrlEncodingDisabled(): boolean {
 		return this.disableUrlEncoding;
 	}
