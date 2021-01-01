@@ -5,21 +5,15 @@
 		"jsx": "react",
 		"outDir": "lib",
 		"rootDir": "src",
-		"strict": false,
 		"noUnusedLocals": true,
 		"esModuleInterop": true,
 		"preserveSymlinks": true,
 		"skipLibCheck": true,
 		"forceConsistentCasingInFileNames": true,
-		"suppressImplicitAnyIndexErrors": false,
 		"resolveJsonModule": true,
 		"stripInternal": true,
 		"declaration": true,
-		"allowJs": false,
-		"sourceMap": false,
-		"inlineSources": false,
-		"removeComments": true,
-		"noImplicitAny": false,
-		"alwaysStrict": false
+		"removeComments": false,
+		"declarationDir": "lib/types",
 	}
 }
