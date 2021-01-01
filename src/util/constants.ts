@@ -11,6 +11,7 @@ export enum RequestType {
 export const DFFlag = {
 	UseNewDataStoreRequestSetTimestampBehaviour: false,
 	GetGlobalDataStorePcallFix: false,
+	UseUnstableDevGetAsyncUrl: false,
 };
 export const DFInt = {
 	DataStoreMaxValueSize: 64 * 1024,
