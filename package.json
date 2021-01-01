@@ -1,28 +1,33 @@
 {
-  "name": "@mfd/rbxdatastoreservice",
-  "version": "1.0.2",
-  "description": "",
-  "main": "lib/index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "MFD",
-  "license": "ISC",
-  "devDependencies": {
-    "@types/request": "^2.48.5",
-    "@types/request-promise": "^4.1.46",
-    "@typescript-eslint/eslint-plugin": "^4.8.1",
-    "@typescript-eslint/parser": "^4.8.1",
-    "eslint": "^7.14.0",
-    "eslint-config-prettier": "^6.15.0",
-    "eslint-plugin-prettier": "^3.1.4",
-    "prettier": "^2.2.0",
-    "request": "^2.88.2",
-    "typescript": "^4.1.2"
-  },
-  "dependencies": {
-    "logging": "^3.2.0",
-    "request-promise": "^4.2.6"
-  }
+	"name": "@mfd/rbxdatastoreservice",
+	"version": "1.1.4",
+	"description": "RbxDataStoreService is a node module that That allows you to use DataStoreService outside of Roblox. This project was created because people outside ROBLOX always want to use DataStoreService outside ROBLOX.",
+	"main": "lib/index.js",
+	"scripts": {},
+	"keywords": [],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/mfd-co/RbxDataStoreService.git"
+	},
+	"author": "nsg <nsg@mfd.com> (https://github.com/nsg-mfd)",
+	"contributors": [
+		"Ivan Gregrovnich <ivan_g@mfd.com>",
+		"Aleksej Grasnich <aleksej_g@mfd.com>"
+	],
+	"license": "Apache-2.0",
+	"devDependencies": {
+		"@types/request": "^2.48.5",
+		"@types/request-promise": "^4.1.46",
+		"@typescript-eslint/eslint-plugin": "^4.8.1",
+		"@typescript-eslint/parser": "^4.8.1",
+		"eslint": "^7.14.0",
+		"eslint-config-prettier": "^6.15.0",
+		"eslint-plugin-prettier": "^3.1.4",
+		"prettier": "^2.2.0",
+		"typescript": "^4.1.2"
+	},
+	"dependencies": {
+		"request": "^2.88.2",
+		"request-promise": "^4.2.6"
+	}
 }
