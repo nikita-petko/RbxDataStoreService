@@ -1,14 +1,21 @@
 {
 	"name": "@mfd/rbxdatastoreservice",
-	"version": "1.0.2",
-	"description": "",
+	"version": "1.2.1",
+	"description": "RbxDataStoreService is a node module that That allows you to use DataStoreService outside of Roblox. This project was created because people outside ROBLOX always want to use DataStoreService outside ROBLOX.",
 	"main": "lib/index.js",
-	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
-	},
+	"types": "lib/types",
+	"scripts": {},
 	"keywords": [],
-	"author": "MFD",
-	"license": "ISC",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/mfd-co/RbxDataStoreService.git"
+	},
+	"author": "nsg <nsg@mfd.com> (https://github.com/nsg-mfd)",
+	"contributors": [
+		"Ivan Gregrovnich <ivan_g@mfd.com>",
+		"Aleksej Grasnich <aleksej_g@mfd.com>"
+	],
+	"license": "Apache-2.0",
 	"devDependencies": {
 		"@types/request": "^2.48.5",
 		"@types/request-promise": "^4.1.46",
