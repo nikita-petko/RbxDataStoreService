@@ -54,7 +54,7 @@ export class DataStorePages extends Pages {
 	/**
 	 * Iterates to the next page in the pages object,
 	 * if possible.
-	 * @yields This is a yielding function. When called, it will pause the Lua thread that called the function until a result is ready to be returned, without interrupting other scripts.
+	 * @yields This is a yielding function. When called, it will pause the JavaScript thread that called the function until a result is ready to be returned, without interrupting other scripts.
 	 */
 	public async AdvanceToNextPageAsync(): Promise<void> {
 		return new Promise<void>(async (resolve: (value: PromiseLike<void> | void) => void) => {

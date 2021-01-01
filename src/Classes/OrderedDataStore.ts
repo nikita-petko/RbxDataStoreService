@@ -49,7 +49,7 @@ export class OrderedDataStore extends DataStore {
 	 * @param pagesize The length of each page.
 	 * @param minValue Optional parameter. If set, data pages with a value less than than minValue will be excluded.
 	 * @param maxValue Optional parameter. If set, data pages with a value greater than maxValue will be excluded.
-	 * @yields This is a yielding function. When called, it will pause the Lua thread that called the function until a result is ready to be returned, without interrupting other scripts.
+	 * @yields This is a yielding function. When called, it will pause the JavaScript thread that called the function until a result is ready to be returned, without interrupting other scripts.
 	 */
 	public async GetSortedAsync<Variant extends any>(
 		isAscending: boolean,
