@@ -5,6 +5,9 @@ import { globals } from '../util/globals';
 import { BuildGenericPersistenceUrl } from '../Helpers/Internal/BuildGenericPersistenceUrl';
 import { executeGet } from '../Helpers/Internal/executeGetInternal';
 import { executeSet } from '../Helpers/Internal/executeSetInternal';
+import { FASTLOG2, FASTLOG3, FASTLOG4, FLog, LOGGROUP } from '../util/FastLog';
+
+LOGGROUP('DataStore');
 
 /**
  * A GlobalDataStore exposes functions for saving and loading data for the DataStoreService.
@@ -23,6 +26,9 @@ export class DataStore {
 		this.serviceUrl = BuildGenericPersistenceUrl(DataStore.urlApiPath());
 	}
 
+	private _callback: <Variant extends any>(Key: string, OldValue: Variant, NewValue: Variant) => void = () => {
+		return;
+	};
 	private readonly isLegacy: boolean = false;
 
 	private constructPostDataForKey(key: string, index: number = 0): string {
@@ -131,6 +137,14 @@ export class DataStore {
 					const [success, res] = DataStore.deserializeVariant(r.body);
 					if (!success) return reject("Can't parse response");
 					let result: Variant;
+					FASTLOG3(
+						FLog['DataStore'],
+						`Running transform function, input: ${
+							<number>res['data'].length === 0
+								? undefined
+								: (DataStore.deserializeVariant(res['data'][0]['Value'])[1] as Variant).toString()
+						}`,
+					);
 					try {
 						result = transformFunc(
 							res['data'].length === 0
@@ -141,6 +155,7 @@ export class DataStore {
 						reject(e);
 					}
 					if (result === undefined || (result as Map<string, unknown>).size === 0 || result === null) {
+						FASTLOG4(FLog['DataStore'], 'Transform function returned nil, update is cancelled');
 						return reject('Transform function returned nil, update is cancelled');
 					}
 					// console.log(result);
@@ -170,6 +185,9 @@ export class DataStore {
 					request.owner = this;
 					request.key = key;
 					request.requestType = RequestType.UPDATE_ASYNC;
+					FASTLOG3(FLog['DataStore'], 'SetIf on key: ' + key);
+					FASTLOG2(FLog['DataStore'], newValue);
+					FASTLOG3(FLog['DataStore'], 'Url encoded: ' + request.postData);
 					executeSet(request)
 						.then((r2) => {
 							const [success, res] = DataStore.deserializeVariant(r2.body);
@@ -179,6 +197,19 @@ export class DataStore {
 									"The response didn't contain the data, therefore a shallow fail was performed",
 								);
 							const final = DataStore.deserializeVariant<Variant>(res['data'])[1];
+							if (this._callback) {
+								try {
+									this._callback(
+										key,
+										(DataStore.deserializeVariant(expectedValue)[1] as string).length === 0
+											? undefined
+											: DataStore.deserializeVariant(expectedValue)[1],
+										final,
+									);
+								} catch (err) {}
+							} else {
+								console.log('no callback');
+							}
 							resolve(final as Variant);
 						})
 						.catch((reason) => {
@@ -231,6 +262,7 @@ export class DataStore {
 				resolve: (value: Variant | PromiseLike<Variant | unknown> | unknown) => void,
 				reject: (reason?: any) => void,
 			) => {
+				FASTLOG3(FLog['DataStore'], `GetAsync on key ${key}`);
 				const [success, message] = checkAccess(key);
 				if (!success) return reject(message);
 
@@ -241,9 +273,12 @@ export class DataStore {
 					.then((r) => {
 						const [success, result] = DataStore.deserializeVariant(r.body);
 						if (!success) return reject("Can't parse response");
-						const [success2, deserialized] = DataStore.deserializeVariant(result['data'][0]['Value']);
+
+						const [success2, deserialized] = DataStore.deserializeVariant(
+							result['data'].length === 0 ? '{"d":true}' : result['data'][0]['Value'],
+						);
 						if (!success2) return reject("Can't parse value");
-						return resolve(deserialized);
+						return resolve(deserialized['d'] ? undefined : deserialized);
 					})
 					.catch((reason) => {
 						return reject(reason);
@@ -256,12 +291,14 @@ export class DataStore {
 	 *
 	 * Sets the value of the key.
 	 * This overwrites any existing data stored in the key.
+	 *
 	 * ---
 	 * CRITICAL
 	 * --------
 	 * If the previous value of the key is important,
 	 * use UpdateAsync() instead.
 	 * Using GetAsync() to retrieve a value and then setting the key with SetAsync() is risky because GetAsync() sometimes returns cached data and other game servers may have modified the key.
+	 *
 	 * ---
 	 * NOTICE
 	 * -------
@@ -269,6 +306,7 @@ export class DataStore {
 	 * In UTF-8,
 	 * values greater than 127 are used exclusively for encoding multi-byte codepoints,
 	 * so a single byte greater than 127 will not be valid UTF-8 and the SetAsync() attempt will fail.
+	 *
 	 * ---
 	 * If this function throws an error,
 	 * the error message will describe the problem.
@@ -285,6 +323,7 @@ export class DataStore {
 			(resolve: (value: PromiseLike<void> | void) => void, reject: (reason?: any) => void) => {
 				const [success, message] = checkAccess(key);
 				if (!success) return reject(message);
+				if (value === undefined) return reject("The value can't be nil, null, undefined or void");
 				if (!this.checkValueIsAllowed(value))
 					return reject(
 						`${typeof value} is not allowed in ${
@@ -305,6 +344,9 @@ export class DataStore {
 				request.key = key;
 				request.requestType = RequestType.SET_ASYNC;
 				request.postData = `value=${this.urlEncodeIfNeeded(v.toString())}`.toString();
+				FASTLOG3(FLog['DataStore'], `SetAsync on key: ${key}`);
+				FASTLOG2(FLog['DataStore'], v);
+				FASTLOG3(FLog['DataStore'], 'Url encoded: ' + request.postData);
 				executeSet(request)
 					.then((r) => {
 						const [success, res] = DataStore.deserializeVariant(r.body);
@@ -374,17 +416,20 @@ export class DataStore {
 	 * - If the function returns nil, the update is cancelled.
 	 * The value returned by this function is the new value,
 	 * returned once the altered data is properly saved.
+	 *
 	 * ---
 	 * INFO
 	 * -----
 	 * In cases where another game server updated the key in the short timespan between retrieving the key's current value and setting the key's value,
 	 * UpdateAsync() will call the function again to ensure that no data is overwritten.
 	 * The function will be called as many times as needed until the data is saved.
+	 *
 	 * ---
 	 * CRITICAL
 	 * ---------
 	 * The function you define as the second parameter of UpdateAsync() cannot yield,
 	 * so do not include calls like setTimeout().
+	 *
 	 * ---
 	 * NOTICE
 	 * -------
@@ -392,6 +437,7 @@ export class DataStore {
 	 * In UTF-8,
 	 * values greater than 127 are used exclusively for encoding multi-byte codepoints,
 	 * so a single byte greater than 127 will not be valid UTF-8 and the SetAsync() attempt will fail.
+	 *
 	 * ---
 	 * If this function throws an error,
 	 * the error message will describe the problem.
@@ -411,6 +457,7 @@ export class DataStore {
 			async (resolve: (value: PromiseLike<Variant> | Variant) => void, reject: (reason?: any) => void) => {
 				const [success, message] = checkAccess(key);
 				if (!success) return reject(message);
+				FASTLOG3(FLog['DataStore'], 'Updating key ' + key);
 				const result = await this.runTransformFunction(key, transformFunc);
 				resolve(result);
 			},
@@ -444,12 +491,15 @@ export class DataStore {
 				.then((value) => {
 					const [success, res] = DataStore.deserializeVariant(value.body);
 					if (!success) return reject("Can't parse response");
-					console.log(res);
 					resolve(DataStore.deserializeVariant(res['data'])[1] as Variant);
 				})
 				.catch((e) => {
 					return reject(e);
 				});
 		});
+	}
+	public set OnUpdate(callback: <Variant extends any>(Key: string, OldValue: Variant, NewValue: Variant) => void) {
+		this._callback = callback;
+		if (this._callback !== callback) this._callback = callback;
 	}
 }
