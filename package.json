@@ -1,10 +1,16 @@
 {
 	"name": "@mfd/rbxdatastoreservice",
-	"version": "1.2.1",
-	"description": "RbxDataStoreService is a node module that That allows you to use DataStoreService outside of Roblox. This project was created because people outside ROBLOX always want to use DataStoreService outside ROBLOX.",
+	"version": "1.2.5",
+	"description": "RbxDataStoreService is a module that allows you to access roblox datastores from your Node.js applications.",
 	"main": "lib/index.js",
 	"types": "lib/types",
-	"scripts": {},
+	"scripts": {
+		"eslint": "eslint . --fix --ext .ts",
+		"build": "tsc --skipLibCheck",
+		"postinstall": "echo Thank you for installing RbxDataStoreService! \n\nFor documentation, visit the official ROBLOX DataStore Documentation (https://developer.roblox.com/en-us/api-reference/class/DataStoreService)",
+		"prepare-windows": "npm install && npm run eslint && npm run build",
+		"prepublishOnly": "npm run build"
+	},
 	"keywords": [],
 	"repository": {
 		"type": "git",
