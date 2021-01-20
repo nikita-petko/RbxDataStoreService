@@ -102,8 +102,6 @@ dist
 
 # TernJS port file
 .tern-port
-
-# Stores VSCode versions used for testing VSCode extensions
 .vscode-test
 .vscode/settings.json
 package-lock.json
@@ -113,6 +111,5 @@ lib
 .vscode
 .idea
 requests.http
-/http-client.private.env.json
+http-client.private.env.json
 cpp
-index.ts
