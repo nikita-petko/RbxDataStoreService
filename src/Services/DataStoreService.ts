@@ -21,7 +21,7 @@ export abstract class _DataStoreService {
 		legacy: boolean,
 		ordered: boolean,
 	): DataStore | OrderedDataStore {
-		if (globals.placeId === 0) {
+		if (globals.placeId < 1) {
 			if (DFFlag['GetGlobalDataStorePcallFix']) {
 				throw new Error('Place has to be opened with Edit button to access DataStores');
 			}
