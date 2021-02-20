@@ -7,16 +7,16 @@
 	"scripts": {
 		"eslint": "eslint . --fix --ext .ts",
 		"build": "tsc --skipLibCheck",
-		"postinstall": "echo Thank you for installing RbxDataStoreService! \n\nFor documentation, visit the official ROBLOX DataStore Documentation (https://developer.roblox.com/en-us/api-reference/class/DataStoreService)",
+		"postinstall": "echo \"Thank you for installing RbxDataStoreService! \n\nFor documentation, visit the official ROBLOX DataStore Documentation (https://developer.roblox.com/en-us/api-reference/class/DataStoreService)\"",
 		"prepare-windows": "npm install && npm run eslint && npm run build",
 		"prepublishOnly": "npm run build"
 	},
 	"keywords": [],
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/mfd-co/RbxDataStoreService.git"
+		"url": "https://github.com/mfd-nsg/RbxDataStoreService.git"
 	},
-	"author": "nsg <nsg@mfd.com> (https://github.com/nsg-mfd)",
+	"author": "nsg <nsg@mfd.com> (https://github.com/mfd-nsg)",
 	"contributors": [
 		"Ivan Gregrovnich <ivan_g@mfd.com>",
 		"Aleksej Grasnich <aleksej_g@mfd.com>"
@@ -34,7 +34,18 @@
 		"typescript": "^4.1.2"
 	},
 	"dependencies": {
+		"@microsoft/signalr": "^5.0.3",
+		"events": "^3.2.0",
+		"http": "^0.0.1-security",
+		"https": "^1.0.0",
+		"node-signalr": "^2.0.5",
+		"querystring": "^0.2.1",
 		"request": "^2.88.2",
-		"request-promise": "^4.2.6"
+		"request-promise": "^4.2.6",
+		"signalr-client": "^0.0.20",
+		"sslkeylog": "^0.2.2",
+		"url": "^0.11.0",
+		"util": "^0.12.3",
+		"ws": "^6.2.1"
 	}
 }
