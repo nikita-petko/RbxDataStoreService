@@ -1,3 +1,3 @@
-import { DataStore } from '../Classes/DataStore';
+import { GlobalDataStore } from '../Classes/GlobalDataStore';
 
-export type DataStores = Map<string, DataStore>;
+export type DataStores = Map<string, GlobalDataStore>;

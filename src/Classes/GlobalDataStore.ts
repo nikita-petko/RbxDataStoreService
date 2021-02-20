@@ -16,14 +16,14 @@ LOGGROUP('DataStore');
  * error handling,
  * etc.
  */
-export class DataStore {
+export class GlobalDataStore {
 	constructor(name: string, scope: string /*= 'global'*/, legacy: boolean) {
 		this.isLegacy = legacy;
 		this.name = name;
 		this.scope = scope;
 		this.nameUrlEncodedIfNeeded = this.urlEncodeIfNeeded(name);
 		this.scopeUrlEncodedIfNeeded = this.urlEncodeIfNeeded(scope);
-		this.serviceUrl = BuildGenericPersistenceUrl(DataStore.urlApiPath());
+		this.serviceUrl = BuildGenericPersistenceUrl(GlobalDataStore.urlApiPath());
 	}
 
 	private _callback: <Variant extends any>(Key: string, OldValue: Variant, NewValue: Variant) => void = () => {
@@ -114,6 +114,7 @@ export class DataStore {
 	}
 
 	static deserializeVariant<Variant extends any>(webValue: string): [boolean, Variant | unknown] {
+		if (<unknown>webValue instanceof Object) return [true, webValue];
 		let result = '';
 		if (webValue.length === 0) return [true, result];
 		try {
@@ -134,7 +135,7 @@ export class DataStore {
 				this.createFetchNewKeyRequest(key, request);
 				request.requestType = RequestType.GET_ASYNC;
 				executeGet(request).then((r) => {
-					const [success, res] = DataStore.deserializeVariant(r.body);
+					const [success, res] = GlobalDataStore.deserializeVariant(r.data);
 					if (!success) return reject("Can't parse response");
 					let result: Variant;
 					FASTLOG3(
@@ -142,14 +143,14 @@ export class DataStore {
 						`Running transform function, input: ${
 							<number>res['data'].length === 0
 								? undefined
-								: (DataStore.deserializeVariant(res['data'][0]['Value'])[1] as Variant).toString()
+								: (GlobalDataStore.deserializeVariant(res['data'][0]['Value'])[1] as Variant).toString()
 						}`,
 					);
 					try {
 						result = transformFunc(
 							res['data'].length === 0
 								? undefined
-								: (DataStore.deserializeVariant(res['data'][0]['Value'])[1] as Variant),
+								: (GlobalDataStore.deserializeVariant(res['data'][0]['Value'])[1] as Variant),
 						);
 					} catch (e) {
 						reject(e);
@@ -166,7 +167,7 @@ export class DataStore {
 							}`,
 						);
 
-					const [success2, newValue] = DataStore.serializeVariant(result);
+					const [success2, newValue] = GlobalDataStore.serializeVariant(result);
 					if (!success2)
 						return reject(
 							`${typeof result} is not allowed in ${
@@ -190,25 +191,23 @@ export class DataStore {
 					FASTLOG3(FLog['DataStore'], 'Url encoded: ' + request.postData);
 					executeSet(request)
 						.then((r2) => {
-							const [success, res] = DataStore.deserializeVariant(r2.body);
+							const [success, res] = GlobalDataStore.deserializeVariant(r2.data);
 							if (!success) return reject("Can't parse response");
 							if (!res['data'])
 								return reject(
 									"The response didn't contain the data, therefore a shallow fail was performed",
 								);
-							const final = DataStore.deserializeVariant<Variant>(res['data'])[1];
+							const final = GlobalDataStore.deserializeVariant<Variant>(res['data'])[1];
 							if (this._callback) {
 								try {
 									this._callback(
 										key,
-										(DataStore.deserializeVariant(expectedValue)[1] as string).length === 0
+										(GlobalDataStore.deserializeVariant(expectedValue)[1] as string).length === 0
 											? undefined
-											: DataStore.deserializeVariant(expectedValue)[1],
+											: GlobalDataStore.deserializeVariant(expectedValue)[1],
 										final,
 									);
 								} catch (err) {}
-							} else {
-								console.log('no callback');
 							}
 							resolve(final as Variant);
 						})
@@ -227,7 +226,7 @@ export class DataStore {
 	protected nameUrlEncodedIfNeeded: string;
 
 	protected checkValueIsAllowed<Variant extends any>(v?: Variant): boolean {
-		const [success] = DataStore.serializeVariant(v);
+		const [success] = GlobalDataStore.serializeVariant(v);
 		return success;
 	}
 
@@ -271,10 +270,10 @@ export class DataStore {
 				request.requestType = RequestType.GET_ASYNC;
 				executeGet(request)
 					.then((r) => {
-						const [success, result] = DataStore.deserializeVariant(r.body);
+						const [success, result] = GlobalDataStore.deserializeVariant(r.data);
 						if (!success) return reject("Can't parse response");
 
-						const [success2, deserialized] = DataStore.deserializeVariant(
+						const [success2, deserialized] = GlobalDataStore.deserializeVariant(
 							result['data'].length === 0 ? '{"d":true}' : result['data'][0]['Value'],
 						);
 						if (!success2) return reject("Can't parse value");
@@ -330,7 +329,7 @@ export class DataStore {
 							this.getDataStoreTypeString() === 'standard' ? 'DataStore' : 'OrderedDataStore'
 						}`,
 					);
-				const [success2, v] = DataStore.serializeVariant(value);
+				const [success2, v] = GlobalDataStore.serializeVariant(value);
 				if (!success2)
 					return reject(
 						`${typeof value} is not allowed in ${
@@ -349,12 +348,13 @@ export class DataStore {
 				FASTLOG3(FLog['DataStore'], 'Url encoded: ' + request.postData);
 				executeSet(request)
 					.then((r) => {
-						const [success, res] = DataStore.deserializeVariant(r.body);
+						const [success, res] = GlobalDataStore.deserializeVariant(r.data);
 						if (!success) return reject("Can't parse response");
 						if (!res['data'])
 							return reject(
 								"The response didn't contain the data, therefore a shallow fail was performed",
 							);
+
 						resolve();
 					})
 					.catch((reason) => {
@@ -391,7 +391,7 @@ export class DataStore {
 				request.requestType = RequestType.INCREMENT_ASYNC;
 				executeSet(request)
 					.then((r) => {
-						const [success, res] = DataStore.deserializeVariant(r.body);
+						const [success, res] = GlobalDataStore.deserializeVariant(r.data);
 						if (!success) return reject("Can't parse response");
 						if (!res['data'])
 							return reject('Unable to increment key as it may be anything other than a number');
@@ -489,16 +489,33 @@ export class DataStore {
 			request.requestType = RequestType.SET_ASYNC;
 			executeSet(request)
 				.then((value) => {
-					const [success, res] = DataStore.deserializeVariant(value.body);
+					const [success, res] = GlobalDataStore.deserializeVariant(value.data);
 					if (!success) return reject("Can't parse response");
-					resolve(DataStore.deserializeVariant(res['data'])[1] as Variant);
+					resolve(GlobalDataStore.deserializeVariant(res['data'])[1] as Variant);
 				})
 				.catch((e) => {
 					return reject(e);
 				});
 		});
 	}
-	public set OnUpdate(callback: <Variant extends any>(Key: string, OldValue: Variant, NewValue: Variant) => void) {
+
+	/**
+	 * nsg - My version of this has a change,
+	 * where it subscribes to all keys and not just one.
+	 *
+	 * This function sets callback as the function to be run any time the value associated with the data store's key changes.
+	 * Once every minute,
+	 * OnUpdate polls for changes by other servers.
+	 * Changes made on the same server will run the function immediately.
+	 * In other words,
+	 * functions like IncrementAsync(),
+	 * SetAsync(),
+	 * and UpdateAsync() change the key’s value in the data store and will cause the function to run.
+	 * See the Data Stores article for an in-depth guide on data structure, management, error handling, etc.
+	 * @param callback The function to be executed any time the value associated with key is changed.
+	 * @deprecated This function has been deprecated and should not be used in new work.
+	 */
+	public OnUpdate(callback: <Variant extends any>(Key: string, OldValue: Variant, NewValue: Variant) => void): void {
 		this._callback = callback;
 		if (this._callback !== callback) this._callback = callback;
 	}

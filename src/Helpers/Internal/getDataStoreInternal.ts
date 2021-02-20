@@ -1,14 +1,19 @@
-import { DataStore } from '../../Classes/DataStore';
+import { GlobalDataStore } from '../../Classes/GlobalDataStore';
 import { globals } from '../../util/globals';
 import { DFFlag } from '../../util/constants';
 import { OrderedDataStore } from '../../Classes/OrderedDataStore';
 import { DataStores } from '../../util/customTypes';
 
-let legacyDataStore: DataStore;
-const dataStores: DataStores = new Map<string, DataStore>();
-const orderedDataStores: DataStores = new Map<string, DataStore>();
+let legacyDataStore: GlobalDataStore;
+const dataStores: DataStores = new Map<string, GlobalDataStore>();
+const orderedDataStores: DataStores = new Map<string, GlobalDataStore>();
 
-export const getDataStoreInternal = (name: string, scope: string, legacy: boolean, ordered: boolean): DataStore => {
+export const getDataStoreInternal = (
+	name: string,
+	scope: string,
+	legacy: boolean,
+	ordered: boolean,
+): GlobalDataStore => {
 	if (globals.placeId === 0) {
 		if (DFFlag['GetGlobalDataStorePcallFix']) {
 			throw new Error('Place has to be opened with Edit button to access DataStores');
@@ -18,7 +23,7 @@ export const getDataStoreInternal = (name: string, scope: string, legacy: boolea
 	}
 	if (legacy) {
 		if (!legacyDataStore) {
-			legacyDataStore = new DataStore(name, scope, true);
+			legacyDataStore = new GlobalDataStore(name, scope, true);
 		}
 		return legacyDataStore;
 	} else if (ordered) {
@@ -34,7 +39,7 @@ export const getDataStoreInternal = (name: string, scope: string, legacy: boolea
 		const key = `${name}-${scope}`;
 		const it = dataStores.has(key);
 		if (it === false) {
-			const ds = new DataStore(name, scope, false);
+			const ds = new GlobalDataStore(name, scope, false);
 			dataStores[key] = ds;
 			return ds;
 		}

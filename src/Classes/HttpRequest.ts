@@ -1,6 +1,6 @@
-import { Response } from 'request';
-import r from 'request-promise';
-import { DataStore } from './DataStore';
+import Http from 'axios';
+import { AxiosResponse } from 'axios';
+import { GlobalDataStore } from './GlobalDataStore';
 import { RequestType } from '../util/constants';
 import { globals } from '../util/globals';
 import { _DataStoreService } from '../Services/DataStoreService';
@@ -9,9 +9,9 @@ export class HttpRequest {
 	public key: string;
 	public url: string;
 	public postData: string;
-	public owner: DataStore;
+	public owner: GlobalDataStore;
 
-	public async execute(_dataStoreService: _DataStoreService): Promise<Response> {
+	public async execute(_dataStoreService: _DataStoreService): Promise<AxiosResponse<any>> {
 		return new Promise((resolve, reject) => {
 			const http = {
 				headers: {
@@ -24,8 +24,8 @@ export class HttpRequest {
 				method: 'POST',
 				body: this.postData === undefined || this.postData.length === 0 ? ' ' : this.postData,
 			};
-			r.post(this.url, http)
-				.then((res: Response) => {
+			Http.post(this.url, http)
+				.then((res) => {
 					resolve(res);
 				})
 				.catch((e) => {

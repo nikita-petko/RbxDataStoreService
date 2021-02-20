@@ -35,7 +35,7 @@ export class DataStorePages extends Pages {
 			request.requestType = RequestType.GET_SORTED_ASYNC_PAGE;
 			request.owner = ods;
 			_DataStoreService.executeGetSorted(request).then((r) => {
-				const [success, result] = OrderedDataStore.deserializeVariant(r.body);
+				const [success, result] = OrderedDataStore.deserializeVariant(r.data);
 				if (!success) return reject("Can't parse response");
 				const deserialized = result['data']['Entries'].length !== 0 ? result['data']['Entries'] : '[]';
 				const newValue: { Value: number; Key: string }[] = [];

@@ -1,6 +1,6 @@
 import { HttpRequest } from '../../Classes/HttpRequest';
-import { Response } from 'request';
+import { AxiosResponse } from 'axios';
 
-export const executeRequest = async (request: HttpRequest): Promise<Response> => {
+export const executeRequest = async (request: HttpRequest): Promise<AxiosResponse<any>> => {
 	return await request.execute(this);
 };

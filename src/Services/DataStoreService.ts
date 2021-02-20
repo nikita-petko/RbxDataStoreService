@@ -1,26 +1,26 @@
 // NOTICE Tag internal members as @internal or pull them out.
 
 import { DataStores } from '../util/customTypes';
-import { DataStore } from '../Classes/DataStore';
+import { GlobalDataStore } from '../Classes/GlobalDataStore';
 import { globals } from '../util/globals';
 import { DFFlag } from '../util/constants';
 import { OrderedDataStore } from '../Classes/OrderedDataStore';
 import { HttpRequest } from '../Classes/HttpRequest';
-import { Response } from 'request';
 import { checkNameAndScope } from '../Helpers/Internal/checkNameAndScope';
+import { AxiosResponse } from 'axios';
 
 // TODO: Convert this to a namespace?
 
 export abstract class _DataStoreService {
-	private static readonly dataStores: DataStores = new Map<string, DataStore>();
-	private static readonly orderedDataStores: DataStores = new Map<string, DataStore>();
+	private static readonly dataStores: DataStores = new Map<string, GlobalDataStore>();
+	private static readonly orderedDataStores: DataStores = new Map<string, GlobalDataStore>();
 
 	private static getDataStoreInternal(
 		name: string,
 		scope: string,
 		legacy: boolean,
 		ordered: boolean,
-	): DataStore | OrderedDataStore {
+	): GlobalDataStore | OrderedDataStore {
 		if (globals.placeId < 1) {
 			if (DFFlag['GetGlobalDataStorePcallFix']) {
 				throw new Error('Place has to be opened with Edit button to access DataStores');
@@ -30,7 +30,7 @@ export abstract class _DataStoreService {
 		}
 		if (legacy) {
 			if (!this.legacyDataStore) {
-				this.legacyDataStore = new DataStore(name, scope, true);
+				this.legacyDataStore = new GlobalDataStore(name, scope, true);
 			}
 			return this.legacyDataStore;
 		} else if (ordered) {
@@ -46,7 +46,7 @@ export abstract class _DataStoreService {
 			const key = `${name}-${scope}`;
 			const it = this.dataStores.has(key);
 			if (it === false) {
-				const ds = new DataStore(name, scope, false);
+				const ds = new GlobalDataStore(name, scope, false);
 				this.dataStores[key] = ds;
 				return ds;
 			}
@@ -61,26 +61,26 @@ export abstract class _DataStoreService {
 	// private static msBatchAverageRequestTime: UnsignedIntegerCountAverage;
 	// private static readSuccessCachedCount: number;
 
-	private static legacyDataStore: DataStore;
+	private static legacyDataStore: GlobalDataStore;
 	private static disableUrlEncoding: boolean = false;
 
-	private static async executeRequest(request: HttpRequest): Promise<Response> {
+	private static async executeRequest(request: HttpRequest): Promise<AxiosResponse<any>> {
 		return await request.execute(this);
 	}
 
-	public static async executeGet(request: HttpRequest): Promise<Response> {
+	public static async executeGet(request: HttpRequest): Promise<AxiosResponse<any>> {
 		return await this.executeRequest(request);
 	}
 
-	public static async executeGetSorted(request: HttpRequest): Promise<Response> {
+	public static async executeGetSorted(request: HttpRequest): Promise<AxiosResponse<any>> {
 		return await this.executeRequest(request);
 	}
 
-	public static async executeSet(request: HttpRequest): Promise<Response> {
+	public static async executeSet(request: HttpRequest): Promise<AxiosResponse<any>> {
 		return await this.executeRequest(request);
 	}
 
-	public static async executeOrderedSet(request: HttpRequest): Promise<Response> {
+	public static async executeOrderedSet(request: HttpRequest): Promise<AxiosResponse<any>> {
 		return await this.executeRequest(request);
 	}
 
@@ -92,7 +92,7 @@ export abstract class _DataStoreService {
 	 * If you want to access a specific named data store instead,
 	 * you should use the GetDataStore() function.
 	 */
-	public static GetGlobalDataStore(): DataStore {
+	public static GetGlobalDataStore(): GlobalDataStore {
 		return this.getDataStoreInternal('', 'u', true, false);
 	}
 
@@ -103,7 +103,7 @@ export abstract class _DataStoreService {
 	 * @param name The name of the DataStore you wish to get.
 	 * @param scope The scope of the DataStore you wish to get, global by default
 	 */
-	public static GetDataStore(name: string, scope: string = 'global'): DataStore {
+	public static GetDataStore(name: string, scope: string = 'global'): GlobalDataStore {
 		checkNameAndScope(name, scope);
 		return this.getDataStoreInternal(name, scope, false, false);
 	}

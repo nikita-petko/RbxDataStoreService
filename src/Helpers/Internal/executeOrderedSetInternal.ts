@@ -1,7 +1,7 @@
 import { HttpRequest } from '../../Classes/HttpRequest';
-import { Response } from 'request';
+import { AxiosResponse } from 'axios';
 import { executeRequest } from './executeRequestInternal';
 
-export const executeOrderedSet = async (request: HttpRequest): Promise<Response> => {
+export const executeOrderedSet = async (request: HttpRequest): Promise<AxiosResponse<any>> => {
 	return await executeRequest(request);
 };

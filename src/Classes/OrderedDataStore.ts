@@ -1,4 +1,4 @@
-import { DataStore } from './DataStore';
+import { GlobalDataStore } from './GlobalDataStore';
 import { DataStorePages } from './DataStorePages';
 import { globals } from '../util/globals';
 import { DFInt } from '../util/constants';
@@ -8,7 +8,7 @@ import { DFInt } from '../util/constants';
  * It exposes a method GetSortedAsync() which allows inspection of the entries in sorted order using a DataStorePages object.
  * See the Data Stores article for an overview on using ordered data stores.
  */
-export class OrderedDataStore extends DataStore {
+export class OrderedDataStore extends GlobalDataStore {
 	constructor(name: string, scope: string) {
 		super(name, scope, false);
 	}

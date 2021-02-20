@@ -1,15 +1,13 @@
 {
 	"name": "@mfd/rbxdatastoreservice",
-	"version": "1.2.6",
+	"version": "1.2.7",
 	"description": "RbxDataStoreService is a module that allows you to access roblox datastores from your Node.js applications.",
 	"main": "lib/index.js",
 	"types": "lib/types",
 	"scripts": {
-		"eslint": "eslint . --fix --ext .ts",
 		"build": "tsc --skipLibCheck",
-		"postinstall": "echo \"Thank you for installing RbxDataStoreService! \n\nFor documentation, visit the official ROBLOX DataStore Documentation (https://developer.roblox.com/en-us/api-reference/class/DataStoreService)\"",
-		"prepare-windows": "npm install && npm run eslint && npm run build",
-		"prepublishOnly": "npm run build"
+		"prepare-windows": "npm install && npm run build",
+		"prepublishOnly": "npm run prepare-windows"
 	},
 	"keywords": [],
 	"repository": {
@@ -23,29 +21,17 @@
 	],
 	"license": "Apache-2.0",
 	"devDependencies": {
-		"@types/request": "^2.48.5",
-		"@types/request-promise": "^4.1.46",
+		"@types/node": "^14.14.31",
 		"@typescript-eslint/eslint-plugin": "^4.8.1",
 		"@typescript-eslint/parser": "^4.8.1",
 		"eslint": "^7.14.0",
 		"eslint-config-prettier": "^7.1.0",
 		"eslint-plugin-prettier": "^3.1.4",
 		"prettier": "^2.2.0",
+		"sslkeylog": "^0.2.2",
 		"typescript": "^4.1.2"
 	},
 	"dependencies": {
-		"@microsoft/signalr": "^5.0.3",
-		"events": "^3.2.0",
-		"http": "^0.0.1-security",
-		"https": "^1.0.0",
-		"node-signalr": "^2.0.5",
-		"querystring": "^0.2.1",
-		"request": "^2.88.2",
-		"request-promise": "^4.2.6",
-		"signalr-client": "^0.0.20",
-		"sslkeylog": "^0.2.2",
-		"url": "^0.11.0",
-		"util": "^0.12.3",
-		"ws": "^6.2.1"
+		"axios": "^0.21.1"
 	}
 }
