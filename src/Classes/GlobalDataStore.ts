@@ -6,6 +6,11 @@ import { BuildGenericPersistenceUrl } from '../Helpers/Internal/BuildGenericPers
 import { executeGet } from '../Helpers/Internal/executeGetInternal';
 import { executeSet } from '../Helpers/Internal/executeSetInternal';
 import { FASTLOG2, FASTLOG3, FASTLOG4, FLog, LOGGROUP } from '../util/FastLog';
+import { DataStoreSetOptions } from './DataStoreSetOptions';
+import { DataStoreIncrementOptions } from './DataStoreIncrementOptions';
+import { RBXScriptConnection } from './RBXScriptConnection';
+
+import events from 'events';
 
 LOGGROUP('DataStore');
 
@@ -26,9 +31,11 @@ export class GlobalDataStore {
 		this.serviceUrl = BuildGenericPersistenceUrl(GlobalDataStore.urlApiPath());
 	}
 
-	private _callback: <Variant extends any>(Key: string, OldValue: Variant, NewValue: Variant) => void = () => {
-		return;
-	};
+	private callbacks: Map<string, <Variant extends any>(newValue: Variant) => Variant> = new Map<
+		string,
+		<Variant extends any>(newValue: Variant) => Variant
+	>();
+	private CachedKeys: Map<string, any> = new Map<string, any>();
 	private readonly isLegacy: boolean = false;
 
 	private constructPostDataForKey(key: string, index: number = 0): string {
@@ -198,16 +205,8 @@ export class GlobalDataStore {
 									"The response didn't contain the data, therefore a shallow fail was performed",
 								);
 							const final = GlobalDataStore.deserializeVariant<Variant>(res['data'])[1];
-							if (this._callback) {
-								try {
-									this._callback(
-										key,
-										(GlobalDataStore.deserializeVariant(expectedValue)[1] as string).length === 0
-											? undefined
-											: GlobalDataStore.deserializeVariant(expectedValue)[1],
-										final,
-									);
-								} catch (err) {}
+							if (this.callbacks.has(key)) {
+								this.callbacks.get(key)(final);
 							}
 							resolve(final as Variant);
 						})
@@ -277,6 +276,7 @@ export class GlobalDataStore {
 							result['data'].length === 0 ? '{"d":true}' : result['data'][0]['Value'],
 						);
 						if (!success2) return reject("Can't parse value");
+						this.CachedKeys.set(key, deserialized['d'] ? undefined : deserialized);
 						return resolve(deserialized['d'] ? undefined : deserialized);
 					})
 					.catch((reason) => {
@@ -317,7 +317,12 @@ export class GlobalDataStore {
 	 * @param value The value of the entry in the data store with the given key.
 	 * @yields This is a yielding function. When called, it will pause the JavaScript thread that called the function until a result is ready to be returned, without interrupting other scripts.
 	 */
-	public async SetAsync<Variant extends any>(key: string, value: Variant): Promise<void> {
+	public async SetAsync<Variant extends any>(
+		key: string,
+		value: Variant,
+		userIds: Array<number> = [],
+		options: DataStoreSetOptions = undefined,
+	): Promise<void> {
 		return new Promise<void>(
 			(resolve: (value: PromiseLike<void> | void) => void, reject: (reason?: any) => void) => {
 				const [success, message] = checkAccess(key);
@@ -354,7 +359,9 @@ export class GlobalDataStore {
 							return reject(
 								"The response didn't contain the data, therefore a shallow fail was performed",
 							);
-
+						if (this.callbacks.has(key)) {
+							this.callbacks.get(key)(value);
+						}
 						resolve();
 					})
 					.catch((reason) => {
@@ -379,7 +386,12 @@ export class GlobalDataStore {
 	 * @param delta The increment amount.
 	 * @yields This is a yielding function. When called, it will pause the JavaScript thread that called the function until a result is ready to be returned, without interrupting other scripts.
 	 */
-	public async IncrementAsync(key: string, delta: number = 1): Promise<number> {
+	public async IncrementAsync(
+		key: string,
+		delta: number = 1,
+		userIds: Array<number> = [],
+		options: DataStoreIncrementOptions = undefined,
+	): Promise<number> {
 		return new Promise<number>(
 			(resolve: (value: PromiseLike<number> | number) => void, reject: (reason?: any) => void) => {
 				const [success, message] = checkAccess(key);
@@ -395,6 +407,9 @@ export class GlobalDataStore {
 						if (!success) return reject("Can't parse response");
 						if (!res['data'])
 							return reject('Unable to increment key as it may be anything other than a number');
+						if (this.callbacks.has(key)) {
+							this.callbacks.get(key)(parseFloat(res['data']) || 0);
+						}
 						resolve(parseFloat(res['data']) || 0);
 					})
 					.catch((reason) => {
@@ -500,10 +515,7 @@ export class GlobalDataStore {
 	}
 
 	/**
-	 * nsg - My version of this has a change,
-	 * where it subscribes to all keys and not just one.
-	 *
-	 * This function sets callback as the function to be run any time the value associated with the data store's key changes.
+	 * This function sets **callback** as the function to be run any time the value associated with the data store's key changes.
 	 * Once every minute,
 	 * OnUpdate polls for changes by other servers.
 	 * Changes made on the same server will run the function immediately.
@@ -511,12 +523,25 @@ export class GlobalDataStore {
 	 * functions like IncrementAsync(),
 	 * SetAsync(),
 	 * and UpdateAsync() change the key’s value in the data store and will cause the function to run.
-	 * See the Data Stores article for an in-depth guide on data structure, management, error handling, etc.
-	 * @param callback The function to be executed any time the value associated with key is changed.
-	 * @deprecated This function has been deprecated and should not be used in new work.
+	 * See the Data Stores article for an in-depth guide on data structure,
+	 * management,
+	 * error handling, etc.
+	 * @param key The key identifying the entry being retrieved from the data store
+	 * @param callback The function to be executed any time the value associated with **key** is changed
+	 * @returns {RBXScriptConnection} The connection to the key being tracked for updates
+	 * @deprecated This function has been deprecated and should not be used in new work. You can use the {@link https://www.npmjs.com/package/@mfd/rbxmessagingservice|Cross Server Messaging Service} to publish and subscribe to topics to receive near real-time updates, completely replacing the need for this function.
 	 */
-	public OnUpdate(callback: <Variant extends any>(Key: string, OldValue: Variant, NewValue: Variant) => void): void {
-		this._callback = callback;
-		if (this._callback !== callback) this._callback = callback;
+	public OnUpdate(key: string, callback: <Variant extends any>(newValue: Variant) => any): RBXScriptConnection {
+		this.callbacks.set(key, callback);
+		// const interval = setInterval(async () => {
+		// 	const v = await this.GetAsync(key);
+		// 	if (v !== this.CachedKeys.get(key)) callback(await this.GetAsync(key));
+		// }, 60000);
+		const event = new events.EventEmitter();
+		event.on('close', () => {
+			this.callbacks.delete(key);
+			// interval.unref();
+		});
+		return new RBXScriptConnection(event);
 	}
 }
