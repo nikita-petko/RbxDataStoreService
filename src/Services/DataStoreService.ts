@@ -115,10 +115,34 @@ export abstract class _DataStoreService {
 	 * Subsequent calls to this method with the same name/scope will return the same object.
 	 * @param name The name of the OrderedDataStore you wish to get.
 	 * @param scope The scope of the OrderedDataStore you wish to get, global by default
+
 	 */
 	public static GetOrderedDataStore(name: string, scope: string = 'global'): OrderedDataStore {
 		checkNameAndScope(name, scope);
 		return this.getDataStoreInternal(name, scope, false, true) as OrderedDataStore;
+	}
+
+	/**
+	 * This is a funny method that existed for a while and then was purged. Don't use it, all it does is allow you to fetch a key from an empty scope.
+	 * @param name
+	 * @param key The key identifying the entry being retrieved from the data store.
+	 * @yields This is a yielding function. When called, it will pause the JavaScript thread that called the function until a result is ready to be returned, without interrupting other scripts.
+	 * @deprecated This function has been deprecated and should not be used in new work.
+	 */
+	public static async GetDataFromEmptyScopeDataStoreAsyncTemporary<Variant extends any>(
+		name: string,
+		key: string,
+	): Promise<Variant> {
+		return new Promise<Variant>(async (resumeFunction, errorFunction) => {
+			try {
+				checkNameAndScope(name, 't');
+				const store = this.getDataStoreInternal(name, '', false, false);
+				const value = await store.GetAsync(key);
+				resumeFunction(<Variant>value);
+			} catch (e) {
+				errorFunction(e.message);
+			}
+		});
 	}
 
 	/**
