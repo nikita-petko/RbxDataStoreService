@@ -1,4 +1,4 @@
-import Http from 'axios';
+import Http, { AxiosRequestConfig } from 'axios';
 import { AxiosResponse } from 'axios';
 import { GlobalDataStore } from './GlobalDataStore';
 import { RequestType } from '../util/constants';
@@ -20,11 +20,12 @@ export class HttpRequest {
 					'Content-Type': 'application/x-www-form-urlencoded',
 					'Roblox-Place-Id': globals.placeId.toString(),
 				},
-				resolveWithFullResponse: true,
-				method: 'POST',
-				body: this.postData === undefined || this.postData.length === 0 ? ' ' : this.postData,
 			};
-			Http.post(this.url, http)
+			Http.post(
+				this.url,
+				this.postData === undefined || this.postData.length === 0 ? ' ' : this.postData,
+				<AxiosRequestConfig>http,
+			)
 				.then((res) => {
 					resolve(res);
 				})
