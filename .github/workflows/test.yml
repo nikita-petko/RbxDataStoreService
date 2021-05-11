@@ -6,6 +6,7 @@ on:
 
 jobs:
     build:
+        needs: Build
         runs-on: windows-latest
         steps:
             - uses: actions/checkout@v2
@@ -14,7 +15,6 @@ jobs:
                   node-version: 12
             - run: npm i --save-dev @types/node
             - run: npm i sslkeylog
-            - run: npm i typescript -g
             - run: npm run prepare-windows
             - run: del settings.json
-            - run: node lib/tests.js ${{ secrets.TOKEN }} ${{ secrets.PLACEID }}
+            - run: node lib/tests.js "${{ secrets.TOKEN }}" "${{ secrets.PLACEID }}"
