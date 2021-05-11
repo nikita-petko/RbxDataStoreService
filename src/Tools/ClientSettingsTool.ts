@@ -81,7 +81,7 @@ export class ClientSettings {
 				}
 			}
 		} catch {
-			return {};
+			return null;
 		}
 	}
 	public static GetFVariables(ctx: string = 'Client') {
