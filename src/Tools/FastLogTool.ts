@@ -35,6 +35,8 @@ export const DFLog = function (name: string): number {
 		new Map<string, number>(Object.entries(df)).forEach((value, key) => {
 			cache.DFLog[key] = value;
 		});
+	} else {
+		return cache[name] || 0;
 	}
 	return df[name] || cache.DFLog[name] || 0;
 };
@@ -64,6 +66,8 @@ export const DFFlag = function (name: string): boolean {
 		new Map<string, boolean>(Object.entries(df)).forEach((value, key) => {
 			cache.DFFlag[key] = value;
 		});
+	} else {
+		return cache[name] || false;
 	}
 	return df[name] || cache.DFFlag[name] || false;
 };
@@ -93,6 +97,8 @@ export const DFInt = function (name: string): number {
 		new Map<string, number>(Object.entries(df)).forEach((value, key) => {
 			cache.DFInt[key] = value;
 		});
+	} else {
+		return cache[name] || 0;
 	}
 	return df[name] || cache.DFInt[name] || 0;
 };
@@ -122,8 +128,10 @@ export const DFString = function (name: string): string {
 		new Map<string, string>(Object.entries(df)).forEach((value, key) => {
 			cache.DFString[key] = value;
 		});
+	} else {
+		return cache[name] || null;
 	}
-	return df[name] || cache.DFString[name] || '';
+	return df[name] || cache.DFString[name] || null;
 };
 
 /**
