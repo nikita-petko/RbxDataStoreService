@@ -106,7 +106,6 @@ dist
 .vscode/settings.json
 package-lock.json
 .npmignore
-tests.ts
 lib
 .vscode
 .idea

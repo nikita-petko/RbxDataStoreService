@@ -125,7 +125,7 @@ export abstract class DataStoreService {
 			if (it === false) {
 				FASTLOGS(FLog['DataStore'], '[FLog::DataStore] Creating data store, name: %s', name);
 				let ds: DataStore;
-				if (useNewApi) {
+				if (!useNewApi) {
 					ds = new DataStore(name, scope, false);
 				} else {
 					ds = new DataStore2(name, scope, false);

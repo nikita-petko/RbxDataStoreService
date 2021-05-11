@@ -22,7 +22,7 @@ export class HttpRequest {
 		return new Promise((resumeFunction, errorFunction) => {
 			const http = <AxiosRequestConfig>{
 				headers: {
-					...Globals.GlobalHeaders,
+					...Globals.GlobalHeaders(),
 					...this.additionalHeaders,
 				},
 				transformResponse: (resp, headers) => {

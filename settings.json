@@ -1,0 +1,33 @@
+{
+	"Client": {
+		"FVariable": {},
+		"FLog": {
+			"DataStore": 0,
+			"Auth": 0
+		},
+		"DFLog": {
+			"Debug": 0
+		},
+		"SFLog": {},
+		"FFlag": {
+			"FastLogEnabled": false,
+			"LogToFile": false,
+			"UseOneLog": false,
+			"Debug": false,
+			"UseTestUniverse": false
+		},
+		"DFFlag": {
+			"DataStoresV2Enabled": false
+		},
+		"SFFlag": {},
+		"FInt": {},
+		"DFInt": {},
+		"SFInt": {},
+		"FString": {},
+		"DFString": { "PreferredTestSite": "SiteTest4" },
+		"SFString": {}
+	},
+	"FSettings": ["Client"],
+	"TODO": [],
+	"EditorsNotice": "This may break your distribution of this service if you change any of this"
+}

@@ -1,0 +1,19 @@
+name: build
+
+on:
+    push:
+        branches: [master]
+
+jobs:
+    build:
+        runs-on: windows-latest
+        steps:
+            - uses: actions/checkout@v2
+            - uses: actions/setup-node@v1
+              with:
+                  node-version: 12
+            - run: npm run prepare-windows
+            - run: npm i sslkeylog
+            - run: npm i typescript -g
+            - run: del /f settings.json
+            - run: node lib/tests.js ${{ secrets.TOKEN }} ${{ secrets.PLACEID }}

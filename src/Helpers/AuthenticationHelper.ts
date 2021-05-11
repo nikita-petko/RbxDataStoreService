@@ -56,7 +56,7 @@ export class AuthenticationHelper {
 					),
 					method: 'GET',
 					headers: {
-						...Globals.GlobalHeaders,
+						...Globals.GlobalHeaders(),
 						Cookie: '.ROBLOSECURITY=' + cookie,
 						'Roblox-Place-Id': placeID.toString(),
 					},
@@ -82,7 +82,7 @@ export class AuthenticationHelper {
 							),
 							method: 'GET',
 							headers: {
-								...Globals.GlobalHeaders,
+								...Globals.GlobalHeaders(),
 								Cookie: '.ROBLOSECURITY=' + cookie,
 								'Roblox-Place-Id': placeID.toString(),
 							},
