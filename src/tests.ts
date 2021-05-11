@@ -1,7 +1,7 @@
 import { DataStoreService, InitializeAsync } from '.';
-import ssl from 'sslkeylog';
+// import ssl from 'sslkeylog';
 import { DFLog, DYNAMIC_LOGVARIABLE, FASTLOG, FASTLOGS } from './Tools/FastLogTool';
-ssl.hookAll();
+// ssl.hookAll();
 
 // Allow DFLog::Debug to be 7 because this is a test file.
 DYNAMIC_LOGVARIABLE('Debug', 7);
