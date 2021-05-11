@@ -16,5 +16,5 @@ jobs:
             - run: npm i sslkeylog
             - run: npm i typescript -g
             - run: npm run prepare-windows
-            - run: del settings.json /f
+            - run: del settings.json
             - run: node lib/tests.js ${{ secrets.TOKEN }} ${{ secrets.PLACEID }}
