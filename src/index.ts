@@ -1,2 +1,5 @@
-export { init as InitializeAsync } from './Helpers/InitAuthenticatedUser';
-export { _DataStoreService as DataStoreService } from './Services/DataStoreService';
+import { AuthenticationHelper } from './Helpers/AuthenticationHelper';
+
+export { DataStoreService } from './Classes/Services/DataStoreService';
+
+export const InitializeAsync = AuthenticationHelper.InitAuthenticatedUser;

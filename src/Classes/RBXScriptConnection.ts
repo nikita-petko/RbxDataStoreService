@@ -1,5 +1,11 @@
 export class RBXScriptConnection {
+	/**
+	 * @internal
+	 */
 	private evt: any = null;
+	/**
+	 * @internal
+	 */
 	private connectionStillAlive = false;
 	public constructor(evt: any) {
 		this.evt = evt;

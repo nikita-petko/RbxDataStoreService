@@ -1,18 +1,19 @@
 import { HttpRequest } from './HttpRequest';
-import { checkAccess } from '../Helpers/Internal/checkAccess';
-import { DFInt, RequestType } from '../util/constants';
-import { globals } from '../util/globals';
-import { BuildGenericPersistenceUrl } from '../Helpers/Internal/BuildGenericPersistenceUrl';
-import { executeGet } from '../Helpers/Internal/executeGetInternal';
-import { executeSet } from '../Helpers/Internal/executeSetInternal';
-import { FASTLOG2, FASTLOG3, FASTLOG4, FLog, LOGGROUP } from '../util/FastLog';
+import { Globals } from '../Util/Globals';
+import { DFInt, DYNAMIC_FASTINTVARIABLE, FASTLOG, FASTLOG1, FASTLOGS, FLog, LOGVARIABLE } from '../Tools/FastLogTool';
 import { DataStoreSetOptions } from './DataStoreSetOptions';
 import { DataStoreIncrementOptions } from './DataStoreIncrementOptions';
 import { RBXScriptConnection } from './RBXScriptConnection';
 
 import events from 'events';
+import { ExectionHelper } from '../Helpers/ExecutionHelper';
+import { InputHelper } from '../Helpers/InputHelper';
+import { ApiDataStoresUrlConstruction } from '../Constructors/ApiDataStoresUrlConstruction';
+import { RequestType } from './Services/DataStoreService';
 
-LOGGROUP('DataStore');
+LOGVARIABLE('DataStore', 0);
+
+DYNAMIC_FASTINTVARIABLE('DataStoreMaxValueSize', 64 * 1024);
 
 /**
  * A GlobalDataStore exposes functions for saving and loading data for the DataStoreService.
@@ -21,23 +22,38 @@ LOGGROUP('DataStore');
  * error handling,
  * etc.
  */
-export class GlobalDataStore {
+export class DataStore {
 	constructor(name: string, scope: string /*= 'global'*/, legacy: boolean) {
 		this.isLegacy = legacy;
 		this.name = name;
 		this.scope = scope;
 		this.nameUrlEncodedIfNeeded = this.urlEncodeIfNeeded(name);
 		this.scopeUrlEncodedIfNeeded = this.urlEncodeIfNeeded(scope);
-		this.serviceUrl = BuildGenericPersistenceUrl(GlobalDataStore.urlApiPath());
+		this.serviceUrl = ApiDataStoresUrlConstruction.BuildGenericPersistenceUrl(this.urlApiPath());
+		FASTLOGS(FLog['DataStore'], '[FLog::DataStore] Initialized Data Store, url: %s', this.serviceUrl);
 	}
 
-	private callbacks: Map<string, <Variant extends any>(newValue: Variant) => Variant> = new Map<
+	/**
+	 * @internal
+	 */
+	protected callbacks: Map<string, <Variant extends any>(newValue: Variant) => Variant> = new Map<
 		string,
 		<Variant extends any>(newValue: Variant) => Variant
 	>();
-	private CachedKeys: Map<string, any> = new Map<string, any>();
+
+	/**
+	 * @internal
+	 */
+	protected CachedKeys: Map<string, any> = new Map<string, any>();
+
+	/**
+	 * @internal
+	 */
 	private readonly isLegacy: boolean = false;
 
+	/**
+	 * @internal
+	 */
 	private constructPostDataForKey(key: string, index: number = 0): string {
 		return this.isLegacy
 			? `&qkeys[${index}].scope=${this.scopeUrlEncodedIfNeeded.toString()}&qkeys[${index}].target=&qkeys[${index}].key=${this.urlEncodeIfNeeded(
@@ -48,15 +64,21 @@ export class GlobalDataStore {
 			  ).toString()}&qkeys[${index}].key=${this.nameUrlEncodedIfNeeded.toString()}`;
 	}
 
+	/**
+	 * @internal
+	 */
 	private constructGetUrl(): string {
-		const placeId = globals.placeId;
+		const placeId = Globals.PlaceID;
 		return `${
 			this.serviceUrl
 		}getV2?placeId=${placeId}&type=${this.getDataStoreTypeString()}&scope=${this.scopeUrlEncodedIfNeeded.toString()}`;
 	}
 
+	/**
+	 * @internal
+	 */
 	private constructSetUrl(key: string, valueLength: number): string {
-		const placeId = globals.placeId;
+		const placeId = Globals.PlaceID;
 		return this.isLegacy
 			? `${this.serviceUrl}set?placeId=${placeId}&key=${this.urlEncodeIfNeeded(
 					key,
@@ -66,8 +88,11 @@ export class GlobalDataStore {
 			  ).toString()}&valueLength=${valueLength}`;
 	}
 
+	/**
+	 * @internal
+	 */
 	private constructSetIfUrl(key: string, valueLength: number, expectedValueLength: number): string {
-		const placeId = globals.placeId;
+		const placeId = Globals.PlaceID;
 		return this.isLegacy
 			? `${this.serviceUrl}set?placeId=${placeId}&key=${this.urlEncodeIfNeeded(
 					key,
@@ -77,8 +102,11 @@ export class GlobalDataStore {
 			  ).toString()}&valueLength=${valueLength}&expectedValueLength=${expectedValueLength}`;
 	}
 
+	/**
+	 * @internal
+	 */
 	private constructIncrementUrl(key: string, delta: number): string {
-		const placeId = globals.placeId;
+		const placeId = Globals.PlaceID;
 		return this.isLegacy
 			? `${this.serviceUrl}increment?placeId=${placeId}&key=${this.urlEncodeIfNeeded(
 					key,
@@ -90,8 +118,11 @@ export class GlobalDataStore {
 			  ).toString()}&value=${delta}`;
 	}
 
+	/**
+	 * @internal
+	 */
 	private constructRemoveUrl(key: string): string {
-		const placeId = globals.placeId;
+		const placeId = Globals.PlaceID;
 		return this.isLegacy
 			? `${this.serviceUrl}remove?placeId=${placeId}&key=${this.urlEncodeIfNeeded(
 					key,
@@ -103,13 +134,16 @@ export class GlobalDataStore {
 			  ).toString()}`;
 	}
 
+	/**
+	 * @internal
+	 */
 	private createFetchNewKeyRequest(key: string, request: HttpRequest): void {
 		request.url = this.constructGetUrl();
 		request.postData = this.constructPostDataForKey(key);
 		request.owner = this;
 	}
 
-	private static serializeVariant<Variant extends any>(variant: Variant): [boolean, string] {
+	static serializeVariant<Variant extends any>(variant: Variant): [boolean, string] {
 		let hasJsonType = true;
 		let result: string;
 		try {
@@ -120,10 +154,22 @@ export class GlobalDataStore {
 		return [hasJsonType, result];
 	}
 
+	/**
+	 * @internal
+	 */
+	protected logLongValue(value: string) {
+		FASTLOGS(FLog['DataStore'], '[FLog::DataStore] Value: %s', value.substring(0, 200));
+		if (value.length > 200) {
+			const tail = value.substring(value.length - 200);
+			FASTLOGS(FLog['DataStore'], '[FLog::DataStore] Value end: %s', tail);
+			FASTLOG1(FLog['DataStore'], '[FLog::DataStore] Value length: %u', value.length);
+		}
+	}
+
 	static deserializeVariant<Variant extends any>(webValue: string): [boolean, Variant | unknown] {
 		if (<unknown>webValue instanceof Object) return [true, webValue];
 		let result = '';
-		if (webValue.length === 0) return [true, result];
+		if (webValue && webValue.length === 0) return [true, result];
 		try {
 			result = JSON.parse(webValue);
 		} catch {
@@ -132,56 +178,64 @@ export class GlobalDataStore {
 		return [true, result];
 	}
 
+	/**
+	 * @internal
+	 */
 	private runTransformFunction<Variant extends any>(
 		key: string,
 		transformFunc: (previousValue: Variant) => Variant,
 	): Promise<Variant> {
 		return new Promise<Variant>(
-			(resolve: (value: PromiseLike<Variant> | Variant) => void, reject: (reason?: any) => void) => {
+			(
+				resumeFunction: (value: PromiseLike<Variant> | Variant) => void,
+				errorFunction: (reason?: any) => void,
+			) => {
 				const request = new HttpRequest();
 				this.createFetchNewKeyRequest(key, request);
 				request.requestType = RequestType.GET_ASYNC;
-				executeGet(request).then((r) => {
-					const [success, res] = GlobalDataStore.deserializeVariant(r.data);
-					if (!success) return reject("Can't parse response");
+				ExectionHelper.ExecuteGet(request).then((r) => {
+					const [success, res] = DataStore.deserializeVariant(r.data);
+					if (!success) return errorFunction("Can't parse response");
 					let result: Variant;
-					FASTLOG3(
+					FASTLOGS(
 						FLog['DataStore'],
-						`Running transform function, input: ${
-							<number>res['data'].length === 0
-								? undefined
-								: (GlobalDataStore.deserializeVariant(res['data'][0]['Value'])[1] as Variant).toString()
-						}`,
+						'[FLog::DataStore] Running transform function, input: %s',
+						<number>res['data'].length === 0
+							? undefined
+							: (DataStore.deserializeVariant(res['data'][0]['Value'])[1] as Variant).toString(),
 					);
 					try {
 						result = transformFunc(
 							res['data'].length === 0
 								? undefined
-								: (GlobalDataStore.deserializeVariant(res['data'][0]['Value'])[1] as Variant),
+								: (DataStore.deserializeVariant(res['data'][0]['Value'])[1] as Variant),
 						);
 					} catch (e) {
-						reject(e);
+						errorFunction(e);
 					}
 					if (result === undefined || (result as Map<string, unknown>).size === 0 || result === null) {
-						FASTLOG4(FLog['DataStore'], 'Transform function returned nil, update is cancelled');
-						return reject('Transform function returned nil, update is cancelled');
+						FASTLOG(
+							FLog['DataStore'],
+							'[FLog::DataStore] Transform function returned nil, update is cancelled',
+						);
+						return errorFunction('Transform function returned nil, update is cancelled');
 					}
 					// console.log(result);
 					if (!this.checkValueIsAllowed(result))
-						return reject(
+						return errorFunction(
 							`${typeof result} is not allowed in ${
 								this.getDataStoreTypeString() === 'standard' ? 'DataStore' : 'OrderedDataStore'
 							}`,
 						);
 
-					const [success2, newValue] = GlobalDataStore.serializeVariant(result);
+					const [success2, newValue] = DataStore.serializeVariant(result);
 					if (!success2)
-						return reject(
+						return errorFunction(
 							`${typeof result} is not allowed in ${
 								this.getDataStoreTypeString() === 'standard' ? 'DataStore' : 'OrderedDataStore'
 							}`,
 						);
-					if (newValue.length > DFInt['DataStoreMaxValueSize']) return reject('Value is too large');
+					if (newValue.length > DFInt('DataStoreMaxValueSize')) return errorFunction('Value is too large');
 					const expectedValue = res['data'].length === 0 ? '' : res['data'][0]['Value'];
 					const postData = `value=${this.urlEncodeIfNeeded(newValue)}&expectedValue=${this.urlEncodeIfNeeded(
 						expectedValue,
@@ -193,51 +247,79 @@ export class GlobalDataStore {
 					request.owner = this;
 					request.key = key;
 					request.requestType = RequestType.UPDATE_ASYNC;
-					FASTLOG3(FLog['DataStore'], 'SetIf on key: ' + key);
-					FASTLOG2(FLog['DataStore'], newValue);
-					FASTLOG3(FLog['DataStore'], 'Url encoded: ' + request.postData);
-					executeSet(request)
+					FASTLOGS(FLog['DataStore'], '[FLog::DataStore] SetIf on key: %s', key);
+					this.logLongValue(newValue);
+					FASTLOG(FLog['DataStore'], '[FLog::DataStore] Url encoded:');
+					this.logLongValue(request.postData);
+					ExectionHelper.ExecuteSet(request)
 						.then((r2) => {
-							const [success, res] = GlobalDataStore.deserializeVariant(r2.data);
-							if (!success) return reject("Can't parse response");
+							const [success, res] = DataStore.deserializeVariant(r2.data);
+							if (!success) return errorFunction("Can't parse response");
 							if (!res['data'])
-								return reject(
+								return errorFunction(
 									"The response didn't contain the data, therefore a shallow fail was performed",
 								);
-							const final = GlobalDataStore.deserializeVariant<Variant>(res['data'])[1];
+							const final = DataStore.deserializeVariant<Variant>(res['data'])[1];
 							if (this.callbacks.has(key)) {
 								this.callbacks.get(key)(final);
 							}
-							resolve(final as Variant);
+							resumeFunction(final as Variant);
 						})
 						.catch((reason) => {
-							return reject(reason);
+							return errorFunction(reason);
 						});
 				});
 			},
 		);
 	}
 
+	/**
+	 * @internal
+	 */
 	protected serviceUrl: string;
+	/**
+	 * @internal
+	 */
 	protected name: string;
+	/**
+	 * @internal
+	 */
 	protected scope: string;
+	/**
+	 * @internal
+	 */
 	protected scopeUrlEncodedIfNeeded: string;
+	/**
+	 * @internal
+	 */
 	protected nameUrlEncodedIfNeeded: string;
 
+	/**
+	 * @internal
+	 */
 	protected checkValueIsAllowed<Variant extends any>(v?: Variant): boolean {
-		const [success] = GlobalDataStore.serializeVariant(v);
+		const [success] = DataStore.serializeVariant(v);
 		return success;
 	}
 
+	/**
+	 * @internal
+	 */
 	protected getDataStoreTypeString(): string {
 		return 'standard';
 	}
 
+	/**
+	 * @internal
+	 */
 	protected urlEncodeIfNeeded(input: string): string {
 		return encodeURIComponent(input);
 	}
 
-	public static urlApiPath(): string {
+	/**
+	 * @internal
+	 */
+	protected urlApiPath(): string {
 		return 'persistence';
 	}
 
@@ -257,30 +339,30 @@ export class GlobalDataStore {
 	public async GetAsync<Variant extends any>(key: string): Promise<Variant | unknown> {
 		return new Promise<Variant | unknown>(
 			(
-				resolve: (value: Variant | PromiseLike<Variant | unknown> | unknown) => void,
-				reject: (reason?: any) => void,
+				resumeFunction: (value: Variant | PromiseLike<Variant | unknown> | unknown) => void,
+				errorFunction: (reason?: any) => void,
 			) => {
-				FASTLOG3(FLog['DataStore'], `GetAsync on key ${key}`);
-				const [success, message] = checkAccess(key);
-				if (!success) return reject(message);
+				FASTLOGS(FLog['DataStore'], `[FLog::DataStore] GetAsync on key %s`, key);
+				const [success, message] = InputHelper.CheckAccess(key);
+				if (!success) return errorFunction(message);
 
 				const request = new HttpRequest();
 				this.createFetchNewKeyRequest(key, request);
 				request.requestType = RequestType.GET_ASYNC;
-				executeGet(request)
+				ExectionHelper.ExecuteGet(request)
 					.then((r) => {
-						const [success, result] = GlobalDataStore.deserializeVariant(r.data);
-						if (!success) return reject("Can't parse response");
+						const [success, result] = DataStore.deserializeVariant(r.data);
+						if (!success) return errorFunction("Can't parse response");
 
-						const [success2, deserialized] = GlobalDataStore.deserializeVariant(
+						const [success2, deserialized] = DataStore.deserializeVariant(
 							result['data'].length === 0 ? '{"d":true}' : result['data'][0]['Value'],
 						);
-						if (!success2) return reject("Can't parse value");
+						if (!success2) return errorFunction("Can't parse value");
 						this.CachedKeys.set(key, deserialized['d'] ? undefined : deserialized);
-						return resolve(deserialized['d'] ? undefined : deserialized);
+						return resumeFunction(deserialized['d'] ? undefined : deserialized);
 					})
 					.catch((reason) => {
-						return reject(reason);
+						return errorFunction(reason);
 					});
 			},
 		);
@@ -324,48 +406,51 @@ export class GlobalDataStore {
 		options: DataStoreSetOptions = undefined,
 	): Promise<void> {
 		return new Promise<void>(
-			(resolve: (value: PromiseLike<void> | void) => void, reject: (reason?: any) => void) => {
-				const [success, message] = checkAccess(key);
-				if (!success) return reject(message);
-				if (value === undefined) return reject("The value can't be nil, null, undefined or void");
+			(resumeFunction: (value: PromiseLike<void> | void) => void, errorFunction: (reason?: any) => void) => {
+				if (userIds.length > 0) return errorFunction('Additional parameter UserIds not allowed');
+				if (options) return errorFunction('Additional parameter Options not allowed');
+				const [success, message] = InputHelper.CheckAccess(key);
+				if (!success) return errorFunction(message);
+				if (value === undefined) return errorFunction("The value can't be nil, null, undefined or void");
 				if (!this.checkValueIsAllowed(value))
-					return reject(
+					return errorFunction(
 						`${typeof value} is not allowed in ${
 							this.getDataStoreTypeString() === 'standard' ? 'DataStore' : 'OrderedDataStore'
 						}`,
 					);
-				const [success2, v] = GlobalDataStore.serializeVariant(value);
+				const [success2, v] = DataStore.serializeVariant(value);
 				if (!success2)
-					return reject(
+					return errorFunction(
 						`${typeof value} is not allowed in ${
 							this.getDataStoreTypeString() === 'standard' ? 'DataStore' : 'OrderedDataStore'
 						}`,
 					);
-				if (v.length > DFInt['DataStoreMaxValueSize']) return reject('Value is too large');
+				if (v.length > DFInt('DataStoreMaxValueSize')) return errorFunction('Value is too large');
 				const request = new HttpRequest();
 				request.url = this.constructSetUrl(key, v.length);
 				request.owner = this;
 				request.key = key;
 				request.requestType = RequestType.SET_ASYNC;
 				request.postData = `value=${this.urlEncodeIfNeeded(v.toString())}`.toString();
-				FASTLOG3(FLog['DataStore'], `SetAsync on key: ${key}`);
-				FASTLOG2(FLog['DataStore'], v);
-				FASTLOG3(FLog['DataStore'], 'Url encoded: ' + request.postData);
-				executeSet(request)
+				FASTLOGS(FLog['DataStore'], `[FLog::DataStore] SetAsync on key: %s`, key);
+				this.logLongValue(v);
+				FASTLOG(FLog['DataStore'], '[FLog::DataStore] Url encoded:');
+				this.logLongValue(request.postData);
+				ExectionHelper.ExecuteSet(request)
 					.then((r) => {
-						const [success, res] = GlobalDataStore.deserializeVariant(r.data);
-						if (!success) return reject("Can't parse response");
+						const [success, res] = DataStore.deserializeVariant(r.data);
+						if (!success) return errorFunction("Can't parse response");
 						if (!res['data'])
-							return reject(
+							return errorFunction(
 								"The response didn't contain the data, therefore a shallow fail was performed",
 							);
 						if (this.callbacks.has(key)) {
 							this.callbacks.get(key)(value);
 						}
-						resolve();
+						resumeFunction();
 					})
 					.catch((reason) => {
-						return reject(reason);
+						return errorFunction(reason);
 					});
 			},
 		);
@@ -393,27 +478,29 @@ export class GlobalDataStore {
 		options: DataStoreIncrementOptions = undefined,
 	): Promise<number> {
 		return new Promise<number>(
-			(resolve: (value: PromiseLike<number> | number) => void, reject: (reason?: any) => void) => {
-				const [success, message] = checkAccess(key);
-				if (!success) return reject(message);
+			(resumeFunction: (value: PromiseLike<number> | number) => void, errorFunction: (reason?: any) => void) => {
+				if (userIds.length > 0) return errorFunction('Additional parameter UserIds not allowed');
+				if (options) return errorFunction('Additional parameter Options not allowed');
+				const [success, message] = InputHelper.CheckAccess(key);
+				if (!success) return errorFunction(message);
 				const request = new HttpRequest();
 				request.url = this.constructIncrementUrl(key, delta);
 				request.owner = this;
 				request.key = key;
 				request.requestType = RequestType.INCREMENT_ASYNC;
-				executeSet(request)
+				ExectionHelper.ExecuteSet(request)
 					.then((r) => {
-						const [success, res] = GlobalDataStore.deserializeVariant(r.data);
-						if (!success) return reject("Can't parse response");
+						const [success, res] = DataStore.deserializeVariant(r.data);
+						if (!success) return errorFunction("Can't parse response");
 						if (!res['data'])
-							return reject('Unable to increment key as it may be anything other than a number');
+							return errorFunction('Unable to increment key as it may be anything other than a number');
 						if (this.callbacks.has(key)) {
 							this.callbacks.get(key)(parseFloat(res['data']) || 0);
 						}
-						resolve(parseFloat(res['data']) || 0);
+						resumeFunction(parseFloat(res['data']) || 0);
 					})
 					.catch((reason) => {
-						return reject(reason);
+						return errorFunction(reason);
 					});
 			},
 		);
@@ -469,12 +556,15 @@ export class GlobalDataStore {
 		transformFunc: (previousValue: Variant) => Variant,
 	): Promise<Variant> {
 		return new Promise<Variant>(
-			async (resolve: (value: PromiseLike<Variant> | Variant) => void, reject: (reason?: any) => void) => {
-				const [success, message] = checkAccess(key);
-				if (!success) return reject(message);
-				FASTLOG3(FLog['DataStore'], 'Updating key ' + key);
+			async (
+				resumeFunction: (value: PromiseLike<Variant> | Variant) => void,
+				errorFunction: (reason?: any) => void,
+			) => {
+				const [success, message] = InputHelper.CheckAccess(key);
+				if (!success) return errorFunction(message);
+				FASTLOGS(FLog['DataStore'], '[FLog::DataStore] Updating key %s', key);
 				const result = await this.runTransformFunction(key, transformFunc);
-				resolve(result);
+				resumeFunction(result);
 			},
 		);
 	}
@@ -494,22 +584,22 @@ export class GlobalDataStore {
 	 * @yields This is a yielding function. When called, it will pause the JavaScript thread that called the function until a result is ready to be returned, without interrupting other scripts.
 	 */
 	public async RemoveAsync<Variant extends any>(key: string): Promise<Variant> {
-		return new Promise<Variant>((resolve, reject) => {
-			const [success, message] = checkAccess(key);
-			if (!success) return reject(message);
+		return new Promise<Variant>((resumeFunction, errorFunction) => {
+			const [success, message] = InputHelper.CheckAccess(key);
+			if (!success) return errorFunction(message);
 			const request = new HttpRequest();
 			request.url = this.constructRemoveUrl(key);
 			request.owner = this;
 			request.key = key;
 			request.requestType = RequestType.SET_ASYNC;
-			executeSet(request)
+			ExectionHelper.ExecuteSet(request)
 				.then((value) => {
-					const [success, res] = GlobalDataStore.deserializeVariant(value.data);
-					if (!success) return reject("Can't parse response");
-					resolve(GlobalDataStore.deserializeVariant(res['data'])[1] as Variant);
+					const [success, res] = DataStore.deserializeVariant(value.data);
+					if (!success) return errorFunction("Can't parse response");
+					resumeFunction(DataStore.deserializeVariant(res['data'])[1] as Variant);
 				})
 				.catch((e) => {
-					return reject(e);
+					return errorFunction(e);
 				});
 		});
 	}
@@ -532,6 +622,7 @@ export class GlobalDataStore {
 	 * @deprecated This function has been deprecated and should not be used in new work. You can use the {@link https://www.npmjs.com/package/@mfd/rbxmessagingservice|Cross Server Messaging Service} to publish and subscribe to topics to receive near real-time updates, completely replacing the need for this function.
 	 */
 	public OnUpdate(key: string, callback: <Variant extends any>(newValue: Variant) => any): RBXScriptConnection {
+		FASTLOGS(FLog['DataStore'], '[FLog::DataStore] Legacy on update callback set for the key %s', key);
 		this.callbacks.set(key, callback);
 		// const interval = setInterval(async () => {
 		// 	const v = await this.GetAsync(key);

@@ -1,11 +1,20 @@
 export class Pages {
+	/**
+	 * @internal
+	 */
 	protected finished: boolean;
-	protected currentPage;
+	/**
+	 * @internal
+	 */
+	protected currentPage: any;
 
 	public constructor() {
 		this.finished = false;
 	}
 
+	/**
+	 * @internal
+	 */
 	protected async FetchNextChunk() {}
 
 	/**

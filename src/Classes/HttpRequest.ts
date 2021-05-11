@@ -1,37 +1,71 @@
 import Http, { AxiosRequestConfig } from 'axios';
 import { AxiosResponse } from 'axios';
-import { GlobalDataStore } from './GlobalDataStore';
-import { RequestType } from '../util/constants';
-import { globals } from '../util/globals';
-import { _DataStoreService } from '../Services/DataStoreService';
+import { DataStore } from './DataStore';
+import { Globals } from '../Util/Globals';
+import { RequestType, DataStoreService } from './Services/DataStoreService';
+import { Agent } from 'https';
+import { FASTFLAG, FFlag } from '../Tools/FastLogTool';
+
+FASTFLAG('Debug');
 
 export class HttpRequest {
 	public key: string;
 	public url: string;
 	public postData: string;
-	public owner: GlobalDataStore;
+	public owner: DataStore;
+	public method: string;
+	public additionalHeaders: Record<string, string> = {};
 
-	public async execute(_dataStoreService: _DataStoreService): Promise<AxiosResponse<any>> {
-		return new Promise((resolve, reject) => {
-			const http = {
+	public doNotParse: boolean = false;
+
+	public async execute(_dataStoreService: DataStoreService): Promise<AxiosResponse<any>> {
+		return new Promise((resumeFunction, errorFunction) => {
+			const http = <AxiosRequestConfig>{
 				headers: {
-					'Cache-Control': 'no-cache',
-					Cookie: '.ROBLOSECURITY=' + globals.cookie,
-					'Content-Type': 'application/x-www-form-urlencoded',
-					'Roblox-Place-Id': globals.placeId.toString(),
+					...Globals.GlobalHeaders,
+					...this.additionalHeaders,
 				},
+				transformResponse: (resp, headers) => {
+					if (this.doNotParse) return resp;
+
+					if (headers && headers['content-type'] && headers['content-type'].includes('json'))
+						try {
+							return JSON.parse(resp);
+						} catch {
+							return resp; // TODO Report an error here.
+						}
+					return resp;
+				},
+				httpsAgent: new Agent({ rejectUnauthorized: !FFlag['Debug'] }),
 			};
-			Http.post(
-				this.url,
-				this.postData === undefined || this.postData.length === 0 ? ' ' : this.postData,
-				<AxiosRequestConfig>http,
-			)
-				.then((res) => {
-					resolve(res);
-				})
-				.catch((e) => {
-					reject(e);
-				});
+			if (!this.method)
+				Http.post(
+					this.url,
+					this.postData === undefined || this.postData.length === 0 ? ' ' : this.postData,
+					<AxiosRequestConfig>http,
+				)
+					.then((res) => {
+						resumeFunction(res);
+					})
+					.catch((e) => {
+						errorFunction(e);
+					});
+			else if (this.method === 'GET')
+				Http.get(this.url, <AxiosRequestConfig>http)
+					.then((res) => {
+						resumeFunction(res);
+					})
+					.catch((e) => {
+						errorFunction(e);
+					});
+			else if (this.method === 'DELETE')
+				Http.delete(this.url, <AxiosRequestConfig>http)
+					.then((res) => {
+						resumeFunction(res);
+					})
+					.catch((e) => {
+						errorFunction(e);
+					});
 		});
 	}
 

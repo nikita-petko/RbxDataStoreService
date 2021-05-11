@@ -1,27 +1,19 @@
-import { OrderedDataStore } from './OrderedDataStore';
+import { RequestType, DataStoreService } from './Services/DataStoreService';
 import { HttpRequest } from './HttpRequest';
-import { RequestType } from './Services/DataStoreService';
 import { Pages } from './Pages';
 import { ExectionHelper } from '../Helpers/ExecutionHelper';
 
-/**
- * A special type of Pages object whose pages contain key/value pairs from an OrderedDataStore.
- * For this object,
- * GetCurrentPage() returns an array of tables,
- * each containing keys named key and value;
- * these reflect the key/value pair data.
- */
-export class DataStorePages extends Pages {
-	constructor(ds: OrderedDataStore, requestUrl: string) {
+export class DataStoreEnumerationPages extends Pages {
+	constructor(dss: DataStoreService, requestUrl: string) {
 		super();
-		this.ds = ds;
+		this.dss = dss;
 		this.requestUrl = requestUrl;
 		this.exclusiveStartKey = '';
 	}
 	/**
 	 * @internal
 	 */
-	private readonly ds: OrderedDataStore;
+	private readonly dss: DataStoreService;
 	/**
 	 * @internal
 	 */
@@ -30,36 +22,23 @@ export class DataStorePages extends Pages {
 	 * @internal
 	 */
 	private exclusiveStartKey: string;
+
 	/**
 	 * @internal
 	 */
 	protected async FetchNextChunk(): Promise<void> {
 		return new Promise<void>((resumeFunction, errorFunction) => {
 			const request = new HttpRequest();
-			const ods = this.ds;
-			if (!ods) {
-				return errorFunction('OrderedDataStore no longer exists');
+			const dss = this.dss;
+			if (!dss) {
+				return errorFunction('DataStoreService no longer exists');
 			}
 			request.url =
 				this.exclusiveStartKey.length === 0
 					? this.requestUrl
 					: `${this.requestUrl.toString()}&exclusiveStartKey=${this.exclusiveStartKey.toString()}`;
 			request.requestType = RequestType.GET_SORTED_ASYNC_PAGE;
-			request.owner = ods;
-			ExectionHelper.ExecuteGetSorted(request).then((r) => {
-				const [success, result] = OrderedDataStore.deserializeVariant(r.data);
-				if (!success) return errorFunction("Can't parse response");
-				const deserialized = result['data']['Entries'].length !== 0 ? result['data']['Entries'] : '[]';
-				const newValue: { Value: number; Key: string }[] = [];
-				for (let i = 0; i < deserialized.length; i++) {
-					newValue.push({
-						Value: OrderedDataStore.deserializeVariant(deserialized[i]['Value'])[1] as number,
-						Key: deserialized[i]['Target'],
-					});
-				}
-				this.currentPage = newValue;
-				return resumeFunction();
-			});
+			ExectionHelper.ExecuteGetSorted(request).then((r) => {});
 		});
 	}
 
