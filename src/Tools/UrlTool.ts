@@ -1,6 +1,7 @@
-import { FFlag, DFString, DYNAMIC_FASTSTRINGVARIABLE, FASTFLAG } from './FastLogTool';
+import { FFlag, DFString, DYNAMIC_FASTSTRINGVARIABLE, FASTFLAG, FASTFLAGVARIABLE } from './FastLogTool';
 import qs from 'querystring';
 
+FASTFLAGVARIABLE('UseSiteTests', false);
 FASTFLAG('Debug');
 DYNAMIC_FASTSTRINGVARIABLE('PreferredTestSite', 'SiteTest1');
 
@@ -23,7 +24,7 @@ export class BaseURL {
 	 */
 	public static GetSecureBaseURL(preferApex: boolean = false): string {
 		return `https://${
-			FFlag['Debug']
+			FFlag['Debug'] && FFlag['UseSiteTests']
 				? GlobalURLS.TestSites[DFString('PreferredTestSite') ? DFString('PreferredTestSite') : 'SiteTest1'][
 						preferApex ? 'Apex' : 'BaseUrl'
 				  ]
@@ -39,7 +40,7 @@ export class BaseURL {
 	 */
 	public static GetBaseHost(preferApex: boolean = false): string {
 		return `${
-			FFlag['Debug']
+			FFlag['Debug'] && FFlag['UseSiteTests']
 				? GlobalURLS.TestSites[DFString('PreferredTestSite') ? DFString('PreferredTestSite') : 'SiteTest1'][
 						preferApex ? 'Apex' : 'BaseUrl'
 				  ]

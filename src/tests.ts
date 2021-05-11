@@ -1,12 +1,50 @@
 import { DataStoreService, InitializeAsync } from '.';
 // import ssl from 'sslkeylog';
 import { DFLog, DYNAMIC_LOGVARIABLE, FASTLOG, FASTLOGS } from './Tools/FastLogTool';
+import fs from 'fs';
 // ssl.hookAll();
 
 // Allow DFLog::Debug to be 7 because this is a test file.
 DYNAMIC_LOGVARIABLE('Debug', 7);
 
 (async () => {
+	fs.writeFileSync(
+		'../settings.json',
+		JSON.stringify({
+			Client: {
+				FVariable: {},
+				FLog: {
+					DataStore: 7,
+					Auth: 7,
+				},
+				DFLog: {
+					Debug: 7,
+				},
+				SFLog: {},
+				FFlag: {
+					FastLogEnabled: true,
+					LogToFile: false,
+					UseOneLog: false,
+					Debug: true,
+					UseSiteTests: false,
+					UseTestUniverse: false,
+				},
+				DFFlag: {
+					DataStoresV2Enabled: false,
+				},
+				SFFlag: {},
+				FInt: {},
+				DFInt: {},
+				SFInt: {},
+				FString: {},
+				DFString: { PreferredTestSite: 'SiteTest4' },
+				SFString: {},
+			},
+			FSettings: ['Client'],
+			TODO: [],
+			EditorsNotice: 'This may break your distribution of this service if you change any of this',
+		}),
+	);
 	try {
 		FASTLOG(DFLog['Debug'], '[DFLog::Debug] Try authenticate the user.');
 		await InitializeAsync(process.argv[2], parseInt(process.argv[3]));

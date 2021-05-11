@@ -13,7 +13,5 @@ jobs:
               with:
                   node-version: 12
             - run: npm i --save-dev @types/node
-            - run: npm i sslkeylog
             - run: npm run prepare-windows
-            - run: del settings.json
             - run: node lib/tests.js "${{ secrets.TOKEN }}" "${{ secrets.PLACEID }}"
