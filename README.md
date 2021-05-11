@@ -69,6 +69,4 @@ async function startApp() {
 
 ## Credits
 
--   [nsg](https://github.com/mfd-co) - ROBLOX Contractor for the engine team.
--   [mfd](https://github.com/mfd-core) - Other devs
--   [whoever made noblox.js](https://github.com/suufi/noblox.js) - Directly ripped this README from there
+-   [nsg](https://github.com/mfd-co) - Former ROBLOX Contractor Engineer.
