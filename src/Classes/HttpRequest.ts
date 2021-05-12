@@ -1,5 +1,4 @@
-import Http, { AxiosRequestConfig } from 'axios';
-import { AxiosResponse } from 'axios';
+import Http, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { DataStore } from './DataStore';
 import { Globals } from '../Util/Globals';
 import { RequestType, DataStoreService } from './Services/DataStoreService';
