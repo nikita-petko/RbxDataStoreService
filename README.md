@@ -19,7 +19,7 @@ RbxDataStoreService is a node module that That allows you to use DataStoreServic
 This project was created because people outside ROBLOX always want to use DataStoreService outside ROBLOX.
 
 RbxDataStoreService allows you to do things you would normally do on the [Roblox](https://www.roblox.com) DataStoreService through a Node.js interface.
-You can use RbxDataStoreService along with ROBLOX's [HttpService feature](http://wiki.roblox.com/index.php?title=API:Class/HttpService) to create scripts that interact with the DataStoreService externally.
+You can use RbxDataStoreService along with ROBLOX's [HttpService feature](https://developer.roblox.com/en-us/api-reference/class/HttpService) to create scripts that interact with the DataStoreService externally.
 
 ## Installation
 
@@ -39,7 +39,7 @@ That's it!
 
 ## Documentation
 
-You can find the current RbxDataStoreService documentation [here (Roblox Wiki)](https://developer.roblox.com/en-us/api-reference/class/DataStoreService) or [here (API Reference)](https://robloxapi.github.io/ref/class/DataStoreService.htm)
+You can find the current RbxDataStoreService documentation [here (Roblox Wiki)](https://developer.roblox.com/en-us/api-reference/class/DataStoreService) or [here (CloneTrooper's API Reference)](https://robloxapi.github.io/ref/class/DataStoreService.html)
 
 ### Initial setup
 
