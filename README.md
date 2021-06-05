@@ -2,7 +2,6 @@
 <br>
 <p align="center">
     <a href="https://standardjs.com"><img src="https://img.shields.io/badge/code_style-standard-blue.svg?style=flat-square" alt="JavaScript Style Guide"/></a>
-    <a href="https://discord.gg/EDXNdAT"><img src="https://img.shields.io/badge/discord-roblox%20api%20chat-blue.svg?style=flat-square" alt="Roblox API Discord"/></a>
     <a href="https://npmjs.org/@mfd/rbxdatastoreservice"><img src="https://img.shields.io/npm/v/@mfd/rbxdatastoreservice.svg?style=flat-square" alt="NPM package"/></a>
 	<a href="https://npmjs.org/@mfd/rbxdatastoreservice"><img src="https://img.shields.io/npm/dm/@mfd/rbxdatastoreservice.svg?style=flat-square" alt="downloads"/></a>
 	<a href="https://github.com/rbx-nsg/RbxDataStoreService/actions/workflows/test.yml"><img src="https://github.com/rbx-nsg/RbxDataStoreService/actions/workflows/test.yml/badge.svg?branch=master" alt="test"/></a>
@@ -29,9 +28,11 @@ With node.js installed simply run:
 ```bash
 # Run this to install RbxDataStoreService locally to your repository.
 $ npm install @mfd/rbxdatastoreservice --save
+$ yarn add @mfd/rbxdatastoreservice
 
 # Run this instead to install RbxDataStoreService globally so you can use it anywhere.
 $ npm install @mfd/rbxdatastoreservice -g
+$ yarn global add @mfd/rbxdatastoreservice
 ```
 
 That's it!
@@ -69,4 +70,4 @@ async function startApp() {
 
 ## Credits
 
--   [nsg](https://github.com/mfd-co) - Former ROBLOX Contractor Engineer.
+-   [nsg](https://github.com/rbx-nsg) - Former ROBLOX Contractor Engineer.
