@@ -4,7 +4,7 @@
     <a href="https://standardjs.com"><img src="https://img.shields.io/badge/code_style-standard-blue.svg?style=flat-square" alt="JavaScript Style Guide"/></a>
     <a href="https://npmjs.org/@mfd/rbxdatastoreservice"><img src="https://img.shields.io/npm/v/@mfd/rbxdatastoreservice.svg?style=flat-square" alt="NPM package"/></a>
 	<a href="https://npmjs.org/@mfd/rbxdatastoreservice"><img src="https://img.shields.io/npm/dm/@mfd/rbxdatastoreservice.svg?style=flat-square" alt="downloads"/></a>
-	<a href="https://github.com/rbx-nsg/RbxDataStoreService/actions/workflows/test.yml"><img src="https://github.com/rbx-nsg/RbxDataStoreService/actions/workflows/test.yml/badge.svg?branch=master" alt="test"/></a>
+	<a href="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/test.yml"><img src="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/test.yml/badge.svg?branch=master" alt="test"/></a>
 </p>
 <p align="center">
   <a href="#about">About</a> •
@@ -70,4 +70,4 @@ async function startApp() {
 
 ## Credits
 
--   [nsg](https://github.com/rbx-nsg) - Former ROBLOX Contractor Engineer.
+-   [nsg](https://github.com/nkpetko) - Former ROBLOX Contractor Engineer.
