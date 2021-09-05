@@ -23,7 +23,7 @@ import { InputHelper } from '../../Helpers/InputHelper';
 LOGGROUP('DataStore');
 DYNAMIC_FASTFLAGVARIABLE('GetGlobalDataStorePcallFix', false);
 DYNAMIC_FASTFLAGVARIABLE('DataStoreLostDataFixEnable', false);
-DYNAMIC_FASTFLAGVARIABLE('DataStoresV2Enabled', false);
+DYNAMIC_FASTFLAGVARIABLE('DataStoresV2Enabled', true);
 
 DYNAMIC_FASTINT('DataStoreKeyLengthLimit');
 
@@ -80,10 +80,10 @@ export abstract class DataStoreService {
 						return true;
 					}
 				throw new ReferenceError(`Options instance of type ${options.constructor.name} did not request v2 API`);
+			} else {
+				if (options !== undefined && options !== null)
+					throw TypeError('Options instance not of type DataStoreOptions');
 			}
-		} else {
-			if (options !== undefined && options !== null)
-				throw TypeError('Options instance not of type DataStoreOptions');
 		}
 
 		return false;
