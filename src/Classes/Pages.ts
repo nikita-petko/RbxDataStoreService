@@ -8,6 +8,9 @@ export class Pages {
 	 */
 	protected currentPage: any;
 
+	/**
+	 * @internal
+	 */
 	public constructor() {
 		this.finished = false;
 	}

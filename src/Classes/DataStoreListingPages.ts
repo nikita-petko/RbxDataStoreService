@@ -2,8 +2,13 @@ import { RequestType, DataStoreService } from './Services/DataStoreService';
 import { HttpRequest } from './HttpRequest';
 import { Pages } from './Pages';
 import { ExectionHelper } from '../Helpers/ExecutionHelper';
+import { DataStoreInfo } from './DataStoreInfo';
+import { DataStore2 } from './DataStore2';
 
-export class DataStoreEnumerationPages extends Pages {
+export class DataStoreListingPages extends Pages {
+	/**
+	 * @internal
+	 */
 	constructor(dss: DataStoreService, requestUrl: string) {
 		super();
 		this.dss = dss;
@@ -26,6 +31,15 @@ export class DataStoreEnumerationPages extends Pages {
 	/**
 	 * @internal
 	 */
+	protected currentPage: DataStoreInfo[];
+
+	public GetCurrentPage(): DataStoreInfo[] {
+		return this.currentPage;
+	}
+
+	/**
+	 * @internal
+	 */
 	protected async FetchNextChunk(): Promise<void> {
 		return new Promise<void>((resumeFunction, errorFunction) => {
 			const request = new HttpRequest();
@@ -38,7 +52,30 @@ export class DataStoreEnumerationPages extends Pages {
 					? this.requestUrl
 					: `${this.requestUrl.toString()}&exclusiveStartKey=${this.exclusiveStartKey.toString()}`;
 			request.requestType = RequestType.GET_SORTED_ASYNC_PAGE;
-			ExectionHelper.ExecuteGetSorted(request).then((r) => {});
+			request.method = 'GET';
+			ExectionHelper.ExecuteGetSorted(request)
+				.then((r) => {
+					const [success, result] = DataStore2.deserializeVariant(r.data);
+
+					if (!success) return errorFunction("Can't parse response");
+					const deserialized = result['datastores'].length !== 0 ? result['datastores'] : [];
+					const newValue: DataStoreInfo[] = [];
+					for (let i = 0; i < deserialized.length; i++) {
+						newValue.push(
+							new DataStoreInfo(
+								new Date(deserialized[i]['createdTime']).getTime(),
+								new Date(deserialized[i]['updatedTime']).getTime(),
+								deserialized[i]['name'],
+							),
+						);
+					}
+					this.exclusiveStartKey = result['lastReturnedKey'];
+					this.currentPage = newValue;
+					return resumeFunction();
+				})
+				.catch((reason) => {
+					return errorFunction(reason);
+				});
 		});
 	}
 

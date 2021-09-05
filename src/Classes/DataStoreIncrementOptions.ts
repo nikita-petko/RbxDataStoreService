@@ -3,6 +3,9 @@ export class DataStoreIncrementOptions {
 	 * @internal
 	 */
 	private attributes: Record<string, unknown>;
+	/**
+	 * @internal
+	 */
 	public constructor(attributes?: Record<string, unknown>) {
 		this.attributes = attributes || {};
 	}

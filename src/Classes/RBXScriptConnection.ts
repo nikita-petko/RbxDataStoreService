@@ -1,16 +1,22 @@
+import EventEmitter from 'events';
+
 export class RBXScriptConnection {
 	/**
 	 * @internal
 	 */
-	private evt: any = null;
+	private _emitter: EventEmitter = null;
 	/**
 	 * @internal
 	 */
 	private connectionStillAlive = false;
-	public constructor(evt: any) {
-		this.evt = evt;
+
+	/**
+	 * @internal
+	 */
+	public constructor(_eventEmitter: EventEmitter) {
+		this._emitter = _eventEmitter;
 		this.connectionStillAlive = true;
-		evt.on('close', () => {
+		_eventEmitter.on('close', () => {
 			this.connectionStillAlive = false;
 		});
 	}
@@ -20,7 +26,7 @@ export class RBXScriptConnection {
 	}
 	public Disconnect(): void {
 		if (this.connectionStillAlive) {
-			this.evt.emit('close');
+			this._emitter.emit('close');
 			this.connectionStillAlive = false;
 		}
 	}

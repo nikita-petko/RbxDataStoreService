@@ -7,7 +7,12 @@ import { FASTFLAG, FFlag } from '../Tools/FastLogTool';
 
 FASTFLAG('Debug');
 
+/**
+ * @internal
+ */
 export class HttpRequest {
+	private static _lastCsrfToken: string;
+
 	public key: string;
 	public url: string;
 	public postData: string;
@@ -22,6 +27,7 @@ export class HttpRequest {
 			const http = <AxiosRequestConfig>{
 				headers: {
 					...Globals.GlobalHeaders(),
+					'x-csrf-token': HttpRequest._lastCsrfToken ?? '',
 					...this.additionalHeaders,
 				},
 				transformResponse: (resp, headers) => {
@@ -47,6 +53,16 @@ export class HttpRequest {
 						resumeFunction(res);
 					})
 					.catch((e) => {
+						if (e.response !== undefined) {
+							if (e.response.status === 403) {
+								const token = e.response.headers['x-csrf-token'];
+								if (token !== undefined) {
+									this.additionalHeaders['x-csrf-token'] = token;
+									HttpRequest._lastCsrfToken = token;
+									return resumeFunction(this.execute(_dataStoreService));
+								}
+							}
+						}
 						errorFunction(e);
 					});
 			else if (this.method === 'GET')

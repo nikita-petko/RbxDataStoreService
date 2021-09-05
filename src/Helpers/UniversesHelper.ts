@@ -2,6 +2,9 @@ import { HttpRequest } from '../Classes/HttpRequest';
 import { BaseURL } from '../Tools/UrlTool';
 import { Globals } from '../Util/Globals';
 
+/**
+ * @internal
+ */
 export class UniversesHelper {
 	public static async GetUniverseIDFromPlaceID(placeID: number): Promise<number> {
 		return new Promise<number>((resumeFunction, errorFunction) => {

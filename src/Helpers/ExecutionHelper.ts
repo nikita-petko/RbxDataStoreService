@@ -1,6 +1,9 @@
 import { AxiosResponse } from 'axios';
 import { HttpRequest } from '../Classes/HttpRequest';
 
+/**
+ * @internal
+ */
 export class ExectionHelper {
 	/**
 	 * @internal

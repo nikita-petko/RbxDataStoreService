@@ -8,6 +8,9 @@ import fs from 'fs';
 import { ClientSettings } from './ClientSettingsTool';
 const FFLags = ClientSettings.GetFFlags();
 
+/**
+ * @internal
+ */
 export const cache = {
 	DFLog: new Map<string, number>(),
 	DFFlag: new Map<string, boolean>(),
@@ -21,6 +24,7 @@ export const cache = {
 
 /**
  * Contains static FastLog variables.
+ * @internal
  */
 export const FLog: Record<string, number> = {};
 
@@ -28,6 +32,7 @@ export const FLog: Record<string, number> = {};
  * A function that refetches the value of the named FastLog variable in {name} and returns it.
  * @param {string} name The name of the FastLog variable.
  * @returns {number} Returns a number that can be used in the FastLogLibrary.
+ * @internal
  */
 export const DFLog = function (name: string): number {
 	const df = ClientSettings.GetDFLogs();
@@ -43,6 +48,7 @@ export const DFLog = function (name: string): number {
 
 /**
  * Contains server sided FastLog variables.
+ * @internal
  */
 export const SFLog: Record<string, number> = {};
 
@@ -52,6 +58,7 @@ export const SFLog: Record<string, number> = {};
 
 /**
  * Contains static FastFlag variables.
+ * @internal
  */
 export const FFlag: Record<string, boolean> = {};
 
@@ -59,6 +66,7 @@ export const FFlag: Record<string, boolean> = {};
  * A function that refetches the value of the named FastFlag variable in {name} and returns it.
  * @param {string} name The name of the FastFlag variable.
  * @returns {boolean} Returns a boolean that can be used in the code base to enable certain features.
+ * @internal
  */
 export const DFFlag = function (name: string): boolean {
 	const df = ClientSettings.GetDFFlags();
@@ -74,6 +82,7 @@ export const DFFlag = function (name: string): boolean {
 
 /**
  * Contains server sided FastFlag variables.
+ * @internal
  */
 export const SFFlag: Record<string, boolean> = {};
 
@@ -83,6 +92,7 @@ export const SFFlag: Record<string, boolean> = {};
 
 /**
  * Contains static FastInt/FastNumber variables.
+ * @internal
  */
 export const FInt: Record<string, number> = {};
 
@@ -90,6 +100,7 @@ export const FInt: Record<string, number> = {};
  * A function that refetches the value of the named FastInt/FastNumber variable in {name} and returns it.
  * @param {string} name The name of the FastInt/FastNumber variable.
  * @returns {number} Returns a number that can be used in the code base to change certain features.
+ * @internal
  */
 export const DFInt = function (name: string): number {
 	const df = ClientSettings.GetDFInts();
@@ -105,6 +116,7 @@ export const DFInt = function (name: string): number {
 
 /**
  * Contains server sided FastInt/FastNumber variables.
+ * @internal
  */
 export const SFInt: Record<string, number> = {};
 
@@ -114,6 +126,7 @@ export const SFInt: Record<string, number> = {};
 
 /**
  * Contains static FastString variables.
+ * @internal
  */
 export const FString: Record<string, string> = {};
 
@@ -121,6 +134,7 @@ export const FString: Record<string, string> = {};
  * A function that refetches the value of the named FastString variable in {name} and returns it.
  * @param {string} name The name of the FastString variable.
  * @returns {boolean} Returns a string that can be used in the code base to change certain features.
+ * @internal
  */
 export const DFString = function (name: string): string {
 	const df = ClientSettings.GetDFStrings();
@@ -136,6 +150,7 @@ export const DFString = function (name: string): string {
 
 /**
  * Contains server sided FastString variables.
+ * @internal
  */
 export const SFString: Record<string, string> = {};
 
@@ -145,12 +160,14 @@ export const SFString: Record<string, string> = {};
 
 /**
  * An array of strings that contain ClientPackNames.
+ * @internal
  */
 export const FSettings: Array<string> = [];
 
 /**
  * Used to enable certain features.
  * @internal This is internal.
+ * @internal
  */
 
 export const d = {
@@ -162,6 +179,7 @@ export const d = {
  * @param {...string[]} args The arguments to include, normally the 1st is the string to modify.
  * @returns {string} Returns a formatted string.
  * @internal This is internal.
+ * @internal
  */
 const parameterizedString = (...args: string[]): string => {
 	const string = args[0];
@@ -205,6 +223,7 @@ const parameterizedString = (...args: string[]): string => {
 /**
  * Sets up FLog initially.
  * @internal This is internal.
+ * @internal
  */
 function setUpFLog() {
 	const f = ClientSettings.GetFLogs();
@@ -332,6 +351,7 @@ function printMessage(
  * @param {any} arg4 Arg4
  * @returns {void} Returns nothing.
  * @internal This is internal.
+ * @internal
  */
 function FastLog(level: number, message: string, arg0: any, arg1: any, arg2: any, arg3: any, arg4: any): void {
 	if (level > 5) {
@@ -344,6 +364,7 @@ function FastLog(level: number, message: string, arg0: any, arg1: any, arg2: any
  * @param {number} group The FastLog level.
  * @param {string} message The message to log.
  * @returns {void} Returns nothing.
+ * @internal
  */
 export const FASTLOG = (group: number, message: string): void => {
 	do {
@@ -357,6 +378,7 @@ export const FASTLOG = (group: number, message: string): void => {
  * @param {string} message The message to log.
  * @param {any} arg0 Arg0
  * @returns {void} Returns nothing.
+ * @internal
  */
 export const FASTLOG1 = (group: number, message: string, arg0: any): void => {
 	do {
@@ -371,6 +393,7 @@ export const FASTLOG1 = (group: number, message: string, arg0: any): void => {
  * @param {any} arg0 Arg0
  * @param {any} arg1 Arg1
  * @returns {void} Returns nothing.
+ * @internal
  */
 export const FASTLOG2 = (group: number, message: string, arg0: any, arg1: any): void => {
 	do {
@@ -386,6 +409,7 @@ export const FASTLOG2 = (group: number, message: string, arg0: any, arg1: any): 
  * @param {any} arg1 Arg1
  * @param {any} arg2 Arg2
  * @returns {void} Returns nothing.
+ * @internal
  */
 export const FASTLOG3 = (group: number, message: string, arg0: any, arg1: any, arg2: any): void => {
 	do {
@@ -402,6 +426,7 @@ export const FASTLOG3 = (group: number, message: string, arg0: any, arg1: any, a
  * @param {any} arg2 Arg2
  * @param {any} arg3 Arg3
  * @returns {void} Returns nothing.
+ * @internal
  */
 export const FASTLOG4 = (group: number, message: string, arg0: any, arg1: any, arg2: any, arg3: any): void => {
 	do {
@@ -419,6 +444,7 @@ export const FASTLOG4 = (group: number, message: string, arg0: any, arg1: any, a
  * @param {any} arg3 Arg3
  * @param {any} arg4 Arg4
  * @returns {void} Returns nothing.
+ * @internal
  */
 export const FASTLOG5 = (
 	group: number,
@@ -440,6 +466,7 @@ export const FASTLOG5 = (
  * @param {string} message The message to log.
  * @param {string} sarg The string argument to use.
  * @returns {void} Returns nothing.
+ * @internal
  */
 export const FASTLOGS = (group: number, message: string, sarg: string): void => {
 	do {
@@ -453,6 +480,7 @@ export const FASTLOGS = (group: number, message: string, sarg: string): void => 
  * @param {string} message The message to log.
  * @param {number} arg0 Arg0
  * @returns {void} Returns nothing.
+ * @internal
  */
 export const FASTLOG1F = (group: number, message: string, arg0: number) => {
 	do {
@@ -467,6 +495,7 @@ export const FASTLOG1F = (group: number, message: string, arg0: number) => {
  * @param {number} arg0 Arg0
  * @param {number} arg1 Arg1
  * @returns {void} Returns nothing.
+ * @internal
  */
 export const FASTLOG2F = (group: number, message: string, arg0: number, arg1: number): void => {
 	do {
@@ -482,6 +511,7 @@ export const FASTLOG2F = (group: number, message: string, arg0: number, arg1: nu
  * @param {number} arg1 Arg1
  * @param {number} arg2 Arg2
  * @returns {void} Returns nothing.
+ * @internal
  */
 export const FASTLOG3F = (group: number, message: string, arg0: number, arg1: number, arg2: number): void => {
 	do {
@@ -498,6 +528,7 @@ export const FASTLOG3F = (group: number, message: string, arg0: number, arg1: nu
  * @param {number} arg2 Arg2
  * @param {number} arg3 Arg3
  * @returns {void} Returns nothing.
+ * @internal
  */
 export const FASTLOG4F = (
 	group: number,
@@ -517,6 +548,7 @@ export const FASTLOG4F = (
  * @param {number} group The FastLog level.
  * @param {string} message The message to log.
  * @returns {void} Returns nothing.
+ * @internal
  */
 export const FASTLOGNOFILTER = (group: number, message: string): void => {
 	FastLog(group, message, null, null, null, null, null);
@@ -529,6 +561,7 @@ export const FASTLOGNOFILTER = (group: number, message: string): void => {
  * @param {any} arg0 Arg0
  * @param {any} arg1 Arg1
  * @returns {void} Returns nothing.
+ * @internal
  */
 export const FASTLOGNOFILTER2 = (group: number, message: string, arg0: any, arg1: any) => {
 	FastLog(group, message, arg0, arg1, null, null, null);
@@ -537,6 +570,7 @@ export const FASTLOGNOFILTER2 = (group: number, message: string, arg0: any, arg1
 /**
  * References the given groupName.
  * @param {string} group The name of the group to reference.
+ * @internal
  */
 export const LOGGROUP = (group: string) => {
 	if (!d.setup) {
@@ -549,6 +583,7 @@ export const LOGGROUP = (group: string) => {
  * Sets the deault valur or gets the current value.
  * @param {string} group The name of the group to create.
  * @param {number} defaulton The value to set the group by,
+ * @internal
  */
 export const LOGVARIABLE = (group: string, defaulton: number) => {
 	if (!d.setup) {
@@ -560,6 +595,7 @@ export const LOGVARIABLE = (group: string, defaulton: number) => {
 /**
  * References the given groupName.
  * @param {string} group The name of the group to reference.
+ * @internal
  */
 export const DYNAMIC_LOGGROUP = (group: string) => {
 	if (!d.setup) {
@@ -572,6 +608,7 @@ export const DYNAMIC_LOGGROUP = (group: string) => {
  * Sets the deault valur or gets the current value.
  * @param {string} group The name of the group to create.
  * @param {number} defaulton The value to set the group by,
+ * @internal
  */
 export const DYNAMIC_LOGVARIABLE = (group: string, defaulton: number) => {
 	if (!d.setup) {
@@ -583,6 +620,7 @@ export const DYNAMIC_LOGVARIABLE = (group: string, defaulton: number) => {
 /**
  * References the given groupName.
  * @param {string} group The name of the group to reference.
+ * @internal
  */
 export const SYNCHRONIZED_LOGGROUP = (group: string) => {
 	if (!d.setup) {
@@ -595,6 +633,7 @@ export const SYNCHRONIZED_LOGGROUP = (group: string) => {
  * Sets the deault valur or gets the current value.
  * @param {string} group The name of the group to create.
  * @param {number} defaulton The value to set the group by,
+ * @internal
  */
 export const SYNCHRONIZED_LOGVARIABLE = (group: string, defaulton: number) => {
 	if (!d.setup) {
@@ -603,116 +642,162 @@ export const SYNCHRONIZED_LOGVARIABLE = (group: string, defaulton: number) => {
 	SFLog[group] = SFLog[group] || defaulton;
 };
 
+/**
+ * @internal
+ */
 export const FASTFLAG = (v: string) => {
 	if (!d.setup) {
 		setUpFLog();
 	}
 	if (FFlag[v] === undefined) FFlag[v] = false;
 };
+/**
+ * @internal
+ */
 export const FASTFLAGVARIABLE = (v: string, defaulton: boolean) => {
 	if (!d.setup) {
 		setUpFLog();
 	}
 	FFlag[v] = FFlag[v] || defaulton;
 };
-
+/**
+ * @internal
+ */
 export const DYNAMIC_FASTFLAG = (v: string) => {
 	if (!d.setup) {
 		setUpFLog();
 	}
 	if (cache.DFFlag[v] === undefined) cache.DFFlag[v] = false;
 };
+/**
+ * @internal
+ */
 export const DYNAMIC_FASTFLAGVARIABLE = (v: string, defaulton: boolean) => {
 	if (!d.setup) {
 		setUpFLog();
 	}
 	cache.DFFlag[v] = cache.DFFlag[v] || defaulton;
 };
-
+/**
+ * @internal
+ */
 export const SYNCHRONIZED_FASTFLAG = (v: string) => {
 	if (!d.setup) {
 		setUpFLog();
 	}
 	if (SFFlag[v] === undefined) SFFlag[v] = false;
 };
+/**
+ * @internal
+ */
 export const SYNCHRONIZED_FASTFLAGVARIABLE = (v: string, defaulton: boolean) => {
 	if (!d.setup) {
 		setUpFLog();
 	}
 	SFFlag[v] = SFFlag[v] || defaulton;
 };
-
+/**
+ * @internal
+ */
 export const FASTINT = (v: string) => {
 	if (!d.setup) {
 		setUpFLog();
 	}
 	if (FInt[v] === undefined) FInt[v] = 0;
 };
+/**
+ * @internal
+ */
 export const FASTINTVARIABLE = (v: string, defaulton: number) => {
 	if (!d.setup) {
 		setUpFLog();
 	}
 	FInt[v] = FInt[v] || defaulton;
 };
-
+/**
+ * @internal
+ */
 export const DYNAMIC_FASTINT = (v: string) => {
 	if (!d.setup) {
 		setUpFLog();
 	}
 	if (cache.DFInt[v] === undefined) cache.DFInt[v] = 0;
 };
+/**
+ * @internal
+ */
 export const DYNAMIC_FASTINTVARIABLE = (v: string, defaulton: number) => {
 	if (!d.setup) {
 		setUpFLog();
 	}
 	cache.DFInt[v] = cache.DFInt[v] || defaulton;
 };
-
+/**
+ * @internal
+ */
 export const SYNCHRONIZED_FASTINT = (v: string) => {
 	if (!d.setup) {
 		setUpFLog();
 	}
 	if (SFInt[v] === undefined) SFInt[v] = 0;
 };
+/**
+ * @internal
+ */
 export const SYNCHRONIZED_FASTINTVARIABLE = (v: string, defaulton: number) => {
 	if (!d.setup) {
 		setUpFLog();
 	}
 	SFInt[v] = SFInt[v] || defaulton;
 };
-
+/**
+ * @internal
+ */
 export const FASTSTRING = (v: string) => {
 	if (!d.setup) {
 		setUpFLog();
 	}
 	if (FString[v] === undefined) FString[v] = '';
 };
+/**
+ * @internal
+ */
 export const FASTSTRINGVARIABLE = (v: string, defaulton: string) => {
 	if (!d.setup) {
 		setUpFLog();
 	}
 	FString[v] = FString[v] || defaulton;
 };
-
+/**
+ * @internal
+ */
 export const DYNAMIC_FASTSTRING = (v: string) => {
 	if (!d.setup) {
 		setUpFLog();
 	}
 	if (cache.DFString[v] === undefined) cache.DFString[v] = '';
 };
+/**
+ * @internal
+ */
 export const DYNAMIC_FASTSTRINGVARIABLE = (v: string, defaulton: string) => {
 	if (!d.setup) {
 		setUpFLog();
 	}
 	cache.DFString[v] = cache.DFString[v] || defaulton;
 };
-
+/**
+ * @internal
+ */
 export const SYNCHRONIZED_FASTSTRING = (v: string) => {
 	if (!d.setup) {
 		setUpFLog();
 	}
 	if (SFString[v] === undefined) SFString[v] = '';
 };
+/**
+ * @internal
+ */
 export const SYNCHRONIZED_FASTSTRINGVARIABLE = (v: string, defaulton: string) => {
 	if (!d.setup) {
 		setUpFLog();

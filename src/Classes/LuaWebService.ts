@@ -1,7 +1,11 @@
 import { HttpRequest } from './HttpRequest';
 import { Globals } from '../Util/Globals';
 import { BaseURL } from '../Tools/UrlTool';
+import { AxiosResponse } from 'axios';
 
+/**
+ * @internal
+ */
 export class LuaWebService {
 	/**
 	 * @internal
@@ -37,7 +41,7 @@ export class LuaWebService {
 					false,
 					true,
 				);
-				let response;
+				let response: AxiosResponse<any>;
 				try {
 					response = await request.execute(null);
 				} catch {}
@@ -45,9 +49,9 @@ export class LuaWebService {
 				let ableToParse = false;
 				let parsedValue = false;
 
-				if (!((<string>response).length === 0)) {
+				if (!((<string>response.data).length === 0)) {
 					try {
-						const v = new Map(Object.entries(JSON.parse(response)));
+						const v = new Map(Object.entries(JSON.parse(response.data)));
 
 						const itr = v.get('StudioAccessToApisAllowed');
 

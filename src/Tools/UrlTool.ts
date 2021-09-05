@@ -4,7 +4,9 @@ import qs from 'querystring';
 FASTFLAGVARIABLE('UseSiteTests', false);
 FASTFLAG('Debug');
 DYNAMIC_FASTSTRINGVARIABLE('PreferredTestSite', 'SiteTest1');
-
+/**
+ * @internal
+ */
 export class BaseURL {
 	/**
 	 * Comes from Roblox.Common.Client.BaseURL (BaseUrl.cs) {M:Roblox.Common.Client.BaseURL.GetBaseURL(System.Nullable`1)}
@@ -138,7 +140,9 @@ export class BaseURL {
 		return str.replace(/www/, rep);
 	}
 }
-
+/**
+ * @internal
+ */
 export class UrlHelper {
 	public static GetRobloxGamePersistenceHost() {
 		return UrlHelper.GetRobloxServiceHost('gamepersistence');
@@ -151,8 +155,51 @@ export class UrlHelper {
 	public static GetBaseHost() {
 		return BaseURL.GetBaseHost(true);
 	}
+
+	public static BuildGenericGameUrl(servicePath: string) {
+		return BaseURL.ConstructServicePathFromSubDomain('assetgame', servicePath + '/', null, true, false);
+	}
+
+	public static BuildGenericPersistenceUrl(servicePath: string) {
+		return BaseURL.ConstructServicePathFromHost(
+			UrlHelper.GetRobloxGamePersistenceHost(),
+			servicePath + '/',
+			null,
+			true,
+			true,
+		);
+	}
+
+	public static GetCountersMultiIncrementUrl(key: string) {
+		return BaseURL.ConstructServicePathFromSubDomain(
+			'ephemeralcounters.api',
+			'v1.0/MultiIncrement',
+			{
+				ApiKey: key,
+			},
+			true,
+			false,
+			true,
+		);
+	}
+
+	public static GetCountersUrl(key: string) {
+		return BaseURL.ConstructServicePathFromSubDomain(
+			'ephemeralcounters.api',
+			'v1.1/Counters/Increment',
+			{
+				ApiKey: key,
+			},
+			true,
+			false,
+			true,
+		);
+	}
 }
 
+/**
+ * @internal
+ */
 export const GlobalURLS = {
 	Production: {
 		Apex: 'roblox.com',

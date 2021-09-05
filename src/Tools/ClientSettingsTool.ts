@@ -13,6 +13,9 @@
 
 import filestream from 'fs';
 
+/**
+ * @internal
+ */
 export enum Group {
 	'FVariable',
 	'FLog',
@@ -33,6 +36,9 @@ export enum Group {
 }
 
 //ClientSettings namespace, beacause you know, it's 100% just client settings, not like ClientSettings are here also.
+/**
+ * @internal
+ */
 export class ClientSettings {
 	// This is helper for grabbing BigSettings, just type cast it if you din't want to say `ClientSettings.GetDFFlag("ClientNoOpt")` etc.
 	// it's also used by GetDFFlag, so yeah

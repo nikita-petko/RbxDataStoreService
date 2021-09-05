@@ -1,3 +1,6 @@
+/**
+ * @internal
+ */
 export class Globals {
 	public static Cookie: string = '';
 	public static PlaceID: number = 0;

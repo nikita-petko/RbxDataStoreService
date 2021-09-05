@@ -3,6 +3,9 @@ export class DataStoreSetOptions {
 	 * @internal
 	 */
 	private attributes: Record<string, unknown>;
+	/**
+	 * @internal
+	 */
 	public constructor(attributes?: Record<string, unknown>) {
 		this.attributes = attributes || {};
 	}

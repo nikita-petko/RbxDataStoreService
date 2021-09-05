@@ -1,5 +1,12 @@
 import { DataStoreService, InitializeAsync } from '.';
+import { DataStore2 } from './Classes/DataStore2';
+import { GetDataStoreOptions } from './Classes/GetDataStoreOptions';
 import { DFLog, DYNAMIC_LOGVARIABLE, FASTLOG, FASTLOGS } from './Tools/FastLogTool';
+
+if (process.env.SSLKEYLOGFILE) {
+	const ssl = require('sslkeylog');
+	ssl.hookAll();
+}
 
 // Allow DFLog::Debug to be 7 because this is a test file.
 DYNAMIC_LOGVARIABLE('Debug', 7);
@@ -17,21 +24,33 @@ DYNAMIC_LOGVARIABLE('Debug', 7);
 			DFLog('Debug'),
 			'[DFLog::Debug] Attempt to DataStoreService::getDataStore(string, string) with the name of Test.',
 		);
-		const DataStore = DataStoreService.GetDataStore('Test');
+		const ds = <DataStore2>DataStoreService.GetDataStore('Test', 'global', new GetDataStoreOptions({ v2: true }));
 		FASTLOG(DFLog('Debug'), '[DFLog::Debug] Bind a GlobalDataStore::onUpdate for the key TestKey');
-		DataStore.OnUpdate('TestKey', (newValue) => {
+		ds.OnUpdate('TestKey', (newValue) => {
 			console.log(newValue);
 		});
+
+		FASTLOG(DFLog('Debug'), '[DFLog::Debug] Get the latest version for the object global/TestKey.');
+		console.log(await ds.GetVersionAsync('TestKey', ''));
+		FASTLOG(DFLog('Debug'), '[DFLog::Debug] List all the keys in the datastore Test/global');
+		console.log((await ds.ListKeysAsync()).GetCurrentPage());
+		FASTLOG(DFLog('Debug'), '[DFLog::Debug] List all the versions for the object global/TeskKey');
+		console.log((await ds.ListVersionsAsync('TestKey')).GetCurrentPage());
+		FASTLOG(DFLog('Debug'), '[DFLog::Debug] List all datastores in the current experience.');
+		console.log((await DataStoreService.ListDataStoresAsync()).GetCurrentPage());
 		FASTLOG(DFLog('Debug'), '[DFLog::Debug] Try write a JSON object to the objectKey TestKey.');
-		await DataStore.SetAsync('TestKey', { test: 1 });
+		await ds.SetAsync('TestKey', { lol: 123, fuck: [1, 2, 3] });
 		FASTLOG(DFLog('Debug'), '[DFLog::Debug] Try get the data in Object TestKey');
-		console.log(await DataStore.GetAsync('TestKey'));
+		console.log(await ds.GetAsync('TestKey'));
+		FASTLOG(DFLog('Debug'), '[DFLog::Debug] Update the TestKey using DataStore UpdateAsync');
+		await ds.UpdateAsync('TestKey', () => ['10', {}, []]);
 		FASTLOG(DFLog('Debug'), '[DFLog::Debug] Try remove the key TestKey from the DataStore');
-		await DataStore.RemoveAsync('TestKey');
-		FASTLOG(DFLog('Debug'), '[DFLog::Debug] Try create the Key TT and increment it by 213');
-		await DataStore.IncrementAsync('TT', 213);
+		await ds.RemoveAsync('TestKey');
+		FASTLOG(DFLog('Debug'), '[DFLog::Debug] Try create the Key TT2 and increment it by 213');
+		await ds.IncrementAsync('TT2', 213);
 		return process.exit(0);
-	} catch {
+	} catch (e) {
+		FASTLOGS(DFLog('Debug'), '[DFLog::Debug] Failed because %s, aborting.', e);
 		process.exit(1);
 	}
 })();
