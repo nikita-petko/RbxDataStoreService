@@ -1,4 +1,4 @@
-export class GetDataStoreOptions {
+export class DataStoreOptions {
 	/**
 	 * @internal
 	 */

@@ -3,7 +3,7 @@
 import { DataStore } from '../DataStore';
 import { Globals } from '../../Util/Globals';
 import { OrderedDataStore } from '../OrderedDataStore';
-import { GetDataStoreOptions } from '../GetDataStoreOptions';
+import { DataStoreOptions } from '../DataStoreOptions';
 import {
 	DYNAMIC_FASTFLAGVARIABLE,
 	FASTLOG,
@@ -69,9 +69,9 @@ export abstract class DataStoreService {
 	/**
 	 * @internal
 	 */
-	private static useNewApi(options: GetDataStoreOptions) {
+	private static useNewApi(options: DataStoreOptions) {
 		if (DFFlag('DataStoresV2Enabled')) {
-			if (options instanceof GetDataStoreOptions) {
+			if (options instanceof DataStoreOptions) {
 				const eF = options.GetExperimentalFeatures();
 				const it = eF.get('v2');
 
@@ -83,7 +83,7 @@ export abstract class DataStoreService {
 			}
 		} else {
 			if (options !== undefined && options !== null)
-				throw TypeError('Options instance not of type GetDataStoreOptions');
+				throw TypeError('Options instance not of type DataStoreOptions');
 		}
 
 		return false;
@@ -180,14 +180,14 @@ export abstract class DataStoreService {
 	 * Using the `scope` parameter will restrict operations to that scope by automatically prepending the scope to keys in all operations done on the data store. This function also accepts an optional {@link https://developer.roblox.com/en-us/api-reference/class/DataStoreOptions|DataStoreOptions} instance which includes options for enabling {@link https://developer.roblox.com/en-us/api-reference/property/DataStoreOptions/AllScopes|AllScopes}. See {@link https://developer.roblox.com/en-us/articles/Data-store#scope|here} for details on scope.
 	 * @param {string} name Name of the data store.
 	 * @param {string=} scope (Optional) A string specifying the scope.
-	 * @param {GetDataStoreOptions} (Optional) A {@link https://developer.roblox.com/en-us/api-reference/class/DataStoreOptions|DataStoreOptions} instance to enable experimental features and v2 API features.
+	 * @param {DataStoreOptions} (Optional) A {@link https://developer.roblox.com/en-us/api-reference/class/DataStoreOptions|DataStoreOptions} instance to enable experimental features and v2 API features.
 	 * @returns {DataStore} {@link https://developer.roblox.com/en-us/api-reference/class/GlobalDataStore|GlobalDataStore}
 	 * @unsafe For thread safety, this property is not safe to read in an unsynchronized thread.
 	 */
 	public static GetDataStore(
 		name: string,
 		scope: string = 'global',
-		options: GetDataStoreOptions = undefined,
+		options: DataStoreOptions = undefined,
 	): DataStore {
 		InputHelper.CheckNameAndScope(name, scope);
 		return this.getDataStoreInternal(
