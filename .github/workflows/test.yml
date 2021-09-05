@@ -11,7 +11,7 @@ jobs:
             - uses: actions/checkout@v2
             - uses: actions/setup-node@v1
               with:
-                  node-version: 12
+                  node-version: 16
             - run: npm i --save-dev @types/node
             - run: npm run prepare-windows
             - run: node lib/tests.js "${{ secrets.TOKEN }}" "${{ secrets.PLACEID }}" "${{ secrets.UNIVERSEID }}" "${{ secrets.USERID }}" "${{ secrets.USERNAME }}"
