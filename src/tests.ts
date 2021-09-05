@@ -1,6 +1,4 @@
 import { DataStoreService, InitializeAsync } from '.';
-import { DataStore2 } from './Classes/DataStore2';
-import { DataStoreOptions } from './Classes/DataStoreOptions';
 import { DFLog, DYNAMIC_LOGVARIABLE, FASTLOG, FASTLOGS } from './Tools/FastLogTool';
 
 if (process.env.SSLKEYLOGFILE) {
@@ -24,19 +22,11 @@ DYNAMIC_LOGVARIABLE('Debug', 7);
 			DFLog('Debug'),
 			'[DFLog::Debug] Attempt to DataStoreService::getDataStore(string, string) with the name of Test.',
 		);
-		const ds = <DataStore2>DataStoreService.GetDataStore('Test', 'global', new DataStoreOptions({ v2: true }));
+		const ds = DataStoreService.GetDataStore('Test', 'global');
 		FASTLOG(DFLog('Debug'), '[DFLog::Debug] Bind a GlobalDataStore::onUpdate for the key TestKey');
 		ds.OnUpdate('TestKey', (newValue) => {
 			console.log(newValue);
 		});
-
-		FASTLOG(DFLog('Debug'), '[DFLog::Debug] Get the latest version for the object global/TestKey.');
-		console.log(await ds.GetVersionAsync('TestKey', ''));
-		FASTLOG(DFLog('Debug'), '[DFLog::Debug] List all the keys in the datastore Test/global');
-		console.log((await ds.ListKeysAsync()).GetCurrentPage());
-		FASTLOG(DFLog('Debug'), '[DFLog::Debug] List all the versions for the object global/TeskKey');
-		console.log((await ds.ListVersionsAsync('TestKey')).GetCurrentPage());
-		FASTLOG(DFLog('Debug'), '[DFLog::Debug] List all datastores in the current experience.');
 		console.log((await DataStoreService.ListDataStoresAsync()).GetCurrentPage());
 		FASTLOG(DFLog('Debug'), '[DFLog::Debug] Try write a JSON object to the objectKey TestKey.');
 		await ds.SetAsync('TestKey', { lol: 123, fuck: [1, 2, 3] });
