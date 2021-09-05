@@ -24,28 +24,33 @@ DYNAMIC_LOGVARIABLE('Debug', 7);
 			DFLog('Debug'),
 			'[DFLog::Debug] Attempt to DataStoreService::getDataStore(string, string) with the name of Test.',
 		);
-		const ds = <DataStore2>DataStoreService.GetDataStore('Test', 'global', new DataStoreOptions({ v2: true }));
+
+		const opts = new DataStoreOptions();
+		opts.AllScopes = true;
+		opts.SetExperimentalFeatures({ v2: true });
+
+		const ds = <DataStore2>DataStoreService.GetDataStore('Test', '', opts);
 		FASTLOG(DFLog('Debug'), '[DFLog::Debug] Bind a GlobalDataStore::onUpdate for the key TestKey');
 		ds.OnUpdate('TestKey', (newValue) => {
 			console.log(newValue);
 		});
 
 		FASTLOG(DFLog('Debug'), '[DFLog::Debug] Get the latest version for the object global/TestKey.');
-		console.log(await ds.GetVersionAsync('TestKey', ''));
+		console.log(await ds.GetVersionAsync('global/TestKey', ''));
 		FASTLOG(DFLog('Debug'), '[DFLog::Debug] List all the keys in the datastore Test/global');
 		console.log((await ds.ListKeysAsync()).GetCurrentPage());
 		FASTLOG(DFLog('Debug'), '[DFLog::Debug] List all the versions for the object global/TeskKey');
-		console.log((await ds.ListVersionsAsync('TestKey')).GetCurrentPage());
+		console.log((await ds.ListVersionsAsync('global/TestKey')).GetCurrentPage());
 		FASTLOG(DFLog('Debug'), '[DFLog::Debug] List all datastores in the current experience.');
 		console.log((await DataStoreService.ListDataStoresAsync()).GetCurrentPage());
 		FASTLOG(DFLog('Debug'), '[DFLog::Debug] Try write a JSON object to the objectKey TestKey.');
-		await ds.SetAsync('TestKey', { lol: 123, fuck: [1, 2, 3] });
+		await ds.SetAsync('global/TestKey', { lol: 123, fuck: [1, 2, 3] });
 		FASTLOG(DFLog('Debug'), '[DFLog::Debug] Try get the data in Object TestKey');
-		console.log(await ds.GetAsync('TestKey'));
+		console.log(await ds.GetAsync('global/TestKey'));
 		FASTLOG(DFLog('Debug'), '[DFLog::Debug] Update the TestKey using DataStore UpdateAsync');
-		await ds.UpdateAsync('TestKey', () => ['10', {}, []]);
+		await ds.UpdateAsync('global/TestKey', () => ['10', {}, []]);
 		FASTLOG(DFLog('Debug'), '[DFLog::Debug] Try remove the key TestKey from the DataStore');
-		await ds.RemoveAsync('TestKey');
+		await ds.RemoveAsync('global/TestKey');
 		FASTLOG(DFLog('Debug'), '[DFLog::Debug] Try create the Key TT2 and increment it by 213');
 		await ds.IncrementAsync('TT2', 213);
 		return process.exit(0);

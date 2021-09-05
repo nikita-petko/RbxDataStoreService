@@ -5,7 +5,7 @@ import { Pages } from './Pages';
 import { ExectionHelper } from '../Helpers/ExecutionHelper';
 import { DFFlag, DYNAMIC_FASTFLAGVARIABLE } from '../Tools/FastLogTool';
 
-DYNAMIC_FASTFLAGVARIABLE('DataStoreUseNewEndpoints', false);
+DYNAMIC_FASTFLAGVARIABLE('DataStoreUseNewEndpoints', true);
 
 /**
  * A special type of Pages object whose pages contain key/value pairs from an OrderedDataStore.

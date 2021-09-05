@@ -74,6 +74,13 @@ export class DataStoreVersionPages extends Pages {
 					return resumeFunction();
 				})
 				.catch((reason) => {
+					if (reason.response) {
+						if (reason.response.data['errors'][0]['code'] === 11) {
+							this.finished = true;
+							return resumeFunction();
+						}
+						return errorFunction(reason.response.data['errors'][0]['message']);
+					}
 					return errorFunction(reason);
 				});
 		});

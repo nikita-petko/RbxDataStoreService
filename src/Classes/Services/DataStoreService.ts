@@ -189,7 +189,7 @@ export abstract class DataStoreService {
 		scope: string = 'global',
 		options: DataStoreOptions = undefined,
 	): DataStore {
-		InputHelper.CheckNameAndScope(name, scope);
+		InputHelper.CheckNameAndScope(name, scope, options);
 		return this.getDataStoreInternal(
 			name,
 			scope,

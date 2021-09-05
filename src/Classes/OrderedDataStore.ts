@@ -4,7 +4,7 @@ import { Globals } from '../Util/Globals';
 import { DFFlag, DFInt, DYNAMIC_FASTFLAGVARIABLE, DYNAMIC_FASTINTVARIABLE } from '../Tools/FastLogTool';
 
 DYNAMIC_FASTINTVARIABLE('DataStoreMaxPageSize', 100);
-DYNAMIC_FASTFLAGVARIABLE('DataStoreUseNewEndpoints', false);
+DYNAMIC_FASTFLAGVARIABLE('DataStoreUseNewEndpoints', true);
 
 /**
  * A OrderedDataStore is essentially a GlobalDataStore with the exception that stored values must be positive integers.

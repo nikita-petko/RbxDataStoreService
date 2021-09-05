@@ -8,7 +8,7 @@ export class DataStoreOptions {
 	 * @internal
 	 */
 	public constructor(experimentalFeatures?: object) {
-		this.experimentalFeatures = new Map<string, unknown>(Object.entries(experimentalFeatures)) || new Map();
+		this.experimentalFeatures = new Map<string, unknown>(Object.entries(experimentalFeatures || {})) || new Map();
 		this.AllScopes = false;
 	}
 	public GetExperimentalFeatures() {

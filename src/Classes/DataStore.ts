@@ -25,8 +25,8 @@ import { DataStoreKeyInfo } from './DataStoreKeyInfo';
 LOGVARIABLE('DataStore', 0);
 
 DYNAMIC_FASTINTVARIABLE('DataStoreMaxValueSize', 64 * 1024);
-DYNAMIC_FASTFLAGVARIABLE('DataStoreUseNewEndpoints', false);
-DYNAMIC_FASTFLAGVARIABLE('DataStoreNewEndpointsReturnResultIfFailedToDeserialize', false);
+DYNAMIC_FASTFLAGVARIABLE('DataStoreUseNewEndpoints', true);
+DYNAMIC_FASTFLAGVARIABLE('DataStoreNewEndpointsReturnResultIfFailedToDeserialize', true);
 
 /**
  * A GlobalDataStore exposes functions for saving and loading data for the DataStoreService.

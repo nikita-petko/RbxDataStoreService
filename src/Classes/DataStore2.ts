@@ -168,9 +168,6 @@ export class DataStore2 extends DataStore {
 			if (!success) return errorFunction(message);
 
 			if (this.allScopes) {
-				if (this.scope.length > 0)
-					return errorFunction('DataStore scope should be an empty string allScopes is set to true');
-
 				if (DFFlag('DataStore2CheckObjectKeyForScope')) {
 					if (key.split('/').length < 2) return errorFunction('The provided object key is invalid.');
 				}
@@ -225,9 +222,6 @@ export class DataStore2 extends DataStore {
 			if (!success) return errorFunction(message);
 
 			if (this.allScopes) {
-				if (this.scope.length > 0)
-					return errorFunction('DataStore scope should be an empty string allScopes is set to true');
-
 				if (DFFlag('DataStore2CheckObjectKeyForScope')) {
 					if (key.split('/').length < 2) return errorFunction('The provided object key is invalid.');
 				}
@@ -297,9 +291,6 @@ export class DataStore2 extends DataStore {
 			if (!success) return errorFunction(message);
 
 			if (this.allScopes) {
-				if (this.scope.length > 0)
-					return errorFunction('DataStore scope should be an empty string allScopes is set to true');
-
 				if (DFFlag('DataStore2CheckObjectKeyForScope')) {
 					if (key.split('/').length < 2) return errorFunction('The provided object key is invalid.');
 				}
@@ -348,9 +339,6 @@ export class DataStore2 extends DataStore {
 			if (!success) return errorFunction(message);
 
 			if (this.allScopes) {
-				if (this.scope.length > 0)
-					return errorFunction('DataStore scope should be an empty string allScopes is set to true');
-
 				if (DFFlag('DataStore2CheckObjectKeyForScope')) {
 					if (key.split('/').length < 2) return errorFunction('The provided object key is invalid.');
 				}
@@ -432,9 +420,6 @@ export class DataStore2 extends DataStore {
 			if (!success) return errorFunction(message);
 
 			if (this.allScopes) {
-				if (this.scope.length > 0)
-					return errorFunction('DataStore scope should be an empty string allScopes is set to true');
-
 				if (DFFlag('DataStore2CheckObjectKeyForScope')) {
 					if (key.split('/').length < 2) return errorFunction('The provided object key is invalid.');
 				}
@@ -541,9 +526,6 @@ export class DataStore2 extends DataStore {
 	): Promise<DataStoreVersionPages> {
 		return new Promise(async (resumeFunction, errorFunction) => {
 			if (this.allScopes) {
-				if (this.scope.length > 0)
-					return errorFunction('DataStore scope should be an empty string allScopes is set to true');
-
 				if (DFFlag('DataStore2CheckObjectKeyForScope')) {
 					if (key.split('/').length < 2) return errorFunction('The provided object key is invalid.');
 				}
@@ -586,9 +568,6 @@ export class DataStore2 extends DataStore {
 			if (!success) return errorFunction(message);
 
 			if (this.allScopes) {
-				if (this.scope.length > 0)
-					return errorFunction('DataStore scope should be an empty string allScopes is set to true');
-
 				if (DFFlag('DataStore2CheckObjectKeyForScope')) {
 					if (key.split('/').length < 2) return errorFunction('The provided object key is invalid.');
 				}

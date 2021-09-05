@@ -1,6 +1,6 @@
 {
 	"name": "@mfd/rbxdatastoreservice",
-	"version": "1.4.9",
+	"version": "2.0.0",
 	"description": "RbxDataStoreService is a module that allows you to access roblox datastores from your Node.js applications.",
 	"main": "lib/index.js",
 	"types": "lib/types",
@@ -22,7 +22,7 @@
 	"license": "Apache-2.0",
 	"devDependencies": {
 		"@types/crypto-js": "^4.0.1",
-		"@types/node": "^16.3.1",
+		"@types/node": "^16.7.10",
 		"@typescript-eslint/eslint-plugin": "^4.8.1",
 		"@typescript-eslint/parser": "^4.8.1",
 		"eslint": "^7.14.0",
