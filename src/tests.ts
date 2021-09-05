@@ -24,7 +24,7 @@ DYNAMIC_LOGVARIABLE('Debug', 7);
 			DFLog('Debug'),
 			'[DFLog::Debug] Attempt to DataStoreService::getDataStore(string, string) with the name of Test.',
 		);
-		const ds = <DataStore2>DataStoreService.GetDataStore('Test', 'global');
+		const ds = <DataStore2>DataStoreService.GetDataStore('Test', 'global', new DataStoreOptions({ v2: true }));
 		FASTLOG(DFLog('Debug'), '[DFLog::Debug] Bind a GlobalDataStore::onUpdate for the key TestKey');
 		ds.OnUpdate('TestKey', (newValue) => {
 			console.log(newValue);
