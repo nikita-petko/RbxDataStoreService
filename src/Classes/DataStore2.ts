@@ -121,7 +121,7 @@ export class DataStore2 extends DataStore {
 			request.additionalHeaders['Content-MD5'] = Base64.stringify(Crypto.MD5(request.postData));
 			request.additionalHeaders['Content-Type'] = '*/*';
 			request.additionalHeaders['If-Match'] = keyInfo.Version;
-			if (metadata) request.additionalHeaders['Roblox-Object-Attributes'] = JSON.stringify(metadata ?? {});
+			if (metadata) request.additionalHeaders['Roblox-Object-Attributes'] = JSON.stringify(metadata || {});
 			if (userIds) request.additionalHeaders['Roblox-Object-UserIds'] = JSON.stringify(userIds);
 			FASTLOGS(FLog['DataStore'], `[FLog::DataStore] SetIf on key: %s`, key);
 			this.logLongValue(v);
@@ -198,8 +198,8 @@ export class DataStore2 extends DataStore {
 							new Date(r.headers['roblox-object-created-time']).getTime(),
 							new Date(r.headers['roblox-object-version-created-time']).getTime(),
 							r.headers['etag'],
-							new Map(Object.entries(JSON.parse(r.headers['roblox-object-attributes'] ?? '{}'))),
-							JSON.parse(r.headers['roblox-Object-userids'] ?? '[]'),
+							new Map(Object.entries(JSON.parse(r.headers['roblox-object-attributes'] || '{}'))),
+							JSON.parse(r.headers['roblox-Object-userids'] || '[]'),
 						),
 					]);
 				})
@@ -326,8 +326,8 @@ export class DataStore2 extends DataStore {
 							new Date(value.headers['roblox-object-created-time']).getTime(),
 							new Date(value.headers['roblox-object-version-created-time']).getTime(),
 							value.headers['etag'],
-							new Map(Object.entries(JSON.parse(value.headers['roblox-object-attributes'] ?? '{}'))),
-							JSON.parse(value.headers['roblox-Object-userids'] ?? '[]'),
+							new Map(Object.entries(JSON.parse(value.headers['roblox-object-attributes'] || '{}'))),
+							JSON.parse(value.headers['roblox-Object-userids'] || '[]'),
 						),
 					]);
 				})
@@ -381,8 +381,8 @@ export class DataStore2 extends DataStore {
 							new Date(value.headers['roblox-object-created-time']).getTime(),
 							new Date(value.headers['roblox-object-version-created-time']).getTime(),
 							value.headers['etag'],
-							new Map(Object.entries(JSON.parse(value.headers['roblox-object-attributes'] ?? '{}'))),
-							JSON.parse(value.headers['roblox-Object-userids'] ?? '[]'),
+							new Map(Object.entries(JSON.parse(value.headers['roblox-object-attributes'] || '{}'))),
+							JSON.parse(value.headers['roblox-Object-userids'] || '[]'),
 						),
 					]);
 				})
@@ -463,8 +463,8 @@ export class DataStore2 extends DataStore {
 							new Date(r.headers['roblox-object-created-time']).getTime(),
 							new Date(r.headers['roblox-object-version-created-time']).getTime(),
 							r.headers['etag'],
-							new Map(Object.entries(JSON.parse(r.headers['roblox-object-attributes'] ?? '{}'))),
-							JSON.parse(r.headers['roblox-Object-userids'] ?? '[]'),
+							new Map(Object.entries(JSON.parse(r.headers['roblox-object-attributes'] || '{}'))),
+							JSON.parse(r.headers['roblox-Object-userids'] || '[]'),
 						),
 					]);
 				})

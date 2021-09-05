@@ -27,7 +27,7 @@ export class HttpRequest {
 			const http = <AxiosRequestConfig>{
 				headers: {
 					...Globals.GlobalHeaders(),
-					'x-csrf-token': HttpRequest._lastCsrfToken ?? '',
+					'x-csrf-token': HttpRequest._lastCsrfToken || '',
 					...this.additionalHeaders,
 				},
 				transformResponse: (resp, headers) => {
