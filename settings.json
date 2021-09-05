@@ -18,17 +18,23 @@
 			"UseTestUniverse": false
 		},
 		"DFFlag": {
-			"DataStoresV2Enabled": false
+			"DataStoresV2Enabled": true,
+			"DataStoreUseNewEndpoints": true,
+			"DataStoreNewEndpointsReturnResultIfFailedToDeserialize": true
 		},
 		"SFFlag": {},
 		"FInt": {},
 		"DFInt": {},
 		"SFInt": {},
 		"FString": {},
-		"DFString": { "PreferredTestSite": "SiteTest4" },
+		"DFString": {
+			"PreferredTestSite": "SiteTest4"
+		},
 		"SFString": {}
 	},
-	"FSettings": ["Client"],
+	"FSettings": [
+		"Client"
+	],
 	"TODO": [],
 	"EditorsNotice": "This may break your distribution of this service if you change any of this"
 }
