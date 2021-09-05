@@ -2,10 +2,9 @@
 <br>
 <p align="center">
     <a href="https://standardjs.com"><img src="https://img.shields.io/badge/code_style-standard-blue.svg?style=flat-square" alt="JavaScript Style Guide"/></a>
-    <a href="https://discord.gg/EDXNdAT"><img src="https://img.shields.io/badge/discord-roblox%20api%20chat-blue.svg?style=flat-square" alt="Roblox API Discord"/></a>
     <a href="https://npmjs.org/@mfd/rbxdatastoreservice"><img src="https://img.shields.io/npm/v/@mfd/rbxdatastoreservice.svg?style=flat-square" alt="NPM package"/></a>
 	<a href="https://npmjs.org/@mfd/rbxdatastoreservice"><img src="https://img.shields.io/npm/dm/@mfd/rbxdatastoreservice.svg?style=flat-square" alt="downloads"/></a>
-	<a href="https://github.com/rbx-nsg/RbxDataStoreService/actions/workflows/test.yml"><img src="https://github.com/rbx-nsg/RbxDataStoreService/actions/workflows/test.yml/badge.svg?branch=master" alt="test"/></a>
+	<a href="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/test.yml"><img src="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/test.yml/badge.svg?branch=master" alt="test"/></a>
 </p>
 <p align="center">
   <a href="#about">About</a> •
@@ -20,7 +19,7 @@ RbxDataStoreService is a node module that That allows you to use DataStoreServic
 This project was created because people outside ROBLOX always want to use DataStoreService outside ROBLOX.
 
 RbxDataStoreService allows you to do things you would normally do on the [Roblox](https://www.roblox.com) DataStoreService through a Node.js interface.
-You can use RbxDataStoreService along with ROBLOX's [HttpService feature](http://wiki.roblox.com/index.php?title=API:Class/HttpService) to create scripts that interact with the DataStoreService externally.
+You can use RbxDataStoreService along with ROBLOX's [HttpService feature](https://developer.roblox.com/en-us/api-reference/class/HttpService) to create scripts that interact with the DataStoreService externally.
 
 ## Installation
 
@@ -29,16 +28,18 @@ With node.js installed simply run:
 ```bash
 # Run this to install RbxDataStoreService locally to your repository.
 $ npm install @mfd/rbxdatastoreservice --save
+$ yarn add @mfd/rbxdatastoreservice
 
 # Run this instead to install RbxDataStoreService globally so you can use it anywhere.
 $ npm install @mfd/rbxdatastoreservice -g
+$ yarn global add @mfd/rbxdatastoreservice
 ```
 
 That's it!
 
 ## Documentation
 
-You can find the current RbxDataStoreService documentation [here (Roblox Wiki)](https://developer.roblox.com/en-us/api-reference/class/DataStoreService) or [here (API Reference)](https://robloxapi.github.io/ref/class/DataStoreService.htm)
+You can find the current RbxDataStoreService documentation [here (Roblox Wiki)](https://developer.roblox.com/en-us/api-reference/class/DataStoreService) or [here (CloneTrooper's API Reference)](https://robloxapi.github.io/ref/class/DataStoreService.html)
 
 ### Initial setup
 
@@ -69,4 +70,4 @@ async function startApp() {
 
 ## Credits
 
--   [nsg](https://github.com/mfd-co) - Former ROBLOX Contractor Engineer.
+-   [nsg](https://github.com/nkpetko) - Former ROBLOX Contractor Engineer.
