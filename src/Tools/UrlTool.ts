@@ -166,7 +166,7 @@ export class UrlHelper {
 			servicePath + '/',
 			null,
 			true,
-			true,
+			false,
 		);
 	}
 

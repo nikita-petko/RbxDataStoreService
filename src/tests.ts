@@ -1,6 +1,4 @@
-import { DataStoreService, InitializeAsync } from '.';
-import { DataStore2 } from './Classes/DataStore2';
-import { DataStoreOptions } from './Classes/DataStoreOptions';
+import { DataStoreService, InitializeAsync, DataStoreOptions, DataStore2 } from '.';
 import { DFLog, DYNAMIC_LOGVARIABLE, FASTLOG, FASTLOGS } from './Tools/FastLogTool';
 
 if (process.env.SSLKEYLOGFILE) {

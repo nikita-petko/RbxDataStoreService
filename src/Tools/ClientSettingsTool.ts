@@ -47,7 +47,7 @@ export class ClientSettings {
 		settingsGroup: string = 'Client',
 	): Record<string, unknown> | string[] | Error {
 		try {
-			const settings = JSON.parse(filestream.readFileSync(__dirname + '\\..\\..\\settings.json', 'ascii'));
+			const settings = JSON.parse(filestream.readFileSync(__dirname + '/../../settings.json', 'ascii'));
 			if (settingsType || settingsType === 0 || settingsType === Group.FFlag) {
 				switch (settingsType as Group) {
 					case Group.FVariable:

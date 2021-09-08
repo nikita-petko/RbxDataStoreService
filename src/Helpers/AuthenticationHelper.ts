@@ -26,10 +26,10 @@ DYNAMIC_FASTFLAGVARIABLE('WeCareAboutTheWarning', true);
 
 FASTFLAG('Debug');
 
-/**
- * @internal
- */
 export class AuthenticationHelper {
+	/**
+	 * @internal
+	 */
 	public static CheckCookieAndPlaceIdInternalAsync(cookie: string, placeID: number): Promise<void> {
 		return new Promise((resumeFunction, errorFunction) => {
 			if (!cookie) {
