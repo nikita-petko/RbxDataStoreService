@@ -50,7 +50,7 @@ DYNAMIC_LOGVARIABLE('Debug', 7);
 		FASTLOG(DFLog('Debug'), '[DFLog::Debug] Try remove the key TestKey from the DataStore');
 		await ds.RemoveAsync('global/TestKey');
 		FASTLOG(DFLog('Debug'), '[DFLog::Debug] Try create the Key TT2 and increment it by 213');
-		await ds.IncrementAsync('TT2', 213);
+		await ds.IncrementAsync('global/TT2', 213);
 		return process.exit(0);
 	} catch (e) {
 		FASTLOGS(DFLog('Debug'), '[DFLog::Debug] Failed because %s, aborting.', e);
