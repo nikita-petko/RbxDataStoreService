@@ -140,6 +140,13 @@ export class AuthenticationHelper {
 		});
 	}
 
+	/**
+	 * Initializes the global cookie and place id, and tries to validate:
+	 * 1. The validity of the cookie.
+	 * 2. The ownership of the user to the place.
+	 * @param {string} cookie The cookie to use, must include the warning text.
+	 * @param {number} placeID The place ID to use, the user that is dependent on the cookie must have edit permissions for this place.
+	 */
 	public static async InitAuthenticatedUser(cookie: string, placeID: number) {
 		FASTLOG1(FLog['Auth'], '[FLog::Auth] Trying to authenticate the user with the placeID %i', placeID);
 		await AuthenticationHelper.CheckCookieAndPlaceIdInternalAsync(cookie, placeID);
