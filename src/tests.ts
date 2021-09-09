@@ -38,7 +38,7 @@ DYNAMIC_LOGVARIABLE('Debug', 7);
 		FASTLOG(DFLog('Debug'), '[DFLog::Debug] List all the keys in the datastore Test/global');
 		console.log((await ds.ListKeysAsync()).GetCurrentPage());
 		FASTLOG(DFLog('Debug'), '[DFLog::Debug] List all the versions for the object global/TeskKey');
-		console.log((await ds.ListVersionsAsync('global/TestKey')).GetCurrentPage());
+		console.log((await ds.ListVersionsAsync('global/O')).GetCurrentPage());
 		FASTLOG(DFLog('Debug'), '[DFLog::Debug] List all datastores in the current experience.');
 		console.log((await DataStoreService.ListDataStoresAsync()).GetCurrentPage());
 		FASTLOG(DFLog('Debug'), '[DFLog::Debug] Try write a JSON object to the objectKey TestKey.');
@@ -50,7 +50,7 @@ DYNAMIC_LOGVARIABLE('Debug', 7);
 		FASTLOG(DFLog('Debug'), '[DFLog::Debug] Try remove the key TestKey from the DataStore');
 		await ds.RemoveAsync('global/TestKey');
 		FASTLOG(DFLog('Debug'), '[DFLog::Debug] Try create the Key TT2 and increment it by 213');
-		await ds.IncrementAsync('global/TT2', 213);
+		await ds.IncrementAsync('TT2', 213);
 		return process.exit(0);
 	} catch (e) {
 		FASTLOGS(DFLog('Debug'), '[DFLog::Debug] Failed because %s, aborting.', e);

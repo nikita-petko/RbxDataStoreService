@@ -3,8 +3,8 @@ import { AuthenticationHelper } from './Helpers/AuthenticationHelper';
 
 export { DataStoreService } from './Classes/Services/DataStoreService';
 export { DataStoreOptions } from './Classes/DataStoreOptions';
-export { DataStore } from './Classes/DataStore';
-export { DataStore2 } from './Classes/DataStore2';
+export { GlobalDataStore as DataStore } from './Classes/GlobalDataStore';
+export { DataStore as DataStore2 } from './Classes/DataStore';
 export { OrderedDataStore } from './Classes/OrderedDataStore';
 
 export const InitializeAsync = AuthenticationHelper.InitAuthenticatedUser;

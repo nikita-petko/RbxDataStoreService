@@ -1,6 +1,6 @@
 // NOTICE Tag internal members as @internal or pull them out.
 
-import { DataStore } from '../DataStore';
+import { GlobalDataStore } from '../GlobalDataStore';
 import { Globals } from '../../Util/Globals';
 import { OrderedDataStore } from '../OrderedDataStore';
 import { DataStoreOptions } from '../DataStoreOptions';
@@ -14,11 +14,13 @@ import {
 	DFInt,
 	DYNAMIC_FASTINT,
 } from '../../Tools/FastLogTool';
-import { DataStore2 } from '../DataStore2';
+import { DataStore } from '../DataStore';
 import { LuaWebService } from '../LuaWebService';
 import { DataStoreListingPages as DataStoreListingPages } from '../DataStoreListingPages';
 import { ApiDataStoresUrlConstruction } from '../../Constructors/ApiDataStoresUrlConstruction';
 import { InputHelper } from '../../Helpers/InputHelper';
+import { ErrorHelper } from '../../Helpers/ErrorHelper';
+import { ErrorType } from '../../Enumeration/ErrorType';
 
 LOGGROUP('DataStore');
 DYNAMIC_FASTFLAGVARIABLE('GetGlobalDataStorePcallFix', false);
@@ -38,17 +40,21 @@ export enum RequestType {
 	GET_SORTED_ASYNC_PAGE = 9,
 }
 
-type DataStores = Map<string, DataStore>;
+type DataStores = Map<string, GlobalDataStore>;
 
+/**
+ * **DataStoreService** exposes methods for getting [GlobalDataStore](https://developer.roblox.com/en-us/api-reference/class/GlobalDataStore) and [OrderedDataStore](https://developer.roblox.com/en-us/api-reference/class/OrderedDataStore) objects.
+ * See the [Data Stores](https://developer.roblox.com/en-us/articles/Data-store) article for an in-depth guide on data structure, management, error handling, etc.
+ */
 export abstract class DataStoreService {
 	/**
 	 * @internal
 	 */
-	private static readonly dataStores: DataStores = new Map<string, DataStore>();
+	private static readonly dataStores: DataStores = new Map<string, GlobalDataStore>();
 	/**
 	 * @internal
 	 */
-	private static readonly orderedDataStores: DataStores = new Map<string, DataStore>();
+	private static readonly orderedDataStores: DataStores = new Map<string, GlobalDataStore>();
 
 	/**
 	 * @internal
@@ -57,10 +63,7 @@ export abstract class DataStoreService {
 		let lws: LuaWebService;
 		if ((lws = new LuaWebService()))
 			if (!(await lws.IsApiAccessEnabled())) {
-				if (errorFunction)
-					errorFunction(
-						'Cannot write to DataStore from studio if API access is not enabled. Enable it by going to the Game Settings page.',
-					);
+				if (errorFunction) errorFunction(ErrorHelper.GetErrorMessage(ErrorType.NO_API_ACCESS_ALLOWED));
 				return false;
 			}
 		return true;
@@ -99,7 +102,7 @@ export abstract class DataStoreService {
 		ordered: boolean,
 		useNewApi: boolean,
 		allScopes: boolean,
-	): DataStore | OrderedDataStore {
+	): GlobalDataStore | OrderedDataStore {
 		if (Globals.PlaceID < 1) {
 			if (DFFlag('GetGlobalDataStorePcallFix')) {
 				throw new Error('Place has to be opened with Edit button to access DataStores');
@@ -110,7 +113,7 @@ export abstract class DataStoreService {
 		if (legacy) {
 			if (!this.legacyDataStore) {
 				FASTLOG(FLog['DataStore'], '[FLog::DataStore] Creating legacy data store');
-				this.legacyDataStore = new DataStore(name, scope, true, allScopes);
+				this.legacyDataStore = new GlobalDataStore(name, scope, true, allScopes);
 			}
 			return this.legacyDataStore;
 		} else if (ordered) {
@@ -128,11 +131,11 @@ export abstract class DataStoreService {
 			const it = this.dataStores.has(key);
 			if (it === false) {
 				FASTLOGS(FLog['DataStore'], '[FLog::DataStore] Creating data store, name: %s', name);
-				let ds: DataStore;
+				let ds: GlobalDataStore;
 				if (!useNewApi) {
-					ds = new DataStore(name, scope, false, allScopes);
+					ds = new GlobalDataStore(name, scope, false, allScopes);
 				} else {
-					ds = new DataStore2(name, scope, false, allScopes);
+					ds = new DataStore(name, scope, false, allScopes);
 				}
 				this.dataStores[key] = ds;
 				return ds;
@@ -151,44 +154,44 @@ export abstract class DataStoreService {
 	/**
 	 * @internal
 	 */
-	private static legacyDataStore: DataStore;
+	private static legacyDataStore: GlobalDataStore;
 
 	// private static dataStoreJob: DataStoreJob;
 
 	/**
-	 * This function returns the default {@link https://developer.roblox.com/en-us/api-reference/class/GlobalDataStore|GlobalDataStore}.
+	 * This function returns the default [GlobalDataStore](https://developer.roblox.com/en-us/api-reference/class/GlobalDataStore).
 	 * If you want to access a specific **named** data store instead,
-	 * you should use the {@link https://developer.roblox.com/en-us/api-reference/function/DataStoreService/GetDataStore|GetDataStore()} function.
-	 * @returns {DataStore} Default {@link https://developer.roblox.com/en-us/api-reference/class/GlobalDataStore|GlobalDataStore} instance
+	 * you should use the [GetDataStore()](https://developer.roblox.com/en-us/api-reference/function/DataStoreService/GetDataStore) function.
+	 * @returns {GlobalDataStore} Default [GlobalDataStore](https://developer.roblox.com/en-us/api-reference/class/GlobalDataStore) instance
 	 * @unsafe For thread safety, this property is not safe to read in an unsynchronized thread.
 	 */
-	public static GetGlobalDataStore(): DataStore {
+	public static GetGlobalDataStore(): GlobalDataStore {
 		return this.getDataStoreInternal('', 'u', true, false, false, false);
 	}
 
 	/**
-	 * This function creates a {@link https://developer.roblox.com/en-us/api-reference/class/GlobalDataStore|GlobalDataStore} instance with the provided name and scope.
+	 * This function creates a [GlobalDataStore](https://developer.roblox.com/en-us/api-reference/class/GlobalDataStore) instance with the provided name and scope.
 	 * Subsequent calls to this method with the same name/scope will return the same object.
 	 *
 	 * ---
 	 * NOTICE
 	 * --------
-	 * If v2.0 experimental features are enabled, this function creates and returns a {@link https://developer.roblox.com/en-us/api-reference/class/DataStore|DataStore} instance instead of a {@link https://developer.roblox.com/en-us/api-reference/class/GlobalDataStore|GlobalDataStore} instance.
+	 * If v2.0 experimental features are enabled, this function creates and returns a [DataStore](https://developer.roblox.com/en-us/api-reference/class/DataStore) instance instead of a [GlobalDataStore](https://developer.roblox.com/en-us/api-reference/class/GlobalDataStore) instance.
 	 *
 	 * ---
 	 *
-	 * Using the `scope` parameter will restrict operations to that scope by automatically prepending the scope to keys in all operations done on the data store. This function also accepts an optional {@link https://developer.roblox.com/en-us/api-reference/class/DataStoreOptions|DataStoreOptions} instance which includes options for enabling {@link https://developer.roblox.com/en-us/api-reference/property/DataStoreOptions/AllScopes|AllScopes}. See {@link https://developer.roblox.com/en-us/articles/Data-store#scope|here} for details on scope.
+	 * Using the `scope` parameter will restrict operations to that scope by automatically prepending the scope to keys in all operations done on the data store. This function also accepts an optional [DataStoreOptions](https://developer.roblox.com/en-us/api-reference/class/DataStoreOptions) instance which includes options for enabling [AllScopes](https://developer.roblox.com/en-us/api-reference/property/DataStoreOptions/AllScopes|AllScopes). See [here](https://developer.roblox.com/en-us/articles/Data-store#scope) for details on scope.
 	 * @param {string} name Name of the data store.
 	 * @param {string=} scope (Optional) A string specifying the scope.
-	 * @param {DataStoreOptions} (Optional) A {@link https://developer.roblox.com/en-us/api-reference/class/DataStoreOptions|DataStoreOptions} instance to enable experimental features and v2 API features.
-	 * @returns {DataStore} {@link https://developer.roblox.com/en-us/api-reference/class/GlobalDataStore|GlobalDataStore}
+	 * @param {DataStoreOptions} (Optional) A [DataStoreOptions](https://developer.roblox.com/en-us/api-reference/class/DataStoreOptions) instance to enable experimental features and v2 API features.
+	 * @returns {GlobalDataStore} [GlobalDataStore](https://developer.roblox.com/en-us/api-reference/class/GlobalDataStore)
 	 * @unsafe For thread safety, this property is not safe to read in an unsynchronized thread.
 	 */
 	public static GetDataStore(
 		name: string,
 		scope: string = 'global',
 		options: DataStoreOptions = undefined,
-	): DataStore {
+	): GlobalDataStore {
 		InputHelper.CheckNameAndScope(name, scope, options);
 		return this.getDataStoreInternal(
 			name,
@@ -201,13 +204,13 @@ export abstract class DataStoreService {
 	}
 
 	/**
-	 * This method returns an {@link https://developer.roblox.com/en-us/api-reference/class/OrderedDataStore|OrderedDataStore},
-	 * similar to the way {@link https://developer.roblox.com/en-us/api-reference/function/DataStoreService/GetDataStore|GetDataStore()} does with {@link https://developer.roblox.com/en-us/api-reference/class/GlobalDataStore|GlobalDataStores}.
+	 * This method returns an [OrderedDataStore](https://developer.roblox.com/en-us/api-reference/class/OrderedDataStore),
+	 * similar to the way [GetDataStore()](https://developer.roblox.com/en-us/api-reference/function/DataStoreService/GetDataStore) does with [GlobalDataStores](https://developer.roblox.com/en-us/api-reference/class/GlobalDataStore).
 	 * Subsequent calls to this method with the same name/scope will return the same object.
 	 *
-	 * @param {string} name The name of the {@link https://developer.roblox.com/en-us/api-reference/class/OrderedDataStore|OrderedDataStore} you wish to get.
-	 * @param {string="global"} scope The scope of the {@link https://developer.roblox.com/en-us/api-reference/class/OrderedDataStore|OrderedDataStore} you wish to get, global by default
-	 * @returns {OrderedDataStore} {@link https://developer.roblox.com/en-us/api-reference/class/OrderedDataStore|OrderedDataStore}
+	 * @param {string} name The name of the [OrderedDataStore](https://developer.roblox.com/en-us/api-reference/class/OrderedDataStore) you wish to get.
+	 * @param {string="global"} scope The scope of the [OrderedDataStore](https://developer.roblox.com/en-us/api-reference/class/OrderedDataStore) you wish to get, global by default
+	 * @returns {OrderedDataStore} [OrderedDataStore](https://developer.roblox.com/en-us/api-reference/class/OrderedDataStore)
 	 * @unsafe For thread safety, this property is not safe to read in an unsynchronized thread.
 	 */
 	public static GetOrderedDataStore(name: string, scope: string = 'global'): OrderedDataStore {
@@ -216,19 +219,14 @@ export abstract class DataStoreService {
 	}
 
 	/**
-	 * This is a funny method that existed for a while and then was purged. Don't use it, all it does is allow you to fetch a key from an empty scope.
-	 * @param {string} name The name of the {@link https://developer.roblox.com/en-us/api-reference/class/GlobalDataStore|GlobalDataStore} you wish to get.
-	 * @param {string} key The key identifying the entry being retrieved from the data store.
-	 * @returns {Variant} {@link https://developer.roblox.com/en-us/api-reference/data-types|Variant}
-	 * @yields This is a yielding function. When called, it will pause the JavaScript thread that called the function until a result is ready to be returned, without interrupting other scripts.
-	 * @deprecated This function has been deprecated and should not be used in new work.
+	 * @internal
 	 */
 	public static async GetDataFromEmptyScopeDataStoreAsyncTemporary<Variant extends any>(
 		name: string,
 		key: string,
-	): Promise<Variant> {
-		return new Promise<Variant>(async (resumeFunction, errorFunction) => {
-			if (!DFFlag['DataStoreLostDataFixEnable']) {
+	): Promise<Variant | unknown> {
+		return new Promise(async (resumeFunction, errorFunction) => {
+			if (!DFFlag('DataStoreLostDataFixEnable')) {
 				errorFunction('GetDataFromEmptyScopeDataStoreAsyncTemporary is not enabled');
 				return;
 			}
@@ -243,12 +241,12 @@ export abstract class DataStoreService {
 			}
 			const ds = this.getDataStoreInternal(name, '', false, false, false, false);
 			const value = await ds.GetAsync(key);
-			resumeFunction(<Variant>value);
+			resumeFunction(value);
 		});
 	}
 
 	/**
-	 * Returns a {@link https://developer.roblox.com/en-us/api-reference/class/DataStoreListingPages|DataStoreListingPages} object for enumerating through all of the experience’s data stores.
+	 * Returns a [DataStoreListingPages](https://developer.roblox.com/en-us/api-reference/class/DataStoreListingPages) object for enumerating through all of the experience’s data stores.
 	 * It accepts an optional `prefix` parameter to only locate data stores whose names start with the provided prefix.
 	 *
 	 * ---
@@ -260,12 +258,12 @@ export abstract class DataStoreService {
 	 *
 	 * SEE ALSO
 	 * --------
-	 * - {@link https://developer.roblox.com/en-us/articles/Data-store|Data Stores}, an in-depth guide on data structure, management, error handling, etc.
+	 * - [Data Stores](https://developer.roblox.com/en-us/articles/Data-store), an in-depth guide on data structure, management, error handling, etc.
 	 * ---
 	 *
 	 * @param {string} prefix (Optional) Prefix to enumerate data stores that start with the given prefix.
 	 * @param {number} pageSize (Optional) Number of items to be returned in each page.
-	 * @returns {DataStoreListingPages} {@link https://developer.roblox.com/en-us/api-reference/class/DataStoreListingPages|DataStoreListingPages} instance containing {@link https://developer.roblox.com/en-us/api-reference/class/DataStoreInfo|DataStoreInfo} instances that provide details such as name, creation time, and time last updated.
+	 * @returns {DataStoreListingPages} [DataStoreListingPages](https://developer.roblox.com/en-us/api-reference/class/DataStoreListingPages) instance containing (https://developer.roblox.com/en-us/api-reference/class/DataStoreInfo) instances that provide details such as name, creation time, and time last updated.
 	 * @yields This is a yielding function. When called, it will pause the Javascript thread that called the function until a result is ready to be returned, without interrupting other scripts.
 	 * @unsafe For thread safety, this property is not safe to read in an unsynchronized thread.
 	 */
@@ -286,8 +284,10 @@ export abstract class DataStoreService {
 			);
 
 			const page = new DataStoreListingPages(this, url);
-			await page.AdvanceToNextPageAsync();
-			return resumeFunction(page);
+			await page
+				.AdvanceToNextPageAsync()
+				.then(() => resumeFunction(page))
+				.catch(errorFunction);
 		});
 	}
 }

@@ -1,5 +1,7 @@
 import { DataStoreOptions } from '../Classes/DataStoreOptions';
+import { ErrorType } from '../Enumeration/ErrorType';
 import { DFInt, DYNAMIC_FASTINTVARIABLE } from '../Tools/FastLogTool';
+import { ErrorHelper } from './ErrorHelper';
 
 DYNAMIC_FASTINTVARIABLE('DataStoreKeyLengthLimit', 50);
 
@@ -23,8 +25,9 @@ export class InputHelper {
 	}
 
 	public static CheckKey(key: string): [boolean, string] {
-		if (key.length === 0) return [false, "Key name can't be empty"];
-		if (key.length > DFInt('DataStoreKeyLengthLimit')) return [false, 'Key name is too long'];
+		if (key.length === 0) return [false, ErrorHelper.GetErrorMessage(ErrorType.NO_EMPTY_KEYNAME)];
+		if (key.length > DFInt('DataStoreKeyLengthLimit'))
+			return [false, ErrorHelper.GetErrorMessage(ErrorType.KEYNAME_TOO_LARGE)];
 		return [true, ''];
 	}
 }

@@ -1,5 +1,5 @@
 import Http, { AxiosRequestConfig, AxiosResponse } from 'axios';
-import { DataStore } from './DataStore';
+import { GlobalDataStore } from './GlobalDataStore';
 import { Globals } from '../Util/Globals';
 import { RequestType, DataStoreService } from './Services/DataStoreService';
 import { Agent } from 'https';
@@ -16,7 +16,7 @@ export class HttpRequest {
 	public key: string;
 	public url: string;
 	public postData: string;
-	public owner: DataStore;
+	public owner: GlobalDataStore;
 	public method: string;
 	public additionalHeaders: Record<string, string> = {};
 

@@ -7,7 +7,7 @@ import { Globals } from '../Util/Globals';
  */
 export class UniversesHelper {
 	public static async GetUniverseIDFromPlaceID(placeID: number): Promise<number> {
-		return new Promise<number>((resumeFunction, errorFunction) => {
+		return new Promise((resumeFunction, errorFunction) => {
 			const request = new HttpRequest();
 			request.method = 'GET';
 			request.url = BaseURL.ConstructServicePathFromSubDomain(
