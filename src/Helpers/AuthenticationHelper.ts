@@ -19,6 +19,7 @@ import { UniversesHelper } from './UniversesHelper';
 import { BaseURL } from '../Tools/UrlTool';
 import { Globals } from '../Util/Globals';
 import { Agent } from 'https';
+import { Analytics } from './AnalyticsHelper';
 
 LOGVARIABLE('Auth', 0);
 
@@ -31,25 +32,29 @@ export class AuthenticationHelper {
 	 * @internal
 	 */
 	public static CheckCookieAndPlaceIdInternalAsync(cookie: string, placeID: number): Promise<void> {
-		return new Promise((resumeFunction, errorFunction) => {
+		return new Promise(async (resumeFunction, errorFunction) => {
 			if (!cookie) {
+				await Analytics.GoogleAnalytics.trackEvent('Authentication', 'AuthCookieNull', '', 0);
 				FASTLOG(FLog['Auth'], '[FLog::Auth] The cookie was null or was not a string, aborting.');
 				return errorFunction('Cookie cannot be null or undefined.');
 			}
 			if (typeof cookie === 'string' && cookie.length === 0) {
+				await Analytics.GoogleAnalytics.trackEvent('Authentication', 'AuthCookieNotString', '', 0);
 				FASTLOG(FLog['Auth'], '[FLog::Auth] The cookie was empty or was not a string, aborting.');
 				return errorFunction("Cookie name can't be empty");
 			}
 			if (placeID < 1) {
+				await Analytics.GoogleAnalytics.trackEvent('Authentication', 'PlaceIdInvalid', '', 0);
 				FASTLOG1(FLog['Auth'], '[FLog::Auth] The placeID was %i when it was expected to be >1', placeID);
 				return errorFunction('The placeID is required to at least be >1');
 			}
 			if (!cookie.match(Constants.CookieWarningCapture) && DFFlag('WeCareAboutTheWarning')) {
+				await Analytics.GoogleAnalytics.trackEvent('Authentication', 'WarningTextInCookieStrNotPresent', '', 0);
 				FASTLOG(
 					FLog['Auth'],
 					'[FLog::Auth] The cookie was invalid because it did not contain the warning text.',
 				);
-				return errorFunction("Cookie isn't valid, it requires the warning text to persistent");
+				return errorFunction("Cookie isn't valid, it requires the warning text to be present.");
 			}
 			Http.request({
 				url: BaseURL.ConstructServicePathFromSubDomain(
@@ -76,6 +81,7 @@ export class AuthenticationHelper {
 						res.data['displayName'],
 						res.data['id'],
 					);
+					Globals.UserID = res.data['id'];
 					const universeId = await UniversesHelper.GetUniverseIDFromPlaceID(placeID);
 					Http.request({
 						url: BaseURL.ConstructServicePathFromSubDomain(
@@ -94,14 +100,21 @@ export class AuthenticationHelper {
 						},
 						httpsAgent: new Agent({ rejectUnauthorized: !FFlag['Debug'] }),
 					})
-						.then((valid) => {
+						.then(async (valid) => {
 							if (!valid.data['data'][0]['canManage'] && !valid.data['data'][0]['canCloudEdit']) {
+								await Analytics.GoogleAnalytics.trackEvent(
+									'Authentication',
+									'UserHadNoPermissions',
+									'',
+									0,
+								);
 								FASTLOG(
 									FLog['Auth'],
 									'[FLog::Auth] Our Place check failed because the user does not have the valid credentials to manage this place, call the errorFunction().',
 								);
 								return errorFunction(`You do not have valid permission to manage the place ${placeID}`);
 							}
+							await Analytics.GoogleAnalytics.trackEvent('Authentication', 'UserHadPermissions', '', 0);
 							FASTLOG2(
 								FLog['Auth'],
 								'[FLog::Auth] Our Place check succeeded for %d (%d), call the resumeFunctiom()',
@@ -110,7 +123,13 @@ export class AuthenticationHelper {
 							);
 							return resumeFunction();
 						})
-						.catch((err) => {
+						.catch(async (err) => {
+							await Analytics.GoogleAnalytics.trackEvent(
+								'Authentication',
+								'PermissionCheckFailure',
+								'',
+								0,
+							);
 							FASTLOGS(
 								FLog['Auth'],
 								'[FLog::Auth] Our authentication check failed because %s, most likely due to a credential mis-match, call the errorFunction()',
@@ -124,7 +143,8 @@ export class AuthenticationHelper {
 							);
 						});
 				})
-				.catch((err) => {
+				.catch(async (err) => {
+					await Analytics.GoogleAnalytics.trackEvent('Authentication', 'UserCheckFailure', '', 0);
 					FASTLOGS(
 						FLog['Auth'],
 						'[FLog::Auth] Our authentication check failed because %s, most likely due to a credential mis-match, call the errorFunction()',
@@ -148,6 +168,8 @@ export class AuthenticationHelper {
 	 * @param {number} placeID The place ID to use, the user that is dependent on the cookie must have edit permissions for this place.
 	 */
 	public static async InitAuthenticatedUser(cookie: string, placeID: number) {
+		await Analytics.GoogleAnalytics.trackEvent('Authentication', 'UserBeginAuth', new Date().toISOString(), 0);
+
 		FASTLOG1(FLog['Auth'], '[FLog::Auth] Trying to authenticate the user with the placeID %i', placeID);
 		await AuthenticationHelper.CheckCookieAndPlaceIdInternalAsync(cookie, placeID);
 		Globals.Cookie = cookie;

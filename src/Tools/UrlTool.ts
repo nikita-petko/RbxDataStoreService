@@ -170,6 +170,16 @@ export class UrlHelper {
 		);
 	}
 
+	public static BuildGenericPersistenceV2Url(servicePath: string) {
+		return BaseURL.ConstructServicePathFromHost(
+			UrlHelper.GetRobloxGamePersistenceHost(),
+			`v2/persistence/${servicePath}`,
+			null,
+			true,
+			true,
+		);
+	}
+
 	public static GetCountersMultiIncrementUrl(key: string) {
 		return BaseURL.ConstructServicePathFromSubDomain(
 			'ephemeralcounters.api',

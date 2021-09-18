@@ -17,10 +17,15 @@ export class InputHelper {
 			if (scope.length > 0) throw new Error('DataStore scope should be an empty string allScopes is set to true');
 		}
 
-		if (scope.length == 0 && !allScopes) throw new Error("DataStore scope can't be empty string");
-		if (scope.length > DFInt('DataStoreKeyLengthLimit') && !allScopes)
+		if (scope.length == 0 && !allScopes) {
+			throw new Error("DataStore scope can't be empty string");
+		}
+		if (scope.length > DFInt('DataStoreKeyLengthLimit') && !allScopes) {
 			throw new Error('DataStore scope is too long');
-		if (name.length == 0) throw new Error("DataStore name can't be empty string");
+		}
+		if (name.length == 0) {
+			throw new Error("DataStore name can't be empty string");
+		}
 		if (name.length > DFInt('DataStoreKeyLengthLimit')) throw new Error('DataStore name is too long');
 	}
 

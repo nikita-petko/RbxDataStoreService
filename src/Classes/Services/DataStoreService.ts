@@ -21,6 +21,7 @@ import { ApiDataStoresUrlConstruction } from '../../Constructors/ApiDataStoresUr
 import { InputHelper } from '../../Helpers/InputHelper';
 import { ErrorHelper } from '../../Helpers/ErrorHelper';
 import { ErrorType } from '../../Enumeration/ErrorType';
+import { Analytics } from '../../Helpers/AnalyticsHelper';
 
 LOGGROUP('DataStore');
 DYNAMIC_FASTFLAGVARIABLE('GetGlobalDataStorePcallFix', false);
@@ -80,6 +81,12 @@ export abstract class DataStoreService {
 
 				if (it && typeof it === 'boolean')
 					if (it === true) {
+						Analytics.GoogleAnalytics.trackEvent(
+							'DataStores',
+							'DataStoreRequestsThatWereOptinNewAPI',
+							'',
+							0,
+						);
 						return true;
 					}
 				throw new ReferenceError(`Options instance of type ${options.constructor.name} did not request v2 API`);
@@ -287,7 +294,16 @@ export abstract class DataStoreService {
 			await page
 				.AdvanceToNextPageAsync()
 				.then(() => resumeFunction(page))
-				.catch(errorFunction);
+				.catch(async (e) => {
+					await Analytics.EphemeralCounter.reportCounter('DataStoreRequestsThatFailed_DataStoreService', 1);
+					await Analytics.GoogleAnalytics.trackEvent(
+						'DataStores',
+						'FailedRequests',
+						e !== undefined ? e.toString() : 'unknown',
+						0,
+					);
+					errorFunction(e);
+				});
 		});
 	}
 }

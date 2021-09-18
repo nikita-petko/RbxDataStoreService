@@ -18,7 +18,7 @@ export class ApiDataStoresUrlConstruction {
 	) {
 		let result = '';
 		let query = '';
-		result = UrlHelper.BuildGenericPersistenceUrl(`v2/persistence/${universeId}/datastores`);
+		result = UrlHelper.BuildGenericPersistenceV2Url(`${universeId}/datastores`);
 
 		if (datastoreName !== undefined) {
 			result += '/objects';
@@ -75,15 +75,15 @@ export class ApiDataStoresUrlConstruction {
 
 		if (query.length > 0 && query[0] === '&') query = ApiDataStoresUrlConstruction.setCharAt(query, 0, '');
 
-		return `${UrlHelper.BuildGenericPersistenceUrl(
-			`v2/persistence/${universeId}/datastores/objects/object/versions`,
-		)}${query.length > 0 ? '?' : ''}${query}`;
+		return `${UrlHelper.BuildGenericPersistenceV2Url(`${universeId}/datastores/objects/object/versions`)}${
+			query.length > 0 ? '?' : ''
+		}${query}`;
 	}
 
 	public static constructObjectOpUrl(datastore: string, objectKey: string, universeId: number) {
 		let result = '';
 
-		result = UrlHelper.BuildGenericPersistenceUrl(`v2/persistence/${universeId}/datastores/objects/object`);
+		result = UrlHelper.BuildGenericPersistenceV2Url(`${universeId}/datastores/objects/object`);
 
 		result += `?datastore=${encodeURIComponent(datastore)}&objectKey=${encodeURIComponent(objectKey)}`;
 
@@ -93,9 +93,7 @@ export class ApiDataStoresUrlConstruction {
 	public static constructIncrementOpUrl(datastore: string, objectKey: string, universeId: number, delta: number) {
 		let result = '';
 
-		result = UrlHelper.BuildGenericPersistenceUrl(
-			`v2/persistence/${universeId}/datastores/objects/object/increment`,
-		);
+		result = UrlHelper.BuildGenericPersistenceV2Url(`${universeId}/datastores/objects/object/increment`);
 
 		result += `?datastore=${encodeURIComponent(datastore)}&objectKey=${encodeURIComponent(
 			objectKey,
@@ -107,7 +105,7 @@ export class ApiDataStoresUrlConstruction {
 	public static constructVersionOpUrl(datastore: string, objectKey: string, universeId: number, version: string) {
 		let result = ApiDataStoresUrlConstruction.constructObjectOpUrl(datastore, objectKey, universeId);
 
-		result += `&version=${encodeURIComponent(version)}`;
+		if (version !== undefined) result += `&version=${encodeURIComponent(version)}`;
 
 		return result;
 	}

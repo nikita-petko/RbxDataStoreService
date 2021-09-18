@@ -129,7 +129,7 @@ export class DataStore extends GlobalDataStore {
 			request.postData = v.toString();
 			request.additionalHeaders['Content-MD5'] = Base64.stringify(Crypto.MD5(request.postData));
 			request.additionalHeaders['Content-Type'] = '*/*';
-			request.additionalHeaders['If-Match'] = keyInfo.Version;
+			request.additionalHeaders['If-Match'] = JSON.stringify(keyInfo.Version);
 			if (metadata) request.additionalHeaders['Roblox-Object-Attributes'] = JSON.stringify(metadata || {});
 			if (userIds) request.additionalHeaders['Roblox-Object-UserIds'] = JSON.stringify(userIds);
 			FASTLOGS(FLog['DataStore'], `[FLog::DataStore] SetIf on key: %s`, key);
@@ -228,7 +228,7 @@ export class DataStore extends GlobalDataStore {
 						new DataStoreKeyInfo(
 							new Date(objectCreatedTimeIso).getTime(),
 							new Date(objectVersionCreatedTime).getTime(),
-							version,
+							JSON.parse(version),
 							new Map(Object.entries(JSON.parse(objectAttributes))),
 							JSON.parse(objectUserIds),
 						),
@@ -381,7 +381,7 @@ export class DataStore extends GlobalDataStore {
 						new DataStoreKeyInfo(
 							new Date(objectCreatedTimeIso).getTime(),
 							new Date(objectVersionCreatedTime).getTime(),
-							version,
+							JSON.parse(version),
 							new Map(Object.entries(JSON.parse(objectAttributes))),
 							JSON.parse(objectUserIds),
 						),
@@ -455,11 +455,11 @@ export class DataStore extends GlobalDataStore {
 					resumeFunction([
 						parseFloat(response.data) || 0,
 						new DataStoreKeyInfo(
-							new Date(response.headers['roblox-object-created-time']).getTime(),
-							new Date(response.headers['roblox-object-version-created-time']).getTime(),
-							response.headers['etag'],
-							new Map(Object.entries(JSON.parse(response.headers['roblox-object-attributes'] || '{}'))),
-							JSON.parse(response.headers['roblox-Object-userids'] || '[]'),
+							new Date(objectCreatedTimeIso).getTime(),
+							new Date(objectVersionCreatedTime).getTime(),
+							version,
+							new Map(Object.entries(JSON.parse(objectAttributes))),
+							JSON.parse(objectUserIds),
 						),
 					]);
 				})
@@ -501,7 +501,7 @@ export class DataStore extends GlobalDataStore {
 	 */
 	public async GetVersionAsync<Variant extends any>(
 		key: string,
-		version: string,
+		version: string = undefined,
 	): Promise<[Variant, DataStoreKeyInfo]> {
 		return new Promise(async (resumeFunction, errorFunction) => {
 			FASTLOGS(FLog['DataStore'], `[FLog::DataStore] GetVersionAsync on key %s`, key);

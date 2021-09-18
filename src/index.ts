@@ -1,3 +1,14 @@
+import { Analytics } from './Helpers/AnalyticsHelper';
+import { DFFlag, DFString, DYNAMIC_FASTFLAGVARIABLE, DYNAMIC_FASTSTRINGVARIABLE } from './Tools/FastLogTool';
+
+DYNAMIC_FASTFLAGVARIABLE('AnalyticsEnabled', true);
+DYNAMIC_FASTSTRINGVARIABLE('GoogleAnalyticsAccountPropertyID', 'UA-201817978-1');
+
+if (DFFlag('AnalyticsEnabled')) {
+	Analytics.GoogleAnalytics.setCanUse();
+	Analytics.GoogleAnalytics.init(DFString('GoogleAnalyticsAccountPropertyID'), 'rcc');
+}
+
 export { SortDirection } from './Enumeration/SortDirection';
 import { AuthenticationHelper } from './Helpers/AuthenticationHelper';
 
@@ -6,6 +17,8 @@ export { DataStoreOptions } from './Classes/DataStoreOptions';
 export { GlobalDataStore as DataStore } from './Classes/GlobalDataStore';
 export { DataStore as DataStore2 } from './Classes/DataStore';
 export { OrderedDataStore } from './Classes/OrderedDataStore';
+export { DataStoreIncrementOptions } from './Classes/DataStoreIncrementOptions';
+export { DataStoreSetOptions } from './Classes/DataStoreSetOptions';
 
 /**
  * Initializes the global cookie and place id, and tries to validate:

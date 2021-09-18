@@ -1,4 +1,4 @@
-import { DataStoreService, InitializeAsync, DataStoreOptions, DataStore2 } from '.';
+import { DataStoreService, InitializeAsync, DataStoreOptions, DataStore2, DataStoreIncrementOptions } from '.';
 import { DFLog, DYNAMIC_LOGVARIABLE, FASTLOG, FASTLOGS } from './Tools/FastLogTool';
 
 if (process.env.SSLKEYLOGFILE) {
@@ -34,7 +34,7 @@ DYNAMIC_LOGVARIABLE('Debug', 7);
 		});
 
 		FASTLOG(DFLog('Debug'), '[DFLog::Debug] Get the latest version for the object global/TestKey.');
-		console.log(await ds.GetVersionAsync('global/TestKey', ''));
+		console.log(await ds.GetVersionAsync('global/TestKey', '08D914BABDF57FB2.000000009C.08D97452B26D5C1A.01'));
 		FASTLOG(DFLog('Debug'), '[DFLog::Debug] List all the keys in the datastore Test/global');
 		console.log((await ds.ListKeysAsync()).GetCurrentPage());
 		FASTLOG(DFLog('Debug'), '[DFLog::Debug] List all the versions for the object global/TeskKey');
@@ -50,7 +50,9 @@ DYNAMIC_LOGVARIABLE('Debug', 7);
 		FASTLOG(DFLog('Debug'), '[DFLog::Debug] Try remove the key TestKey from the DataStore');
 		await ds.RemoveAsync('global/TestKey');
 		FASTLOG(DFLog('Debug'), '[DFLog::Debug] Try create the Key TT2 and increment it by 213');
-		await ds.IncrementAsync('global/TT2', 213);
+		const incrementOptions = new DataStoreIncrementOptions();
+		incrementOptions.SetMetadata({ Test: 123, Test2: 1234 });
+		await ds.IncrementAsync('global/TT2', 213, [1, 2, 3, 4], incrementOptions);
 		return process.exit(0);
 	} catch (e) {
 		FASTLOGS(DFLog('Debug'), '[DFLog::Debug] Failed because %s, aborting.', e);

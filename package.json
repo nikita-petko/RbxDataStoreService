@@ -1,20 +1,20 @@
 {
 	"name": "@mfd/rbxdatastoreservice",
-	"version": "2.0.7",
+	"version": "2.1.1",
 	"description": "RbxDataStoreService is a module that allows you to access roblox datastores from your Node.js applications.",
 	"main": "lib/index.js",
 	"types": "lib/types",
 	"scripts": {
-		"build": "tsc --skipLibCheck",
-		"prepare-windows": "npm update && npm run build",
-		"prepublishOnly": "npm run prepare-windows"
+		"build": "tsc -b --clean && tsc -b -v --listEmittedFiles",
+		"prepare": "npm update && npm run build",
+		"prepublishOnly": "npm run prepare"
 	},
 	"keywords": [],
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/mfd-nsg/RbxDataStoreService.git"
+		"url": "https://github.com/nkpetko/RbxDataStoreService.git"
 	},
-	"author": "nsg <nsg@mfd.com> (https://github.com/mfd-nsg)",
+	"author": "Nikita Petko <petko@mfdlabs.com> (https://github.com/nkpetko)",
 	"contributors": [
 		"Ivan Gregrovnich <ivan_g@mfd.com>",
 		"Aleksej Grasnich <aleksej_g@mfd.com>"

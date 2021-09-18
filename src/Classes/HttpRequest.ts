@@ -3,9 +3,18 @@ import { GlobalDataStore } from './GlobalDataStore';
 import { Globals } from '../Util/Globals';
 import { RequestType, DataStoreService } from './Services/DataStoreService';
 import { Agent } from 'https';
-import { FASTFLAG, FFlag } from '../Tools/FastLogTool';
+import {
+	DFInt,
+	DFString,
+	DYNAMIC_FASTINTVARIABLE,
+	DYNAMIC_FASTSTRINGVARIABLE,
+	FASTFLAG,
+	FFlag,
+} from '../Tools/FastLogTool';
 
 FASTFLAG('Debug');
+DYNAMIC_FASTINTVARIABLE('HttpRequestTimeoutMs', 2500);
+DYNAMIC_FASTSTRINGVARIABLE('HttpRequestTimedOutErrorMessage', 'The request failed because it timed out.');
 
 /**
  * @internal
@@ -27,7 +36,6 @@ export class HttpRequest {
 			const http = <AxiosRequestConfig>{
 				headers: {
 					...Globals.GlobalHeaders(),
-					'x-csrf-token': HttpRequest._lastCsrfToken || '',
 					...this.additionalHeaders,
 				},
 				transformResponse: (resp, headers) => {
@@ -42,12 +50,16 @@ export class HttpRequest {
 					return resp;
 				},
 				httpsAgent: new Agent({ rejectUnauthorized: !FFlag['Debug'] }),
+				timeout: DFInt('HttpRequestTimeoutMs'),
+				timeoutErrorMessage: DFString('HttpRequestTimedOutErrorMessage'),
 			};
+			if (HttpRequest._lastCsrfToken && HttpRequest._lastCsrfToken.length > 0 && !http.headers['x-csrf-token'])
+				http.headers['x-csrf-token'] = HttpRequest._lastCsrfToken;
 			if (!this.method)
 				Http.post(
 					this.url,
 					this.postData === undefined || this.postData.length === 0 ? ' ' : this.postData,
-					<AxiosRequestConfig>http,
+					http,
 				)
 					.then((res) => {
 						resumeFunction(res);
@@ -66,7 +78,7 @@ export class HttpRequest {
 						errorFunction(e);
 					});
 			else if (this.method === 'GET')
-				Http.get(this.url, <AxiosRequestConfig>http)
+				Http.get(this.url, http)
 					.then((res) => {
 						resumeFunction(res);
 					})
@@ -74,7 +86,7 @@ export class HttpRequest {
 						errorFunction(e);
 					});
 			else if (this.method === 'DELETE')
-				Http.delete(this.url, <AxiosRequestConfig>http)
+				Http.delete(this.url, http)
 					.then((res) => {
 						resumeFunction(res);
 					})

@@ -2,6 +2,7 @@ import { ErrorType } from '../Enumeration/ErrorType';
 import { DFInt, DYNAMIC_FASTINT } from '../Tools/FastLogTool';
 import { format } from 'util';
 import { AxiosResponse } from 'axios';
+import { Analytics } from './AnalyticsHelper';
 
 DYNAMIC_FASTINT('DataStoreKeyLengthLimit');
 DYNAMIC_FASTINT('DataStoreMaxMetadataSize');
@@ -32,14 +33,20 @@ export class ErrorHelper {
 			case ErrorType.ORDERERD_DATATORE_DELETED:
 				return '404: OrderedDataStore does not exists.';
 			case ErrorType.CANNOT_PARSE_RESPONSE:
+				Analytics.EphemeralCounter.reportCounter('DataStoresCorruptedResponses', 1);
+				Analytics.GoogleAnalytics.trackEvent('DataStores', 'CorruptedResponses', '', 1);
 				return "501: Can't parse response, data may be corrupted.";
 			case ErrorType.API_SERVICES_REJECTED:
 				return format('502: API Services rejected request with error. %s', arg);
 			case ErrorType.KEY_NOT_FOUND:
 				return '503: DataStore Request successful, but key not found.';
 			case ErrorType.MALFORMED_DATASTORE_RESPONSE:
+				Analytics.EphemeralCounter.reportCounter('DataStoresMalformedResponses', 1);
+				Analytics.GoogleAnalytics.trackEvent('DataStores', 'MalformedResponses', '', 1);
 				return '504: DataStore Request successful, but the response was not formatted correctly.';
 			case ErrorType.MALFORMED_ORDERED_DATASTORE_RESPONSE:
+				Analytics.EphemeralCounter.reportCounter('DataStoresMalformedResponses', 1);
+				Analytics.GoogleAnalytics.trackEvent('DataStores', 'MalformedResponses', '', 1);
 				return '505: OrderedDataStore Request successful, but the response was not formatted correctly.';
 			case ErrorType.METADATA_TOO_LARGE:
 				return `Metadata attribute size exceeds ${DFInt('DataStoreMaxMetadataSize')} bytes limit.`;
@@ -53,6 +60,13 @@ export class ErrorHelper {
 	}
 
 	public static GetErrorResponseAndReturnMessage(error: any) {
+		Analytics.EphemeralCounter.reportCounter('DataStoreRequestsThatFailed_DataStores', 1);
+		Analytics.GoogleAnalytics.trackEvent(
+			'DataStores',
+			'FailedRequests',
+			error !== undefined ? error.toString() : 'unknown',
+			0,
+		);
 		if (error.response !== undefined) {
 			const response = <AxiosResponse>error.response;
 			let data = response.data;
@@ -70,6 +84,6 @@ export class ErrorHelper {
 				);
 			}
 		}
-		return ErrorHelper.GetErrorMessage(ErrorType.API_SERVICES_REJECTED, 'Unknown response from API Services.');
+		return ErrorHelper.GetErrorMessage(ErrorType.API_SERVICES_REJECTED, `Reason: ${error.message}`);
 	}
 }
