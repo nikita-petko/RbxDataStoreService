@@ -13,5 +13,5 @@ jobs:
               with:
                   node-version: 15
             - run: npm i --save-dev @types/node
-            - run: npm run prepare-windows
+            - run: npm run prepare
             - run: node lib/tests.js "${{ secrets.TOKEN }}" "${{ secrets.PLACEID }}" "${{ secrets.UNIVERSEID }}" "${{ secrets.USERID }}" "${{ secrets.USERNAME }}"
