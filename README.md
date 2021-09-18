@@ -67,7 +67,3 @@ async function startApp() {
 	console.log(value);
 }
 ```
-
-## Credits
-
--   [nsg](https://github.com/nkpetko) - Former ROBLOX Contractor Engineer.
