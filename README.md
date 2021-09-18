@@ -1,8 +1,8 @@
 <h2 align="center"><b>A Node.js wrapper for interacting with the Roblox DataStore API.</b></h2>
 <br>
 <p align="center">
-    <a href="https://standardjs.com"><img src="https://img.shields.io/badge/code_style-standard-blue.svg?style=flat-square" alt="JavaScript Style Guide"/></a>
-    <a href="https://npmjs.org/@mfd/rbxdatastoreservice"><img src="https://img.shields.io/npm/v/@mfd/rbxdatastoreservice.svg?style=flat-square" alt="NPM package"/></a>
+	<a href="https://standardjs.com"><img src="https://img.shields.io/badge/code_style-standard-blue.svg?style=flat-square" alt="JavaScript Style Guide"/></a>
+	<a href="https://npmjs.org/@mfd/rbxdatastoreservice"><img src="https://img.shields.io/npm/v/@mfd/rbxdatastoreservice.svg?style=flat-square" alt="NPM package"/></a>
 	<a href="https://npmjs.org/@mfd/rbxdatastoreservice"><img src="https://img.shields.io/npm/dm/@mfd/rbxdatastoreservice.svg?style=flat-square" alt="downloads"/></a>
 	<a href="https://git.mfdlabs.local/petko/roblox-datastore-service/actions/workflows/test.yml"><img src="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/test.yml/badge.svg?branch=master" alt="test"/></a>
 </p>
@@ -39,23 +39,23 @@ local usersResolutionTable = users:GetAsync("UsersResolution") or {}; -- or {} i
 PlayersService.PlayerAdded:Connect(function (remotePlayer)
 	local playerDiscriminator = tostring(remotePlayer.UserId);
 
-    -- dummy true here just for resolution
-    -- create user if they do not exist already
-    if (usersResolutionTable[playerDiscriminator] ~= true) then
-        local data = { Name = remotePlayer.Name, ID = remotePlayer.UserId, Status = 0, Created = DateTime.now():ToISODate() };
-        users:SetAsync(playerDiscriminator, data, nil, nil); -- no userIDs or DataStoreSetOptions because V2 API not enabled right now
-        usersResolutionTable[playerDiscriminator] = true;
-        users:UpdateAsync("UsersResolution", function() return usersResolutionTable end); -- SetAsync would suffice here but we want to skip cache
-    end
-    local user = users:GetAsync(tostring(remotePlayer.UserId));
+	-- dummy true here just for resolution
+	-- create user if they do not exist already
+	if (usersResolutionTable[playerDiscriminator] ~= true) then
+		local data = { Name = remotePlayer.Name, ID = remotePlayer.UserId, Status = 0, Created = DateTime.now():ToISODate() };
+		users:SetAsync(playerDiscriminator, data, nil, nil); -- no userIDs or DataStoreSetOptions because V2 API not enabled right now
+		usersResolutionTable[playerDiscriminator] = true;
+		users:UpdateAsync("UsersResolution", function() return usersResolutionTable end); -- SetAsync would suffice here but we want to skip cache
+	end
+	local user = users:GetAsync(tostring(remotePlayer.UserId));
 
-    if (user.Status == 1) then
-        -- user is banned
-        remotePlayer:Kick("You are banned");
-        return;
-    end
+	if (user.Status == 1) then
+		-- user is banned
+		remotePlayer:Kick("You are banned");
+		return;
+	end
 
-    -- continue with further logic.
+	-- continue with further logic.
 
 end)
 ```
