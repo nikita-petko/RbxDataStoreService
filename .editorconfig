@@ -7,3 +7,6 @@ end_of_line = lf
 
 [*.yml]
 indent_style = space
+
+[*.md]
+indent_style = space
