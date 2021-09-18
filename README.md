@@ -1,4 +1,4 @@
-<h4 align="center">A Node.js wrapper for interacting with the Roblox DataStore API.</h4>
+<h2 align="center"><b>A Node.js wrapper for interacting with the Roblox DataStore API.</b></h2>
 <br>
 <p align="center">
     <a href="https://standardjs.com"><img src="https://img.shields.io/badge/code_style-standard-blue.svg?style=flat-square" alt="JavaScript Style Guide"/></a>
@@ -6,26 +6,102 @@
 	<a href="https://npmjs.org/@mfd/rbxdatastoreservice"><img src="https://img.shields.io/npm/dm/@mfd/rbxdatastoreservice.svg?style=flat-square" alt="downloads"/></a>
 	<a href="https://git.mfdlabs.local/petko/roblox-datastore-service/actions/workflows/test.yml"><img src="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/test.yml/badge.svg?branch=master" alt="test"/></a>
 </p>
-<p align="center">
-  <a href="#about">About</a> •
-  <a href="#installation">Installation</a> •
-  <a href="#documentation">Docs</a> •
-  <a href="#credits">Credits</a>
-</p>
 
 ## About
 
-RbxDataStoreService is a node module that That allows you to use DataStoreService outside of Roblox.
-This project was created because people outside ROBLOX always want to use DataStoreService outside ROBLOX.
+Nikita Petko and a few other friends alike created a NodeJS package that mocks the [Roblox DataStore System](https://developer.roblox.com/en-us/articles/Data-store) almost identically,
+introducting calls and creations like the actual Lua DataStoreService
 
-RbxDataStoreService allows you to do things you would normally do on the [Roblox](https://www.roblox.com) DataStoreService through a Node.js interface.
-You can use RbxDataStoreService along with ROBLOX's [HttpService feature](https://developer.roblox.com/en-us/api-reference/class/HttpService) to create scripts that interact with the DataStoreService externally.
+What makes this especially interesting, is that everything you do is:
+
+-   Strong/Inferred in typings (DataStore2 result can be a tuple of variant and DataStoreKeyInfo whereas GlobalDataStore result can be just a variant)
+-   External usage identical to Lua with better syntax in your NodeJS applications.
+
+## An example of read world implementation
+
+Say you have a web server with [Express JS](https://www.npmjs.com/package/express), and you have a game that manages users with moderation etc.
+
+With your web server you can query your users like you would via Roblox and get the results like you would on Roblox.
+
+The example is as follows:
+
+### Roblox Game Server Code
+
+```lua
+-- Server script in ServerScriptService
+
+local PlayersService = game:GetService("Players");
+local DataStoreService = game:GetService("DataStoreService");
+
+local users = DataStoreService:GetDataStore("Users", "global", nil); -- no options parameter here as AllScopes nor V2 API isn't needed.
+local usersResolutionTable = users:GetAsync("UsersResolution") or {}; -- or {} in case it's nil
+
+PlayersService.PlayerAdded:Connect(function (remotePlayer)
+	local playerDiscriminator = tostring(remotePlayer.UserId);
+
+    -- dummy true here just for resolution
+    -- create user if they do not exist already
+    if (usersResolutionTable[playerDiscriminator] ~= true) then
+        local data = { Name = remotePlayer.Name, ID = remotePlayer.UserId, Status = 0, Created = DateTime.now():ToISODate() };
+        users:SetAsync(playerDiscriminator, data, nil, nil); -- no userIDs or DataStoreSetOptions because V2 API not enabled right now
+        usersResolutionTable[playerDiscriminator] = true;
+        users:UpdateAsync("UsersResolution", function() return usersResolutionTable end); -- SetAsync would suffice here but we want to skip cache
+    end
+    local user = users:GetAsync(tostring(remotePlayer.UserId));
+
+    if (user.Status == 1) then
+        -- user is banned
+        remotePlayer:Kick("You are banned");
+        return;
+    end
+
+    -- continue with further logic.
+
+end)
+```
+
+### Web Server Code
+
+```js
+// This code will query all the userIDs and try to resolve each user, the structure depends on the UsersResolution table to be a table or null of course
+
+const app = require("express")();
+const {
+DataStoreService,
+InitializeAsync,
+} = require("@mfd/rbxdatastoreservice");
+
+(async () => {
+	await InitializeAsync("Security token for authentication purposes", place id);
+
+	const users = DataStoreService.GetDataStore("Users", "global", undefined); // no options parameter here as AllScopes nor V2 API isn't needed.
+
+	app.get("/v1/all-users", async (request, response) => {
+		const usersResolutionTable =
+		(await users.GetAsync("UsersResolution"
+		)) || {}; // or {} in case it's nil
+
+		let resultingUsers = [];
+
+		for (const userID of Object.keys(usersResolutionTable)) {
+			resultingUsers.push(await users.GetAsync(userID));
+		}
+
+		return response
+			.status(200)
+			.send({ count: resultingUsers.length, data: resultingUsers });
+
+	});
+
+	app.listen(8080);
+})();
+```
 
 ## Installation
 
 With node.js installed simply run:
 
-```bash
+```sh
 # Run this to install RbxDataStoreService locally to your repository.
 $ npm install @mfd/rbxdatastoreservice --save
 $ yarn add @mfd/rbxdatastoreservice
@@ -39,31 +115,60 @@ That's it!
 
 ## Documentation
 
-You can find the current RbxDataStoreService documentation [here (Roblox Wiki)](https://developer.roblox.com/en-us/api-reference/class/DataStoreService) or [here (CloneTrooper's API Reference)](https://robloxapi.github.io/ref/class/DataStoreService.html)
+As this framework mocks the [Roblox DataStore System](https://developer.roblox.com/en-us/articles/Data-store) identically, the documentation for this will almost be identical to the Lua documentation at:
+
+-   [Roblox Developer Hub](https://developer.roblox.com/en-us/api-reference/class/DataStoreService)
+-   [CloneTrooper1019's Documentation](https://robloxapi.github.io/ref/class/DataStoreService.html)
+
+It is made this way to make it seem familiar to users moving, or users that use JavaScript and TypeScript
 
 ### Initial setup
 
-1. Run `RbxDataStoreService.InitializeAsync` with the parameters of `Cookie` and `PlaceId`. This will store your cookie internally and validate it, but will perform **no** cookie refresh automatically, it also requires that your cookie have the warning and be valid.
-2. While this works, Roblox `.ROBLOSECURITY` cookies expire after 30 years of first authenticating them.
-3. You need to store this new cookie somewhere - whether it be in a database, or a JSON file.
+Before you can do anything you must initialize the global state with valid data.
+The data you must give are:
 
-> Note: By default, InitializeAsync will validate the cookie you provide by making a HTTP request.
+1. A valid .ROBLOSECURITY token that you can get from the brower or after an authentication check.
+2. A valid PlaceID for a place that you have edit permissions for.
 
-### Example
+At initialization these 2 arguments are validated via:
 
-This example makes use of the new async-await syntax.
+1. Checking if the .ROBLOSECURITY token has a corresponding account.
+2. Checking if there is a place/asset with the give placeID.
+3. Checking if the authenticated user has sufficient permissions to access datastores for the place (edit permissions will suffice).
 
-```js
-const RBX = require('@mfd/rbxdatastoreservice');
-async function startApp() {
-	await RBX.InitializeAsync(
-		'_|WARNING:-DO-NOT-SHARE-THIS.--Sharing-this-will-allow-someone-to-log-in-as-you-and-to-steal-your-ROBUX-and-items.|_...',
-		123,
-	);
-	// Do everything else, calling functions and the like.
-	let DataStoreService = RBX.DataStoreService;
-	let DataStore = DataStoreService.GetDataStore('Test', 'global');
-	let value = await DataStore.GetAsync('SomeKey');
-	console.log(value);
-}
+When you are using the library, you will want to import the `InitializeAsync` method from the index file like this:
+
+```ts
+import { InitializeAsync } from '@mfd/rbxdatastoreservice';
 ```
+
+And you will use it like:
+
+```ts
+import { InitializeAsync } from "@mfd/rbxdatastoreservice";
+
+(async () => {
+	// This method is async, so you will want to use it in an async block, or you will want to bind to .then and .catch etc.
+	await InitializeAsync("The .ROBLOSECURITY with the warning INCLUDED", the place ID);
+})();
+```
+
+The cookie cannot be:
+
+1. Empty
+2. null or undefined
+
+The placeId cannot be:
+
+1. Null, NaN or undefined
+2. < 1
+
+You will know the initialization succeeded if the method didn't throw during initialization, then you can start using the DataStoreService object you import.
+
+## Closing Words
+
+If you want to contribute, please open a pull request via [here](https://github.com/nkpetko/RbxDataStoreService/pulls).
+
+If you have any issues when using this library, please open an issue [here](https://github.com/nkpetko/RbxDataStoreService/issues).
+
+Thank you and please enjoy!
