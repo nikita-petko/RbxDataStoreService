@@ -1,5 +1,4 @@
 import { FFlag, DFString, DYNAMIC_FASTSTRINGVARIABLE, FASTFLAG, FASTFLAGVARIABLE } from './FastLogTool';
-import qs from 'querystring';
 
 FASTFLAGVARIABLE('UseSiteTests', false);
 FASTFLAG('Debug');
@@ -83,7 +82,7 @@ export class BaseURL {
 		}
 
 		if (queryParameters) {
-			uri += `?${qs.stringify(queryParameters)}`;
+			uri += `?${new URLSearchParams(queryParameters).toString()}`;
 		}
 
 		return uri;
@@ -120,7 +119,7 @@ export class BaseURL {
 		let uri: string = `${baseUrl}${path}`;
 
 		if (queryParameters) {
-			uri += `?${qs.stringify(queryParameters)}`;
+			uri += `?${new URLSearchParams(queryParameters).toString()}`;
 		}
 
 		return uri;

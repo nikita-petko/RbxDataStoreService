@@ -2,18 +2,18 @@
 	"Client": {
 		"FVariable": {},
 		"FLog": {
-			"DataStore": 7,
-			"Auth": 7
+			"DataStore": 0,
+			"Auth": 0
 		},
 		"DFLog": {
-			"Debug": 7
+			"Debug": 0
 		},
 		"SFLog": {},
 		"FFlag": {
-			"FastLogEnabled": true,
-			"LogToFile": true,
-			"UseOneLog": true,
-			"Debug": true,
+			"FastLogEnabled": false,
+			"LogToFile": false,
+			"UseOneLog": false,
+			"Debug": false,
 			"UseSiteTests": false,
 			"UseTestUniverse": false
 		},

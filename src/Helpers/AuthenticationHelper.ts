@@ -34,22 +34,18 @@ export class AuthenticationHelper {
 	public static CheckCookieAndPlaceIdInternalAsync(cookie: string, placeID: number): Promise<void> {
 		return new Promise(async (resumeFunction, errorFunction) => {
 			if (!cookie) {
-				await Analytics.GoogleAnalytics.trackEvent('Authentication', 'AuthCookieNull', '', 0);
 				FASTLOG(FLog['Auth'], '[FLog::Auth] The cookie was null or was not a string, aborting.');
 				return errorFunction('Cookie cannot be null or undefined.');
 			}
 			if (typeof cookie === 'string' && cookie.length === 0) {
-				await Analytics.GoogleAnalytics.trackEvent('Authentication', 'AuthCookieNotString', '', 0);
 				FASTLOG(FLog['Auth'], '[FLog::Auth] The cookie was empty or was not a string, aborting.');
 				return errorFunction("Cookie name can't be empty");
 			}
 			if (placeID < 1) {
-				await Analytics.GoogleAnalytics.trackEvent('Authentication', 'PlaceIdInvalid', '', 0);
 				FASTLOG1(FLog['Auth'], '[FLog::Auth] The placeID was %i when it was expected to be >1', placeID);
 				return errorFunction('The placeID is required to at least be >1');
 			}
 			if (!cookie.match(Constants.CookieWarningCapture) && DFFlag('WeCareAboutTheWarning')) {
-				await Analytics.GoogleAnalytics.trackEvent('Authentication', 'WarningTextInCookieStrNotPresent', '', 0);
 				FASTLOG(
 					FLog['Auth'],
 					'[FLog::Auth] The cookie was invalid because it did not contain the warning text.',
@@ -105,7 +101,7 @@ export class AuthenticationHelper {
 								await Analytics.GoogleAnalytics.trackEvent(
 									'Authentication',
 									'UserHadNoPermissions',
-									'',
+									Globals.UserID.toString(),
 									0,
 								);
 								FASTLOG(
@@ -127,7 +123,9 @@ export class AuthenticationHelper {
 							await Analytics.GoogleAnalytics.trackEvent(
 								'Authentication',
 								'PermissionCheckFailure',
-								'',
+								(err.response ? err.response.status : 0) +
+									' because ' +
+									(err.response ? err.response.data['errors'][0]['message'] : 'Connection Hang'),
 								0,
 							);
 							FASTLOGS(
@@ -144,7 +142,14 @@ export class AuthenticationHelper {
 						});
 				})
 				.catch(async (err) => {
-					await Analytics.GoogleAnalytics.trackEvent('Authentication', 'UserCheckFailure', '', 0);
+					await Analytics.GoogleAnalytics.trackEvent(
+						'Authentication',
+						'UserCheckFailure',
+						(err.response ? err.response.status : 0) +
+							' because ' +
+							(err.response ? err.response.data['errors'][0]['message'] : 'Connection Hang'),
+						0,
+					);
 					FASTLOGS(
 						FLog['Auth'],
 						'[FLog::Auth] Our authentication check failed because %s, most likely due to a credential mis-match, call the errorFunction()',
@@ -168,8 +173,6 @@ export class AuthenticationHelper {
 	 * @param {number} placeID The place ID to use, the user that is dependent on the cookie must have edit permissions for this place.
 	 */
 	public static async InitAuthenticatedUser(cookie: string, placeID: number) {
-		await Analytics.GoogleAnalytics.trackEvent('Authentication', 'UserBeginAuth', new Date().toISOString(), 0);
-
 		FASTLOG1(FLog['Auth'], '[FLog::Auth] Trying to authenticate the user with the placeID %i', placeID);
 		await AuthenticationHelper.CheckCookieAndPlaceIdInternalAsync(cookie, placeID);
 		Globals.Cookie = cookie;

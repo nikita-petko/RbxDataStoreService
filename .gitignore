@@ -113,3 +113,5 @@ requests.http
 http-client.private.env.json
 cpp
 clientid.txt
+first-install.js
+first-install.ts

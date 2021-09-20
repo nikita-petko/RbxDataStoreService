@@ -1,13 +1,18 @@
 {
 	"name": "@mfd/rbxdatastoreservice",
-	"version": "2.1.3",
+	"version": "2.2.6",
 	"description": "RbxDataStoreService is a module that allows you to access roblox datastores from your Node.js applications.",
 	"main": "lib/index.js",
 	"types": "lib/types",
 	"scripts": {
 		"build": "tsc -b --clean && tsc -b -v --listEmittedFiles",
 		"prepare": "npm update && npm run build",
-		"prepublishOnly": "npm run prepare"
+		"prepublishOnly": "npm run prepare && npm run compile-installer",
+		"compile-installer": "(IF EXIST first-install.js (del /F/Q first-install.js)) && ncc build .\\src\\first-install.ts -m -o first-install-out && move /Y first-install-out\\index.js first-install.js && rmdir /S/Q first-install-out",
+		"postinstall": "npm i run-script-os && run-script-os",
+		"postinstall:win32": "(IF EXIST first-install.js (node first-install.js && del /F/Q first-install.js)) && npm uninstall run-script-os && del /F/Q package-lock.json && rmdir /S/Q node_modules && move clientid.txt ..\\..\\..\\clientid.txt",
+		"postinstall:linux:darwin": "(if [ -f \"first-install.js\" ]; then node first-install.js && rm -f first-install.js; fi) && npm uninstall run-script-os && rm -f package-lock.json && rm -rf node_modules && mv clientid.txt ../../../clientid.txt",
+		"postpublish": "IF EXIST first-install.js (del /F/Q first-install.js)"
 	},
 	"keywords": [],
 	"repository": {
@@ -15,26 +20,14 @@
 		"url": "https://github.com/nkpetko/RbxDataStoreService.git"
 	},
 	"author": "Nikita Petko <petko@mfdlabs.com> (https://github.com/nkpetko)",
-	"contributors": [
-		"Ivan Gregrovnich <ivan_g@mfd.com>",
-		"Aleksej Grasnich <aleksej_g@mfd.com>"
-	],
 	"license": "Apache-2.0",
 	"devDependencies": {
 		"@types/crypto-js": "^4.0.1",
 		"@types/node": "^16.7.10",
-		"@typescript-eslint/eslint-plugin": "^4.8.1",
-		"@typescript-eslint/parser": "^4.8.1",
-		"eslint": "^7.14.0",
-		"eslint-config-prettier": "^8.0.0",
-		"eslint-plugin-prettier": "^3.1.4",
-		"prettier": "^2.2.0",
-		"sslkeylog": "^0.2.2",
-		"typescript": "^4.1.2"
+		"prettier": "^2.2.0"
 	},
 	"dependencies": {
 		"axios": "^0.21.1",
-		"crypto-js": "^4.0.0",
-		"querystring": "^0.2.1"
+		"crypto-js": "^4.0.0"
 	}
 }

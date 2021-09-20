@@ -1,11 +1,6 @@
 import { DataStoreService, InitializeAsync, DataStoreOptions, DataStore2, DataStoreIncrementOptions } from '.';
 import { DFLog, DYNAMIC_LOGVARIABLE, FASTLOG, FASTLOGS } from './Tools/FastLogTool';
 
-if (process.env.SSLKEYLOGFILE) {
-	const ssl = require('sslkeylog');
-	ssl.hookAll();
-}
-
 // Allow DFLog::Debug to be 7 because this is a test file.
 DYNAMIC_LOGVARIABLE('Debug', 7);
 
