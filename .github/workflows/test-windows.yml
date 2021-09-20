@@ -3,8 +3,8 @@ name: Production Test Windows Server 2019
 on:
     push:
         paths:
-          - "./src/**"
-          - "./.github/workflows/**"
+          - 'src/**'
+          - '.github/workflows/**'
 
 jobs:
     info-logger:
