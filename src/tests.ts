@@ -49,8 +49,8 @@ DYNAMIC_LOGVARIABLE('Debug', 7);
 		incrementOptions.SetMetadata({ Test: 123, Test2: 1234 });
 		await ds.IncrementAsync('global/TT2', 213, [1, 2, 3, 4], incrementOptions);
 		return process.exit(0);
-	} catch (e) {
-		FASTLOGS(DFLog('Debug'), '[DFLog::Debug] Failed because %s, aborting.', e);
+	} catch (ex) {
+		FASTLOGS(DFLog('Debug'), '[DFLog::Debug] Failed because %s, aborting.', ex);
 		process.exit(1);
 	}
 })();
