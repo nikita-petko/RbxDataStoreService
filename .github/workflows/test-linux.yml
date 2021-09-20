@@ -7,16 +7,19 @@ on:
           - "./.github/workflows/**"
 
 jobs:
+    info-logger:
+        runs-on: ubuntu-latest
+        steps:
+          - run: "echo \"Job(${GITHUB_JOB}-${GITHUB_ACTION}): Running workflow \\\"${GITHUB_WORKFLOW}\\\" with ID \\\"${GITHUB_RUN_ID}\\\" and number \\\"${GITHUB_RUN_NUMBER}\\\"\""
+
     production-test:
         runs-on: ubuntu-latest
         steps:
-            - run: "echo \"Job(${GITHUB_JOB}-${GITHUB_ACTION}): Running workflow \\\"${GITHUB_WORKFLOW}\\\" with ID \\\"${GITHUB_RUN_ID}\\\" and number \\\"${GITHUB_RUN_NUMBER}\\\"\""
-
             - name: Checkout repository.
-            - uses: actions/checkout@v2
+              uses: actions/checkout@v2
 
             - name: Setup the node js environment with version 16.x
-            - uses: actions/setup-node@v1
+              uses: actions/setup-node@v1
               with:
                   node-version: 16
 
