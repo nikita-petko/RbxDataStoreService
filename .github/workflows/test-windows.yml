@@ -10,7 +10,8 @@ jobs:
     info-logger:
         runs-on: windows-latest
         steps:
-          - run: "echo \"Job(%GITHUB_JOB%-%GITHUB_ACTION%): Running workflow \\\"%GITHUB_WORKFLOW%\" with ID \\\"%GITHUB_RUN_ID%\\\" and number \\\"%GITHUB_RUN_NUMBER%\\\"\""
+           - name: Logger
+             run: "echo \"Job(%GITHUB_JOB%-%GITHUB_ACTION%): Running workflow \\\"%GITHUB_WORKFLOW%\" with ID \\\"%GITHUB_RUN_ID%\\\" and number \\\"%GITHUB_RUN_NUMBER%\\\"\""
 
     production-test:
         runs-on: windows-latest
