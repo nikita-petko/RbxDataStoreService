@@ -1,4 +1,4 @@
-name: Production Test Linux Ubuntu 1604
+name: Production Test Windows Server 2019
 
 on:
     push:
@@ -8,12 +8,12 @@ on:
 
 jobs:
     info-logger:
-        runs-on: ubuntu-latest
+        runs-on: windows-latest
         steps:
-          - run: "echo \"Job(${GITHUB_JOB}-${GITHUB_ACTION}): Running workflow \\\"${GITHUB_WORKFLOW}\\\" with ID \\\"${GITHUB_RUN_ID}\\\" and number \\\"${GITHUB_RUN_NUMBER}\\\"\""
+          - run: "echo \"Job(%GITHUB_JOB%-%GITHUB_ACTION%): Running workflow \\\"%GITHUB_WORKFLOW%\" with ID \\\"%GITHUB_RUN_ID%\\\" and number \\\"%GITHUB_RUN_NUMBER%\\\"\""
 
     production-test:
-        runs-on: ubuntu-latest
+        runs-on: windows-latest
         steps:
             - name: Checkout repository.
             - uses: actions/checkout@v2
