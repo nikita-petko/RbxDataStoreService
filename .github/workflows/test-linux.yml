@@ -3,8 +3,8 @@ name: Production Test Linux Ubuntu 1604
 on:
     push:
         paths:
-          - "./src/**"
-          - "./.github/workflows/**"
+          - 'src/**'
+          - '.github/workflows/**'
 
 jobs:
     info-logger:
