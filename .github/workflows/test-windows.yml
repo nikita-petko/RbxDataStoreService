@@ -3,18 +3,12 @@ name: Production Test Windows Server 2019
 on:
     push:
         paths:
-          - 'src/**'
+          - 'Source/**'
           - '.github/workflows/**'
           - 'package.json'
 
 jobs:
-    info-logger:
-        runs-on: windows-latest
-        steps:
-           - name: Logger
-             run: "echo \"Job(%GITHUB_JOB%-%GITHUB_ACTION%): Running workflow \\\"%GITHUB_WORKFLOW%\" with ID \\\"%GITHUB_RUN_ID%\\\" and number \\\"%GITHUB_RUN_NUMBER%\\\"\""
-
-    production-test:
+    production-test-windows:
         runs-on: windows-latest
         steps:
             - name: Checkout repository.
@@ -32,4 +26,4 @@ jobs:
               run: npm run prepare
             
             - name: Run the tests.js file to test the datastores.
-              run: node lib/tests.js "${{ secrets.TOKEN }}" "${{ secrets.PLACEID }}" "${{ secrets.UNIVERSEID }}" "${{ secrets.USERID }}" "${{ secrets.USERNAME }}"
+              run: node Bin/tests.js "${{ secrets.TOKEN }}" "${{ secrets.PLACEID }}" "${{ secrets.UNIVERSEID }}" "${{ secrets.USERID }}" "${{ secrets.USERNAME }}"
