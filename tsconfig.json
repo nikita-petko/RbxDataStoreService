@@ -3,8 +3,8 @@
 		"target": "es2020",
 		"module": "commonjs",
 		"jsx": "react",
-		"outDir": "lib",
-		"rootDir": "src",
+		"outDir": "Bin",
+		"rootDir": "Source",
 		"noUnusedLocals": true,
 		"esModuleInterop": true,
 		"preserveSymlinks": true,
@@ -14,6 +14,9 @@
 		"stripInternal": true,
 		"declaration": true,
 		"removeComments": false,
-		"declarationDir": "lib/types",
-	}
+		"declarationDir": "Bin/Types",
+	},
+	"include": [
+		"Source/"
+	]
 }

@@ -13,7 +13,7 @@ import {
 } from '../Tools/FastLogTool';
 
 FASTFLAG('Debug');
-DYNAMIC_FASTINTVARIABLE('HttpRequestTimeoutMs', 2500);
+DYNAMIC_FASTINTVARIABLE('HttpRequestTimeoutMs', 10000);
 DYNAMIC_FASTSTRINGVARIABLE('HttpRequestTimedOutErrorMessage', 'The request failed because it timed out.');
 
 /**
