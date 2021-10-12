@@ -117,7 +117,7 @@ That's it!
 As this framework mocks the [Roblox DataStore System](https://developer.roblox.com/en-us/articles/Data-store) identically, the documentation for this will almost be identical to the Lua documentation at:
 
 -   [Roblox Developer Hub](https://developer.roblox.com/en-us/api-reference/class/DataStoreService)
--   [CloneTrooper1019's Documentation](https://robloxapi.github.io/ref/class/DataStoreService.html)
+-   [Anaminus's Documentation](https://robloxapi.github.io/ref/class/DataStoreService.html)
 
 It is made this way to make it seem familiar to users moving, or users that use JavaScript and TypeScript
 
