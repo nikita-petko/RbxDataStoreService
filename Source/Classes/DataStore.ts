@@ -163,7 +163,7 @@ export class DataStore extends GlobalDataStore {
 						return errorFunction(ErrorHelper.GetErrorMessage(ErrorType.MALFORMED_DATASTORE_RESPONSE));
 
 					resumeFunction([
-						result,
+						res,
 						new DataStoreKeyInfo(
 							new Date(objectCreatedTimeIso).getTime(),
 							new Date(createdTimeIso).getTime(),
@@ -477,8 +477,9 @@ export class DataStore extends GlobalDataStore {
 			const [success, message] = InputHelper.CheckKey(key);
 			if (!success) return errorFunction(message);
 			FASTLOGS(FLog['DataStore'], '[FLog::DataStore] Updating key %s', key);
-			const result = await this.runTransformFunction(key, transformFunction);
-			resumeFunction(result);
+			this.runTransformFunction(key, transformFunction)
+			    .then(resumeFunction)
+			    .catch(errorFunction);
 		});
 	}
 
