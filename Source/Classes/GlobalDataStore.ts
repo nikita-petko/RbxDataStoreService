@@ -924,8 +924,9 @@ export class GlobalDataStore {
 			const [success, message] = InputHelper.CheckKey(key);
 			if (!success) return errorFunction(message);
 			FASTLOGS(FLog['DataStore'], '[FLog::DataStore] Updating key %s', key);
-			const result = await this.runTransformFunction(key, transformFunction);
-			resumeFunction(result);
+			this.runTransformFunction(key, transformFunction)
+			    .then(resumeFunction)
+			    .catch(errorFunction);
 		});
 	}
 
