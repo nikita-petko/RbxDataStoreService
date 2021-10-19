@@ -1,3 +1,7 @@
+# NOTICE
+I am aware of the issues surrounding installing it globally, for now you'll have to install it per-project, if you have a fix for it before I commit my fixes, please make a pull request and I'll review it.
+\- Nikita Petko
+
 <h2 align="center"><b>A Node.js wrapper for interacting with the Roblox DataStore API.</b></h2>
 <br>
 <p align="center">
