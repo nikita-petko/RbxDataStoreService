@@ -1,0 +1,4 @@
+name: 'CodeQL Security Analysis Shared Configuration'
+
+paths:
+    - ./Source

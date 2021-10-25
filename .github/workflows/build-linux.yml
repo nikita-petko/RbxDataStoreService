@@ -1,4 +1,4 @@
-name: Production Test Windows Server 2016, 2019, 2022 and Latest
+name: Production Build Linux Ubuntu 1804, 2004 and Latest
 
 on:
   push:
@@ -13,12 +13,12 @@ on:
       - "package.json"
 
 jobs:
-  production-test-windows:
+  production-build-linux:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-       os: ["windows-2016", "windows-2019", "windows-2022", "windows-latest"]
+       os: ["ubuntu-18.04", "ubuntu-20.04", "ubuntu-latest"]
        node: [12, 14, 16]
     steps:
       - name: Checkout repository.
@@ -34,6 +34,3 @@ jobs:
 
       - name: Run the prepare script to update packages and build the project.
         run: npm run prepare
-
-      - name: Run the tests.js file to test the datastores.
-        run: node Bin/tests.js "${{ secrets.TOKEN }}" "${{ secrets.PLACEID }}" "${{ secrets.UNIVERSEID }}" "${{ secrets.USERID }}" "${{ secrets.USERNAME }}"

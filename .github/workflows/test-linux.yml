@@ -1,31 +1,41 @@
-name: Production Test Linux Ubuntu 1604
+name: Production Test Linux Ubuntu 1804, 2004 and Latest
 
 on:
-    push:
-        paths:
-          - 'Source/**'
-          - '.github/workflows/**'
-          - 'package.json'
+  push:
+    paths:
+      - "Source/**"
+      - ".github/workflows/**"
+      - "package.json"
+  pull_request:
+    paths:
+      - "Source/**"
+      - ".github/workflows/**"
+      - "package.json"
 
 jobs:
-    production-test-linux:
-        runs-on: ubuntu-latest
-        env:
-          DEV_TEST: 'TRUE'
-        steps:
-            - name: Checkout repository.
-              uses: actions/checkout@v2
+  production-test-linux:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+       os: ["ubuntu-18.04", "ubuntu-20.04", "ubuntu-latest"]
+       node: [12, 14, 16]
+    env:
+      DEV_TEST: "TRUE"
+    steps:
+      - name: Checkout repository.
+        uses: actions/checkout@v2
 
-            - name: Setup the node js environment with version 16.x
-              uses: actions/setup-node@v1
-              with:
-                  node-version: 16
+      - name: Setup the node js environment with version 16.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node }}
 
-            - name: Install the lastest node-js types for typescript.
-              run: npm i --save-dev @types/node
+      - name: Install the lastest node-js types for typescript.
+        run: npm i --save-dev @types/node
 
-            - name: Run the prepare script to update packages and build the project.
-              run: npm run prepare
-            
-            - name: Run the tests.js file to test the datastores.
-              run: node Bin/tests.js "${{ secrets.TOKEN }}" "${{ secrets.PLACEID }}" "${{ secrets.UNIVERSEID }}" "${{ secrets.USERID }}" "${{ secrets.USERNAME }}"
+      - name: Run the prepare script to update packages and build the project.
+        run: npm run prepare
+
+      - name: Run the tests.js file to test the datastores.
+        run: node Bin/tests.js "${{ secrets.TOKEN }}" "${{ secrets.PLACEID }}" "${{ secrets.UNIVERSEID }}" "${{ secrets.USERID }}" "${{ secrets.USERNAME }}"

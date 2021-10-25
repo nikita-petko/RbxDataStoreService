@@ -1,4 +1,4 @@
-name: Production Test Windows Server 2016, 2019, 2022 and Latest
+name: Production Build Windows Server 2016, 2019, 2022 and Latest
 
 on:
   push:
@@ -13,7 +13,7 @@ on:
       - "package.json"
 
 jobs:
-  production-test-windows:
+  production-build-windows:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -34,6 +34,3 @@ jobs:
 
       - name: Run the prepare script to update packages and build the project.
         run: npm run prepare
-
-      - name: Run the tests.js file to test the datastores.
-        run: node Bin/tests.js "${{ secrets.TOKEN }}" "${{ secrets.PLACEID }}" "${{ secrets.UNIVERSEID }}" "${{ secrets.USERID }}" "${{ secrets.USERNAME }}"

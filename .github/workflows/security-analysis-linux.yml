@@ -1,0 +1,37 @@
+name: Production Security Analysis Linux Ubuntu 1804, 2004 and Latest
+
+on:
+  push:
+    paths:
+      - "Source/**"
+      - ".github/workflows/**"
+      - "package.json"
+  pull_request:
+    paths:
+      - "Source/**"
+      - ".github/workflows/**"
+      - "package.json"
+  schedule:
+    - cron: "00 13 1-31 1-12 1/2" # "At 13:00 on every day-of-month from 1 through 31 and on every 2nd day-of-week from Monday through Sunday in every month from January through December."
+
+jobs:
+  production-security-analysis-linux:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+
+      matrix:
+        language: ["typescript"]
+        os: ["ubuntu-18.04", "ubuntu-20.04", "ubuntu-latest"]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v1
+        with:
+          languages: ${{ matrix.language }}
+          config-file: "./.github/configuration/security-analysis-shared-config.yml"
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v1
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v1
