@@ -61,9 +61,9 @@ function execSyncSafe(command) {
 }
 
 function commandExists(commandName) {
-	const whereCommand = process.platform === 'win32' ? 'where' : 'whereis';
+	if (process.platform === 'win32') return execSyncSafe(`where ${command.trim()}`);
 
-	return execSyncSafe(`${whereCommand} ${commandName.trim()}`);
+	return execSyncSafe(`command -v ${commandName.trim()}`);
 }
 
 function cwd(path) {
