@@ -1,5 +1,7 @@
 # NOTICE
-I am aware of the issues surrounding installing it globally, for now you'll have to install it per-project, if you have a fix for it before I commit my fixes, please make a pull request and I'll review it.
+Really fast, concurrent Updates to the same key may cause the service to throw 412 (Precondition Failed), because it is trying to compare a USN that doesn't exist anymore.
+This has only been identified in DataStore2 so far.
+<br />
 \- Nikita Petko
 
 <h2 align="center"><b>A Node.js wrapper for interacting with the Roblox DataStore API.</b></h2>
