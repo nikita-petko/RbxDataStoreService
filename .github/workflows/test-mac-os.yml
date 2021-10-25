@@ -1,0 +1,41 @@
+name: Production Test Mac OS 10.15, 11 and Latest
+
+on:
+  push:
+    paths:
+      - "Source/**"
+      - ".github/workflows/**"
+      - "package.json"
+  pull_request:
+    paths:
+      - "Source/**"
+      - ".github/workflows/**"
+      - "package.json"
+
+jobs:
+  production-test-mac-os:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+       os: ["macos-10.15", "macos-11", "macos-latest"]
+       node: [12, 14, 16]
+    env:
+      DEV_TEST: "TRUE"
+    steps:
+      - name: Checkout repository.
+        uses: actions/checkout@v2
+
+      - name: Setup the node js environment with version 16.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Install the lastest node-js types for typescript.
+        run: npm i --save-dev @types/node
+
+      - name: Run the prepare script to update packages and build the project.
+        run: npm run prepare
+
+      - name: Run the tests.js file to test the datastores.
+        run: node Bin/tests.js "${{ secrets.TOKEN }}" "${{ secrets.PLACEID }}" "${{ secrets.UNIVERSEID }}" "${{ secrets.USERID }}" "${{ secrets.USERNAME }}"

@@ -40,8 +40,6 @@ DYNAMIC_LOGVARIABLE('Debug', 7);
 		await ds.SetAsync('global/TestKey', { lol: 123, fuck: [1, 2, 3] });
 		FASTLOG(DFLog('Debug'), '[DFLog::Debug] Try get the data in Object TestKey');
 		console.log(await ds.GetAsync('global/TestKey'));
-		FASTLOG(DFLog('Debug'), '[DFLog::Debug] Update the TestKey using DataStore UpdateAsync');
-		await ds.UpdateAsync('global/TestKey', () => ['10', {}, []]);
 		FASTLOG(DFLog('Debug'), '[DFLog::Debug] Try remove the key TestKey from the DataStore');
 		await ds.RemoveAsync('global/TestKey');
 		FASTLOG(DFLog('Debug'), '[DFLog::Debug] Try create the Key TT2 and increment it by 213');
