@@ -388,6 +388,14 @@ export class DataStore extends GlobalDataStore {
 					]);
 				})
 				.catch((error) => {
+					if (error.response) {
+						if (error.response.data instanceof Object) {
+							const errors = error.response.data['errors'];
+							if (Array.isArray(errors) && errors.length > 0) {
+								if (errors[0].code === 11) return resumeFunction([undefined, undefined]);
+							}
+						}
+					}
 					return errorFunction(ErrorHelper.GetErrorResponseAndReturnMessage(error));
 				});
 		});
