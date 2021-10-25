@@ -4,15 +4,46 @@ Really fast, concurrent Updates to the same key may cause the service to throw 4
 This has only been identified in DataStore2 so far.
 <br />
 \- Nikita Petko
-
+<hr />
 <h2 align="center"><b>A Node.js wrapper for interacting with the Roblox DataStore API.</b></h2>
-<br>
+<hr />
+<br />
 <p align="center">
-    <a href="https://standardjs.com"><img src="https://img.shields.io/badge/code_style-standard-blue.svg?style=flat-square" alt="JavaScript Style Guide"/></a>
-    <a href="https://npmjs.org/@mfd/rbxdatastoreservice"><img src="https://img.shields.io/npm/v/@mfd/rbxdatastoreservice.svg?style=flat-square" alt="NPM package"/></a>
-    <a href="https://npmjs.org/@mfd/rbxdatastoreservice"><img src="https://img.shields.io/npm/dm/@mfd/rbxdatastoreservice.svg?style=flat-square" alt="downloads"/></a>
-    <a href="https://roblox.atlantic-kilo.mfdlabs.local/ui/Roblox/Roblox-DataStore-Service/Reports/List?t=no&platform=Windows&arch=x86"><img src="https://img.shields.io/badge/Windows%20Build%20Status-Passing-brightgreen)" alt="test"/></a>
-    <a href="https://roblox.atlantic-kilo.mfdlabs.local/ui/Roblox/Roblox-DataStore-Service/Reports/List?t=no&platform=Linux&arch=x64"><img src="https://img.shields.io/badge/Linux%20Build%20Status-Passing-brightgreen)" alt="test"/></a>
+<h1 align="center"><b>Action Runner Statuses</b></h1>
+<div align="center">
+	<h3><u><b>Security Analysis Runners</b></u></h3>
+	<p></p>
+    <a style="display: block;" href="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/security-analysis-windows.yml"><img src="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/security-analysis-windows.yml/badge.svg?branch=master" alt="Production Security Analysis Windows"/></a>
+    <a style="display: block;" href="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/security-analysis-linux.yml"><img src="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/security-analysis-linux.yml/badge.svg?branch=master" alt="Production Security Analysis Linux"/></a>
+    <a style="display: block;" href="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/security-analysis-mac-os.yml"><img src="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/security-analysis-mac-os.yml/badge.svg?branch=master" alt="Production Security Analysis Mac OS"/></a>
+</div>
+<hr />
+<div align="center">
+	<h3><u><b>Build Runners</b></u></h3>
+	<p></p>
+    <a style="display: block;" href="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/build-windows.yml"><img src="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/build-windows.yml/badge.svg?branch=master" alt="Production Build Windows"/></a>
+    <a style="display: block;" href="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/build-linux.yml"><img src="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/build-linux.yml/badge.svg?branch=master" alt="Production Build Linux"/></a>
+    <a style="display: block;" href="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/build-mac-os.yml"><img src="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/build-mac-os.yml/badge.svg?branch=master" alt="Production Build Mac OS"/></a>
+</div>
+<hr />
+<div align="center">
+    <h3><u><b>Unit Test Runners</b></u></h3>
+	<p></p>
+    <h2><b>Soon :)</b></h2>
+	<!-- <a style="display: block;" href="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/unit-test-windows.yml"><img src="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/unit-test-windows.yml/badge.svg?branch=master" alt="Production Unit Test Windows"/></a>
+    <a style="display: block;" href="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/unit-test-linux.yml"><img src="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/unit-test-linux.yml/badge.svg?branch=master" alt="Production Unit Test Linux"/></a>
+    <a style="display: block;" href="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/unit-test-mac-os.yml"><img src="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/unit-test-mac-os.yml/badge.svg?branch=master" alt="Production Unit Test Mac OS"/></a> -->
+</div>
+<hr />
+<div align="center">	
+	<h3><u><b>Test Runners</b></u></h3>
+	<p></p>
+	<a style="display: block;" href="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/test-windows.yml"><img src="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/test-windows.yml/badge.svg?branch=master" alt="Production Test Windows"/></a>
+    <a style="display: block;" href="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/test-linux.yml"><img src="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/test-linux.yml/badge.svg?branch=master" alt="Production Test Linux"/></a>
+    <a style="display: block;" href="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/test-mac-os.yml"><img src="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/test-mac-os.yml/badge.svg?branch=master" alt="Production Test Mac OS"/></a>
+</div>
+	<hr />
+
 </p>
 
 ## About
