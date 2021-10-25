@@ -61,7 +61,7 @@ function execSyncSafe(command) {
 }
 
 function commandExists(commandName) {
-	if (process.platform === 'win32') return execSyncSafe(`where ${command.trim()}`);
+	if (process.platform === 'win32') return execSyncSafe(`where ${commandName.trim()}`);
 
 	return execSyncSafe(`command -v ${commandName.trim()}`);
 }
