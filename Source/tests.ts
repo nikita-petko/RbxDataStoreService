@@ -29,7 +29,7 @@ DYNAMIC_LOGVARIABLE('Debug', 7);
 		});
 
 		FASTLOG(DFLog('Debug'), '[DFLog::Debug] Get the latest version for the object global/TestKey.');
-		console.log(await ds.GetVersionAsync('global/TestKey', '08D914BABDF57FB2.000000009C.08D97452B26D5C1A.01'));
+		console.log(await ds.GetVersionAsync('global/TestKey', ''));
 		FASTLOG(DFLog('Debug'), '[DFLog::Debug] List all the keys in the datastore Test/global');
 		console.log((await ds.ListKeysAsync()).GetCurrentPage());
 		FASTLOG(DFLog('Debug'), '[DFLog::Debug] List all the versions for the object global/TeskKey');
