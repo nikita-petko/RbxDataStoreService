@@ -298,6 +298,8 @@ export class GlobalDataStore {
 	}
 
 	/**
+	 * https://git.mfdlabs.local/petko/rbx-datastores-typescript/issues/142
+	 * https://roblox.backlog.mfdlabs.local/ui/petko/rbx-datastores-typescript/issues/15
 	 * @internal
 	 */
 	protected runTransformFunction<Variant extends any>(

@@ -1,6 +1,6 @@
 {
 	"name": "@mfd/rbxdatastoreservice",
-	"version": "2.2.7",
+	"version": "2.3.3",
 	"description": "RbxDataStoreService is a module that allows you to access roblox datastores from your Node.js applications.",
 	"main": "Bin/index.js",
 	"types": "Bin/Types",
@@ -8,11 +8,9 @@
 		"build": "tsc -b --clean && tsc -b -v --listEmittedFiles",
 		"prepare": "npm update && npm run build",
 		"prepublishOnly": "npm run prepare && npm run compile-installer",
-		"compile-installer": "(IF EXIST first-install.js (del /F/Q first-install.js)) && ncc build .\\src\\first-install.ts -m -o first-install-out && move /Y first-install-out\\index.js first-install.js && rmdir /S/Q first-install-out",
-		"postinstall": "npm i run-script-os && run-script-os",
-		"postinstall:win32": "(IF EXIST first-install.js (node first-install.js && del /F/Q first-install.js)) && npm uninstall run-script-os && del /F/Q package-lock.json && rmdir /S/Q node_modules && move clientid.txt ..\\..\\..\\clientid.txt",
-		"postinstall:linux:darwin": "(if [ -f \"first-install.js\" ]; then node first-install.js && rm -f first-install.js; fi) && npm uninstall run-script-os && rm -f package-lock.json && rm -rf node_modules && mv clientid.txt ../../../clientid.txt",
-		"postpublish": "IF EXIST first-install.js (del /F/Q first-install.js)"
+		"compile-installer": "node ./compile-first-install.js",
+		"postinstall": "node ./first-install.js",
+		"postpublish": "node ./post-publish-cleanup.js"
 	},
 	"keywords": [],
 	"repository": {

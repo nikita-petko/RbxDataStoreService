@@ -163,7 +163,7 @@ export class DataStore extends GlobalDataStore {
 						return errorFunction(ErrorHelper.GetErrorMessage(ErrorType.MALFORMED_DATASTORE_RESPONSE));
 
 					resumeFunction([
-						res,
+						res as Variant,
 						new DataStoreKeyInfo(
 							new Date(objectCreatedTimeIso).getTime(),
 							new Date(createdTimeIso).getTime(),

@@ -18,5 +18,8 @@
 	},
 	"include": [
 		"Source/"
+	],
+	"exclude": [
+		"Source/first-install.ts"
 	]
 }

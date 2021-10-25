@@ -10,6 +10,8 @@ on:
 jobs:
     production-test-windows:
         runs-on: windows-latest
+        env:
+          DEV_TEST: 'TRUE'
         steps:
             - name: Checkout repository.
               uses: actions/checkout@v2

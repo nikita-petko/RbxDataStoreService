@@ -10,6 +10,8 @@ on:
 jobs:
     production-test-linux:
         runs-on: ubuntu-latest
+        env:
+          DEV_TEST: 'TRUE'
         steps:
             - name: Checkout repository.
               uses: actions/checkout@v2

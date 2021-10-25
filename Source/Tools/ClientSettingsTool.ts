@@ -1,16 +1,3 @@
-/**
- * Jak: Try to shorten this, it's too long!
- * ROBLOX: This is too long, refactor it to happen on files.api
- * This uses https://files.api.sitetest4.robloxlabs.com/ClientSettingsFormatted?clientSettingsType=Client&apiKey=91105AEA-2038-4BFE-B98E-BF6A009E2AF7
- * And https://files.api.sitetest4.robloxlabs.com/ClientSettingsFormatted?ClientSettingsType=Client&apiKey=91105AEA-2038-4BFE-B98E-BF6A009E2AF7
- *
- * files.api needs a ROBLOX specific IP for it to actually not infinitely load,
- * why does it do this? It's an internal api, so we don't want people to hack into it because it has archived clientsettings and archived builds,
- * we don't purge things on it because we need backups for any sponsors that would like to see our old work.
- * Sponsors... definitely sponsors hahaha... no we need this incase we break something, or we want old binaries and can't find them.
- *
- */
-
 import filestream from 'fs';
 
 /**
@@ -35,19 +22,21 @@ export enum Group {
 	'All',
 }
 
-//ClientSettings namespace, beacause you know, it's 100% just client settings, not like ClientSettings are here also.
 /**
  * @internal
  */
 export class ClientSettings {
-	// This is helper for grabbing BigSettings, just type cast it if you din't want to say `ClientSettings.GetDFFlag("ClientNoOpt")` etc.
-	// it's also used by GetDFFlag, so yeah
 	public static GetSettings<SettingsType extends Group>(
 		settingsType: SettingsType,
 		settingsGroup: string = 'Client',
 	): Record<string, unknown> | string[] | Error {
 		try {
-			const settings = JSON.parse(filestream.readFileSync(__dirname + '/../../settings.json', 'ascii'));
+			const settings = JSON.parse(
+				filestream.readFileSync(
+					__dirname + `/../../settings${process.env.DEV_TEST !== undefined ? '.dev.' : '.'}json`,
+					'ascii',
+				),
+			);
 			if (settingsType || settingsType === 0 || settingsType === Group.FFlag) {
 				switch (settingsType as Group) {
 					case Group.FVariable:
