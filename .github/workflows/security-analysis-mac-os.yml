@@ -1,4 +1,4 @@
-name: Production Security Analysis Mac OS 10.15, 11 and Latest
+name: Production Security Analysis Mac OS
 
 on:
   push:

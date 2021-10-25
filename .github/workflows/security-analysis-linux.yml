@@ -1,4 +1,4 @@
-name: Production Security Analysis Linux Ubuntu 1804, 2004 and Latest
+name: Production Security Analysis Linux
 
 on:
   push:

@@ -1,4 +1,4 @@
-name: 'CodeQL Security Analysis Shared Configuration'
+name: "CodeQL Security Analysis Shared Configuration"
 
 paths:
     - ./Source

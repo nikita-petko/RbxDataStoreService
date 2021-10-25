@@ -33,9 +33,7 @@
 		},
 		"SFString": {}
 	},
-	"FSettings": [
-		"Client"
-	],
+	"FSettings": ["Client"],
 	"TODO": [],
 	"EditorsNotice": "This may break your distribution of this service if you change any of this"
 }

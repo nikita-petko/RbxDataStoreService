@@ -14,12 +14,8 @@
 		"stripInternal": true,
 		"declaration": true,
 		"removeComments": false,
-		"declarationDir": "Bin/Types",
+		"declarationDir": "Bin/Types"
 	},
-	"include": [
-		"Source/"
-	],
-	"exclude": [
-		"Source/first-install.ts"
-	]
+	"include": ["Source/"],
+	"exclude": ["Source/first-install.ts", "Source/Tests"]
 }

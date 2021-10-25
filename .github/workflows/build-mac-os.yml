@@ -1,4 +1,4 @@
-name: Production Build Mac OS 10.15, 11 and Latest
+name: Production Build Mac OS
 
 on:
   push:
@@ -18,8 +18,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-       os: ["macos-10.15", "macos-11", "macos-latest"]
-       node: [12, 14, 16]
+        os: ["macos-10.15", "macos-11", "macos-latest"]
+        node: [12, 14, 16]
     steps:
       - name: Checkout repository.
         uses: actions/checkout@v2
