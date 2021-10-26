@@ -1,6 +1,6 @@
 {
 	"name": "@mfd/rbxdatastoreservice",
-	"version": "2.3.4",
+	"version": "2.3.5",
 	"description": "RbxDataStoreService is a module that allows you to access roblox datastores from your Node.js applications.",
 	"main": "Bin/index.js",
 	"types": "Bin/Types",
@@ -10,7 +10,8 @@
 		"prepublishOnly": "npm run prepare && npm run compile-installer",
 		"compile-installer": "node ./compile-first-install.js",
 		"postinstall": "node ./first-install.js",
-		"postpublish": "node ./post-publish-cleanup.js"
+		"postpublish": "node ./post-publish-cleanup.js",
+		"test": "npm update && jest --verbose --detectOpenHandles"
 	},
 	"keywords": [],
 	"repository": {
@@ -21,8 +22,11 @@
 	"license": "Apache-2.0",
 	"devDependencies": {
 		"@types/crypto-js": "^4.0.1",
+		"@types/jest": "^27.0.2",
 		"@types/node": "^16.7.10",
+		"jest": "^27.3.1",
 		"prettier": "^2.2.0",
+		"ts-jest": "^27.0.7",
 		"typescript": "^4.4.3"
 	},
 	"dependencies": {

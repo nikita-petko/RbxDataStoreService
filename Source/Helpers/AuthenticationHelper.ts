@@ -172,10 +172,16 @@ export class AuthenticationHelper {
 	 * @param {string} cookie The cookie to use, must include the warning text.
 	 * @param {number} placeID The place ID to use, the user that is dependent on the cookie must have edit permissions for this place.
 	 */
-	public static async InitAuthenticatedUser(cookie: string, placeID: number) {
-		FASTLOG1(FLog['Auth'], '[FLog::Auth] Trying to authenticate the user with the placeID %i', placeID);
-		await AuthenticationHelper.CheckCookieAndPlaceIdInternalAsync(cookie, placeID);
-		Globals.Cookie = cookie;
-		Globals.PlaceID = placeID;
+	public static async InitAuthenticatedUser(cookie: string, placeID: number): Promise<void> {
+		return new Promise((resumeFunction, errorFunction) => {
+			FASTLOG1(FLog['Auth'], '[FLog::Auth] Trying to authenticate the user with the placeID %i', placeID);
+			AuthenticationHelper.CheckCookieAndPlaceIdInternalAsync(cookie, placeID)
+				.then(() => {
+					Globals.Cookie = cookie;
+					Globals.PlaceID = placeID;
+					resumeFunction();
+				})
+				.catch(errorFunction);
+		});
 	}
 }
