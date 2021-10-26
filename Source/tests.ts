@@ -1,4 +1,4 @@
-import { DataStoreService, InitializeAsync, DataStoreOptions, DataStore2, DataStoreIncrementOptions } from '.';
+import { DataStoreService, InitializeAsync, DataStoreOptions, DataStore, DataStoreIncrementOptions } from '.';
 import { DFLog, DYNAMIC_LOGVARIABLE, FASTLOG, FASTLOGS } from './Tools/FastLogTool';
 
 // Allow DFLog::Debug to be 7 because this is a test file.
@@ -22,7 +22,7 @@ DYNAMIC_LOGVARIABLE('Debug', 7);
 		opts.AllScopes = true;
 		opts.SetExperimentalFeatures({ v2: true });
 
-		const ds = <DataStore2>DataStoreService.GetDataStore('Test', '', opts);
+		const ds = <DataStore>DataStoreService.GetDataStore('Test', '', opts);
 		FASTLOG(DFLog('Debug'), '[DFLog::Debug] Bind a GlobalDataStore::onUpdate for the key TestKey');
 		ds.OnUpdate('TestKey', (newValue) => {
 			console.log(newValue);
