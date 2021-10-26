@@ -6,11 +6,13 @@ on:
       - "Source/**"
       - ".github/workflows/**"
       - "package.json"
+      - "package-lock.json"
   pull_request:
     paths:
       - "Source/**"
       - ".github/workflows/**"
       - "package.json"
+      - "package-lock.json"
   schedule:
     - cron: "00 13 1-31 1-12 1/2" # "At 13:00 on every day-of-month from 1 through 31 and on every 2nd day-of-week from Monday through Sunday in every month from January through December."
 

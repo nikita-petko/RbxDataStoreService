@@ -6,11 +6,13 @@ on:
       - "Source/**"
       - ".github/workflows/**"
       - "package.json"
+      - "package-lock.json"
   pull_request:
     paths:
       - "Source/**"
       - ".github/workflows/**"
       - "package.json"
+      - "package-lock.json"
 
 jobs:
   production-build-mac-os:
