@@ -24,6 +24,7 @@ DYNAMIC_LOGVARIABLE('Debug', 7);
 
 		const ds = <DataStore>DataStoreService.GetDataStore('Test', '', opts);
 		FASTLOG(DFLog('Debug'), '[DFLog::Debug] Bind a GlobalDataStore::onUpdate for the key TestKey');
+		
 		ds.OnUpdate('TestKey', (newValue) => {
 			console.log(newValue);
 		});

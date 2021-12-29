@@ -21,7 +21,8 @@
 			"DataStoresV2Enabled": true,
 			"DataStoreUseNewEndpoints": true,
 			"DataStoreNewEndpointsReturnResultIfFailedToDeserialize": true,
-			"WeCareAboutTheWarning": false
+			"WeCareAboutTheWarning": false,
+			"DataStoresV2Force": true
 		},
 		"SFFlag": {},
 		"FInt": {},
