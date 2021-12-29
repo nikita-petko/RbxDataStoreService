@@ -2,6 +2,8 @@ name: Production Security Analysis Windows
 
 on:
   push:
+    branches:
+      - "master"
     paths:
       - "Source/**"
       - ".github/workflows/**"
