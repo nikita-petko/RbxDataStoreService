@@ -27,6 +27,7 @@ LOGGROUP('DataStore');
 DYNAMIC_FASTFLAGVARIABLE('GetGlobalDataStorePcallFix', false);
 DYNAMIC_FASTFLAGVARIABLE('DataStoreLostDataFixEnable', false);
 DYNAMIC_FASTFLAGVARIABLE('DataStoresV2Enabled', true);
+DYNAMIC_FASTFLAGVARIABLE('DataStoresV2Force', true);
 
 DYNAMIC_FASTINT('DataStoreKeyLengthLimit');
 
@@ -75,6 +76,11 @@ export abstract class DataStoreService {
 	 */
 	private static useNewApi(options: DataStoreOptions) {
 		if (DFFlag('DataStoresV2Enabled')) {
+			if (DFFlag('DataStoresV2Force')) {
+				FASTLOG(FLog['DataStore'], '[FLog::DataStore] DataStoresV2Force is set, forcing new API');
+				return true;
+			}
+
 			if (options instanceof DataStoreOptions) {
 				const eF = options.GetExperimentalFeatures();
 				const it = eF.get('v2');

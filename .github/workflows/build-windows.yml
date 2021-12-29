@@ -2,6 +2,8 @@ name: Production Build Windows
 
 on:
   push:
+    branches:
+      - "master"
     paths:
       - "Source/**"
       - ".github/workflows/**"
@@ -16,6 +18,7 @@ on:
 
 jobs:
   production-build-windows:
+    if: "!contains(toJSON(github.event.commits.*.message), '[SKIP CI]')"
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false

@@ -4,11 +4,20 @@
 
 // Refactor, Refator, Refactor!!
 
-import fs from 'fs';
+import fs, { existsSync, mkdirSync } from 'fs';
 import { ClientSettings } from './ClientSettingsTool';
+
+import { join } from 'path';
+
+const logsFolder =
+	process.platform === 'win32'
+		? join(process.env.LOCALAPPDATA, 'MFDLABS', 'Logs')
+		: join(process.env.HOME, '.cache', 'mfdlabs', 'log');
+
 const FFLags = ClientSettings.GetFFlags();
 
 /**
+ * @exports cache This is exported because it's state needs to be persistent on this session.
  * @internal
  */
 export const cache = {
@@ -181,7 +190,7 @@ export const d = {
  * @internal This is internal.
  * @internal
  */
-const parameterizedString = (...args: string[]): string => {
+const format = (...args: string[]): string => {
 	const string = args[0];
 	let i = 1;
 	return string.replace(/%((%)|s|d|f|lf|i|x|X|u)/g, function (m: any) {
@@ -240,75 +249,23 @@ function setUpFLog() {
 	const sfs = ClientSettings.GetSFStrings();
 	const fss = ClientSettings.GetFSettings();
 
-	if (f) {
-		new Map<string, number>(Object.entries(f)).forEach((value, key) => {
-			FLog[key] = value;
-		});
-	}
-	if (df) {
-		new Map<string, number>(Object.entries(df)).forEach((value, key) => {
-			cache.DFLog[key] = value;
-		});
-	}
-	if (sf) {
-		new Map<string, number>(Object.entries(sf)).forEach((value, key) => {
-			SFLog[key] = value;
-		});
-	}
+	if (f !== null) for (const k in f) FLog[k] = f[k];
+	if (df !== null) for (const k in df) DFLog[k] = df[k];
+	if (sf !== null) for (const k in sf) SFLog[k] = sf[k];
 
-	if (ff) {
-		new Map<string, boolean>(Object.entries(ff)).forEach((value, key) => {
-			FFlag[key] = value;
-		});
-	}
-	if (dff) {
-		new Map<string, boolean>(Object.entries(dff)).forEach((value, key) => {
-			cache.DFFlag[key] = value;
-		});
-	}
-	if (sff) {
-		new Map<string, boolean>(Object.entries(sff)).forEach((value, key) => {
-			SFFlag[key] = value;
-		});
-	}
+	if (ff !== null) for (const k in ff) FFlag[k] = ff[k];
+	if (dff !== null) for (const k in dff) DFFlag[k] = dff[k];
+	if (sff !== null) for (const k in sff) SFFlag[k] = sff[k];
 
-	if (fi) {
-		new Map<string, number>(Object.entries(fi)).forEach((value, key) => {
-			FInt[key] = value;
-		});
-	}
-	if (dfi) {
-		new Map<string, number>(Object.entries(dfi)).forEach((value, key) => {
-			cache.DFInt[key] = value;
-		});
-	}
-	if (sfi) {
-		new Map<string, number>(Object.entries(sfi)).forEach((value, key) => {
-			SFInt[key] = value;
-		});
-	}
+	if (fi !== null) for (const k in fi) FInt[k] = fi[k];
+	if (dfi !== null) for (const k in dfi) DFInt[k] = dfi[k];
+	if (sfi !== null) for (const k in sfi) SFInt[k] = sfi[k];
 
-	if (fs) {
-		new Map<string, string>(Object.entries(fs)).forEach((value, key) => {
-			FString[key] = value;
-		});
-	}
-	if (dfs) {
-		new Map<string, string>(Object.entries(dfs)).forEach((value, key) => {
-			cache.DFString[key] = value;
-		});
-	}
-	if (sfs) {
-		new Map<string, string>(Object.entries(sfs)).forEach((value, key) => {
-			SFString[key] = value;
-		});
-	}
+	if (fs !== null) for (const k in fs) FString[k] = fs[k];
+	if (dfs !== null) for (const k in dfs) DFString[k] = dfs[k];
+	if (sfs !== null) for (const k in sfs) SFString[k] = sfs[k];
 
-	if (fss) {
-		(<string[]>fss).forEach((element) => {
-			FSettings.push(element);
-		});
-	}
+	if (fss !== null && Array.isArray(fss)) fss.forEach((e) => FSettings.push(e));
 	d.setup = true;
 }
 
@@ -324,20 +281,24 @@ function printMessage(
 	arg4: any,
 ) {
 	if (FFLags['FastLogEnabled']) {
-		if (!fs.existsSync(__dirname + '\\..\\..\\logs')) fs.mkdirSync(__dirname + '\\..\\..\\logs');
-		const formatted = parameterizedString(message, arg0, arg1, arg2, arg3, arg4);
+		if (!existsSync(logsFolder)) mkdirSync(logsFolder, { recursive: true });
+
+		const formatted = format(message, arg0, arg1, arg2, arg3, arg4);
+
 		const out = `${timeStamp},${process.uptime().toPrecision(6)},${threadId.toString(16)},${
 			Math.floor(level) || 1
 		} ${formatted}`;
+
 		console.log(out);
-		if (FFLags['LogToFile'])
-			fs.appendFileSync(
-				__dirname + `\\..\\..\\logs\\${FFLags['UseOneLog'] ? 'main' : process.pid.toString(16)}-log.log`,
-				`${out}\n`,
-				{
-					encoding: 'utf-8',
-				},
-			);
+
+		if (FFLags['LogToFile']) {
+			const logFile =
+				__dirname + join(logsFolder, FFLags['UseOneLog'] ? 'main-log.log' : `${process.pid.toString(16)}.log`);
+
+			fs.appendFileSync(logFile, `${out}\n`, {
+				encoding: 'utf-8',
+			});
+		}
 	}
 }
 /**
@@ -351,7 +312,6 @@ function printMessage(
  * @param {any} arg4 Arg4
  * @returns {void} Returns nothing.
  * @internal This is internal.
- * @internal
  */
 function FastLog(level: number, message: string, arg0: any, arg1: any, arg2: any, arg3: any, arg4: any): void {
 	if (level > 5) {

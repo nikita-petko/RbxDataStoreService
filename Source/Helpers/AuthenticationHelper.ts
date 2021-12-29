@@ -1,7 +1,5 @@
-//C:\Users\Asjasx\Git\RbxDataStoreService\src\Helpers\Internal\checkCookieAndPlaceIdInternalAsync.ts
-//C:\Users\Asjasx\Git\RbxDataStoreService\src\Helpers\InitAuthenticatedUser.ts
 import { Constants } from '../Util/Constants';
-import Http from 'axios';
+import http, { AxiosRequestConfig } from 'axios';
 import {
 	DFFlag,
 	DYNAMIC_FASTFLAGVARIABLE,
@@ -20,6 +18,15 @@ import { BaseURL } from '../Tools/UrlTool';
 import { Globals } from '../Util/Globals';
 import { Agent } from 'https';
 import { Analytics } from './AnalyticsHelper';
+import { ErrorHelper } from './ErrorHelper';
+import { SkinnyUserResponse } from '../Models/SkinnyUserResponse';
+import { ApiArrayResponse } from '../Models/ApiArrayResponse';
+import { UniverseIdPermissionsModel } from '../Models/UniverseIdPermissionsModel';
+import { ErrorType } from '../Enumeration/ErrorType';
+
+LOGVARIABLE('Auth', 0);
+DYNAMIC_FASTFLAGVARIABLE('WeCareAboutTheWarning', true);
+FASTFLAG('Debug');
 
 LOGVARIABLE('Auth', 0);
 
@@ -28,6 +35,27 @@ DYNAMIC_FASTFLAGVARIABLE('WeCareAboutTheWarning', true);
 FASTFLAG('Debug');
 
 export class AuthenticationHelper {
+	/**
+	 * @internal
+	 */
+	private static readonly _sharedHttpsAgent = new Agent({ rejectUnauthorized: !FFlag['Debug'] });
+
+	/**
+	 * @internal
+	 */
+	private static GetSharedRequestConfiguration(url: string, cookie: string, placeID: number): AxiosRequestConfig {
+		return {
+			url: url,
+			method: 'GET',
+			headers: {
+				...Globals.GlobalHeaders(),
+				Cookie: '.ROBLOSECURITY=' + cookie,
+				'Roblox-Place-Id': placeID.toString(),
+			},
+			httpsAgent: AuthenticationHelper._sharedHttpsAgent,
+		};
+	}
+
 	/**
 	 * @internal
 	 */
@@ -52,116 +80,103 @@ export class AuthenticationHelper {
 				);
 				return errorFunction("Cookie isn't valid, it requires the warning text to be present.");
 			}
-			Http.request({
-				url: BaseURL.ConstructServicePathFromSubDomain(
-					'users',
-					'v1/users/authenticated',
-					null,
+			const authenticatedUserUrl = BaseURL.ConstructServicePathFromSubDomain(
+				'users',
+				'v1/users/authenticated',
+				null,
+				true,
+				false,
+				true,
+			);
+			try {
+				const authenticatedUser = <SkinnyUserResponse>(
+					(
+						await http.request(
+							AuthenticationHelper.GetSharedRequestConfiguration(authenticatedUserUrl, cookie, placeID),
+						)
+					).data
+				);
+				FASTLOG3(
+					FLog['Auth'],
+					'[FLog::Auth] Our cookie check succeeded for user %s - %s (%d), try validate the place ownership and call the resumeFunction()',
+					authenticatedUser.name,
+					authenticatedUser.displayName,
+					authenticatedUser.id,
+				);
+				Globals.UserID = authenticatedUser.id;
+				const universeId = await UniversesHelper.GetUniverseIDFromPlaceID(placeID);
+				const universePermissionsUrl = BaseURL.ConstructServicePathFromSubDomain(
+					'develop',
+					'v1/universes/multiget/permissions',
+					{ ids: [universeId] },
 					true,
 					false,
 					true,
-				),
-				method: 'GET',
-				headers: {
-					...Globals.GlobalHeaders(),
-					Cookie: '.ROBLOSECURITY=' + cookie,
-					'Roblox-Place-Id': placeID.toString(),
-				},
-				httpsAgent: new Agent({ rejectUnauthorized: !FFlag['Debug'] }),
-			})
-				.then(async (res) => {
-					FASTLOG3(
-						FLog['Auth'],
-						'[FLog::Auth] Our cookie check succeeded for user %s - %s (%d), try validate the place ownership and call the resumeFunction()',
-						res.data['name'],
-						res.data['displayName'],
-						res.data['id'],
-					);
-					Globals.UserID = res.data['id'];
-					const universeId = await UniversesHelper.GetUniverseIDFromPlaceID(placeID);
-					Http.request({
-						url: BaseURL.ConstructServicePathFromSubDomain(
-							'develop',
-							'v1/universes/multiget/permissions',
-							{ ids: [universeId] },
-							true,
-							false,
-							true,
-						),
-						method: 'GET',
-						headers: {
-							...Globals.GlobalHeaders(),
-							Cookie: '.ROBLOSECURITY=' + cookie,
-							'Roblox-Place-Id': placeID.toString(),
-						},
-						httpsAgent: new Agent({ rejectUnauthorized: !FFlag['Debug'] }),
-					})
-						.then(async (valid) => {
-							if (!valid.data['data'][0]['canManage'] && !valid.data['data'][0]['canCloudEdit']) {
-								await Analytics.GoogleAnalytics.trackEvent(
-									'Authentication',
-									'UserHadNoPermissions',
-									Globals.UserID.toString(),
-									0,
-								);
-								FASTLOG(
-									FLog['Auth'],
-									'[FLog::Auth] Our Place check failed because the user does not have the valid credentials to manage this place, call the errorFunction().',
-								);
-								return errorFunction(`You do not have valid permission to manage the place ${placeID}`);
-							}
-							await Analytics.GoogleAnalytics.trackEvent('Authentication', 'UserHadPermissions', '', 0);
-							FASTLOG2(
-								FLog['Auth'],
-								'[FLog::Auth] Our Place check succeeded for %d (%d), call the resumeFunctiom()',
-								placeID,
-								universeId,
-							);
-							return resumeFunction();
-						})
-						.catch(async (err) => {
-							await Analytics.GoogleAnalytics.trackEvent(
-								'Authentication',
-								'PermissionCheckFailure',
-								(err.response ? err.response.status : 0) +
-									' because ' +
-									(err.response ? err.response.data['errors'][0]['message'] : 'Connection Hang'),
-								0,
-							);
-							FASTLOGS(
-								FLog['Auth'],
-								'[FLog::Auth] Our authentication check failed because %s, most likely due to a credential mis-match, call the errorFunction()',
-								err,
-							);
-							return errorFunction(
-								"Cookie isn't valid, validation threw a " +
-									(err.response ? err.response.status : 0) +
-									' because ' +
-									(err.response ? err.response.data['errors'][0]['message'] : 'Connection Hang'),
-							);
-						});
-				})
-				.catch(async (err) => {
+				);
+
+				const universePermissions = <ApiArrayResponse<UniverseIdPermissionsModel>>(
+					(
+						await http.request(
+							AuthenticationHelper.GetSharedRequestConfiguration(universePermissionsUrl, cookie, placeID),
+						)
+					).data
+				);
+				if (universePermissions.data?.length === 0) {
 					await Analytics.GoogleAnalytics.trackEvent(
 						'Authentication',
-						'UserCheckFailure',
-						(err.response ? err.response.status : 0) +
-							' because ' +
-							(err.response ? err.response.data['errors'][0]['message'] : 'Connection Hang'),
+						'EmptyUniversePermissionsResponse',
+						`User '${Globals.UserID.toString()}' for place '${placeID}'`,
 						0,
 					);
-					FASTLOGS(
+					FASTLOG(
 						FLog['Auth'],
-						'[FLog::Auth] Our authentication check failed because %s, most likely due to a credential mis-match, call the errorFunction()',
-						err,
+						"[FLog::Auth] Our Place check failed because the response's data had an invalid length, call the errorFunction().",
 					);
-					return errorFunction(
-						"Cookie isn't valid, validation threw a " +
-							(err.response ? err.response.status : 0) +
-							' because ' +
-							(err.response ? err.response.data['errors'][0]['message'] : 'Connection Hang'),
+					return errorFunction(ErrorHelper.GetErrorMessage(ErrorType.CANNOT_PARSE_RESPONSE));
+				}
+
+				const noAccess = !universePermissions.data[0].canCloudEdit && !universePermissions.data[0].canManage;
+
+				if (noAccess) {
+					await Analytics.GoogleAnalytics.trackEvent(
+						'Authentication',
+						'UserHadNoPermissions',
+						`User '${Globals.UserID.toString()}' for place '${placeID}'`,
+						0,
 					);
-				});
+					FASTLOG(
+						FLog['Auth'],
+						'[FLog::Auth] Our Place check failed because the user does not have the valid credentials to manage this place, call the errorFunction().',
+					);
+					return errorFunction(`You do not have valid permission to manage the place ${placeID}`);
+				}
+				await Analytics.GoogleAnalytics.trackEvent(
+					'Authentication',
+					'PermissionsCheckSuccess',
+					`User '${Globals.UserID.toString()}' for place '${placeID}'`,
+					0,
+				);
+				FASTLOG2(
+					FLog['Auth'],
+					'[FLog::Auth] Our Place check succeeded for %d (%d), call the resumeFunctiom()',
+					placeID,
+					universeId,
+				);
+				return resumeFunction();
+			} catch (ex) {
+				await Analytics.GoogleAnalytics.trackEvent(
+					'Authentication',
+					'AuthenticationFailure',
+					ErrorHelper.GetErrorResponseAndReturnMessage(ex),
+					0,
+				);
+				FASTLOGS(
+					FLog['Auth'],
+					'[FLog::Auth] Our authentication check failed because %s, most likely due to a credential mis-match or a permissions mis-match, call the errorFunction()',
+					ex.message,
+				);
+				return errorFunction(ErrorHelper.GetErrorResponseAndReturnMessage(ex));
+			}
 		});
 	}
 

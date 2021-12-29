@@ -2,6 +2,8 @@ name: Production Security Analysis Mac OS
 
 on:
   push:
+    branches:
+      - "master"
     paths:
       - "Source/**"
       - ".github/workflows/**"
@@ -18,6 +20,7 @@ on:
 
 jobs:
   production-security-analysis-mac-os:
+    if: "!contains(toJSON(github.event.commits.*.message), '[SKIP ANALYSIS]')"
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
