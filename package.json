@@ -23,7 +23,7 @@
 	"devDependencies": {
 		"@types/crypto-js": "^4.0.1",
 		"@types/jest": "^27.0.2",
-		"@types/node": "^16.7.10",
+		"@types/node": "^17.0.5",
 		"jest": "^27.3.1",
 		"prettier": "^2.2.0",
 		"ts-jest": "^27.0.7",
