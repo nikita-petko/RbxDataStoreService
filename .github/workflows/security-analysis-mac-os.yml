@@ -10,6 +10,8 @@ on:
       - "package.json"
       - "package-lock.json"
   pull_request:
+    branches:
+        - "master"
     paths:
       - "Source/**"
       - ".github/workflows/**"
