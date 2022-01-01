@@ -121,7 +121,7 @@ export class AuthenticationHelper {
 						)
 					).data
 				);
-				if (universePermissions.data?.length === 0) {
+				if (universePermissions.data !== null && universePermissions.data.length === 0) {
 					await Analytics.GoogleAnalytics.trackEvent(
 						'Authentication',
 						'EmptyUniversePermissionsResponse',

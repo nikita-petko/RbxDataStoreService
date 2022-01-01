@@ -2,12 +2,16 @@ name: Production Security Analysis Windows
 
 on:
   push:
+    branches:
+      - "master"
     paths:
       - "Source/**"
       - ".github/workflows/**"
       - "package.json"
       - "package-lock.json"
   pull_request:
+    branches:
+        - "master"
     paths:
       - "Source/**"
       - ".github/workflows/**"
