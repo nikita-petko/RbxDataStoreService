@@ -11,7 +11,7 @@
 		"compile-installer": "node ./compile-first-install.js",
 		"postinstall": "node ./first-install.js",
 		"postpublish": "node ./post-publish-cleanup.js",
-		"test": "npm update && jest --verbose --detectOpenHandles"
+		"test": "npm update && jest --config jestconfig.json --verbose --detectOpenHandles"
 	},
 	"keywords": [],
 	"repository": {

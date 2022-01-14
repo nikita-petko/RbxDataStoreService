@@ -104,7 +104,6 @@ dist
 .tern-port
 .vscode-test
 .vscode/settings.json
-.npmignore
 Bin
 .vscode
 .idea
