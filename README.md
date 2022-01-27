@@ -15,7 +15,6 @@ This has only been identified in DataStore2 so far.
 	<p></p>
     <a style="display: block;" href="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/security-analysis-windows.yml"><img src="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/security-analysis-windows.yml/badge.svg?branch=master" alt="Production Security Analysis Windows"/></a>
     <a style="display: block;" href="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/security-analysis-linux.yml"><img src="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/security-analysis-linux.yml/badge.svg?branch=master" alt="Production Security Analysis Linux"/></a>
-<a href="https://app.fossa.com/projects/git%2Bgithub.com%2Fnkpetko%2FRbxDataStoreService?ref=badge_shield" alt="FOSSA Status"><img src="https://app.fossa.com/api/projects/git%2Bgithub.com%2Fnkpetko%2FRbxDataStoreService.svg?type=shield"/></a>
     <a style="display: block;" href="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/security-analysis-mac-os.yml"><img src="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/security-analysis-mac-os.yml/badge.svg?branch=master" alt="Production Security Analysis Mac OS"/></a>
 </div>
 <hr />
@@ -44,7 +43,12 @@ This has only been identified in DataStore2 so far.
     <a style="display: block;" href="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/test-mac-os.yml"><img src="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/test-mac-os.yml/badge.svg?branch=master" alt="Production Test Mac OS"/></a>
 </div>
 	<hr />
-
+<div align="center">
+    <h3><u><b>License Status</b></u></h3>
+	<p></p>
+<a href="https://app.fossa.com/projects/git%2Bgithub.com%2Fnkpetko%2FRbxDataStoreService?ref=badge_shield" alt="FOSSA Status"><img algin="center" src="https://app.fossa.com/api/projects/git%2Bgithub.com%2Fnkpetko%2FRbxDataStoreService.svg?type=shield"/></a>    
+</div>
+	<hr />
 </p>
 
 ## About
