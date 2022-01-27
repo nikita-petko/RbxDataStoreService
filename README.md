@@ -15,6 +15,7 @@ This has only been identified in DataStore2 so far.
 	<p></p>
     <a style="display: block;" href="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/security-analysis-windows.yml"><img src="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/security-analysis-windows.yml/badge.svg?branch=master" alt="Production Security Analysis Windows"/></a>
     <a style="display: block;" href="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/security-analysis-linux.yml"><img src="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/security-analysis-linux.yml/badge.svg?branch=master" alt="Production Security Analysis Linux"/></a>
+<a href="https://app.fossa.com/projects/git%2Bgithub.com%2Fnkpetko%2FRbxDataStoreService?ref=badge_shield" alt="FOSSA Status"><img src="https://app.fossa.com/api/projects/git%2Bgithub.com%2Fnkpetko%2FRbxDataStoreService.svg?type=shield"/></a>
     <a style="display: block;" href="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/security-analysis-mac-os.yml"><img src="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/security-analysis-mac-os.yml/badge.svg?branch=master" alt="Production Security Analysis Mac OS"/></a>
 </div>
 <hr />
@@ -209,3 +210,7 @@ If you want to contribute, please open a pull request via [here](https://github.
 If you have any issues when using this library, please open an issue [here](https://github.com/nkpetko/RbxDataStoreService/issues).
 
 Thank you and please enjoy!
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fnkpetko%2FRbxDataStoreService.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fnkpetko%2FRbxDataStoreService?ref=badge_large)
