@@ -292,8 +292,7 @@ function printMessage(
 		console.log(out);
 
 		if (FFLags['LogToFile']) {
-			const logFile =
-				__dirname + join(logsFolder, FFLags['UseOneLog'] ? 'main-log.log' : `${process.pid.toString(16)}.log`);
+			const logFile = join(logsFolder, FFLags['UseOneLog'] ? 'main-log.log' : `${process.pid.toString(16)}.log`);
 
 			fs.appendFileSync(logFile, `${out}\n`, {
 				encoding: 'utf-8',
