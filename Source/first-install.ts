@@ -1,3 +1,7 @@
+/**
+ * Quick analytics tracking for the first install, it will be called only once on install and will then be deleted.
+ */
+
 import { Analytics } from './Helpers/AnalyticsHelper';
 import { DFFlag, DFString, DYNAMIC_FASTFLAGVARIABLE, DYNAMIC_FASTSTRINGVARIABLE } from './Tools/FastLogTool';
 import { unlinkSync } from 'fs';

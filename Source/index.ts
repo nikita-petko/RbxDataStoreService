@@ -2,6 +2,8 @@ import { Analytics } from './Helpers/AnalyticsHelper';
 import { DFFlag, DFString, DYNAMIC_FASTFLAGVARIABLE, DYNAMIC_FASTSTRINGVARIABLE } from './Tools/FastLogTool';
 
 DYNAMIC_FASTFLAGVARIABLE('AnalyticsEnabled', true);
+// TODO: http://analytics-ops.backlog.mfdlabs.local/ui/ga-tracking/issues/26512?t=no&shortName=Find+All+Tracker+IDs+That+Are+Used+In+Projects+That+Are+Also+Used+In+Other+Projects
+//		 This tracker ID is used by the StatusPage Service. It is not owned by this. Dedicate another tracker ID to this.
 DYNAMIC_FASTSTRINGVARIABLE('GoogleAnalyticsAccountPropertyID', 'UA-201817978-1');
 
 if (DFFlag('AnalyticsEnabled')) {
