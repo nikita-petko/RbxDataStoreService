@@ -11,11 +11,11 @@
 		"SFLog": {},
 		"FFlag": {
 			"FastLogEnabled": true,
-			"LogToFile": false,
+			"LogToFile": true,
 			"UseOneLog": false,
 			"Debug": true,
-			"UseSiteTests": false,
-			"UseTestUniverse": false
+			"UseSiteTests": true,
+			"UseTestUniverse": true
 		},
 		"DFFlag": {
 			"DataStoresV2Enabled": true,
