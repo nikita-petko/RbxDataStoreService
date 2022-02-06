@@ -14,8 +14,8 @@
 			"LogToFile": true,
 			"UseOneLog": false,
 			"Debug": true,
-			"UseSiteTests": true,
-			"UseTestUniverse": true
+			"UseSiteTests": false,
+			"UseTestUniverse": false
 		},
 		"DFFlag": {
 			"DataStoresV2Enabled": true,
