@@ -1,10 +1,3 @@
-# NOTICE
-
-Really fast, concurrent Updates to the same key may cause the service to throw 412 (Precondition Failed), because it is trying to compare a USN that doesn't exist anymore.
-This has only been identified in DataStore2 so far.
-<br />
-\- Nikita Petko
-<hr />
 <h2 align="center"><b>A Node.js wrapper for interacting with the Roblox DataStore API.</b></h2>
 <hr />
 <br />
@@ -38,9 +31,10 @@ This has only been identified in DataStore2 so far.
 <div align="center">	
 	<h3><u><b>Test Runners</b></u></h3>
 	<p></p>
-	<a style="display: block;" href="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/test-windows.yml"><img src="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/test-windows.yml/badge.svg?branch=master" alt="Production Test Windows"/></a>
+      <h2><b>Disabled due to Forms Cookie invalidation</b></h2>
+	<!-- <a style="display: block;" href="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/test-windows.yml"><img src="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/test-windows.yml/badge.svg?branch=master" alt="Production Test Windows"/></a>
     <a style="display: block;" href="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/test-linux.yml"><img src="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/test-linux.yml/badge.svg?branch=master" alt="Production Test Linux"/></a>
-    <a style="display: block;" href="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/test-mac-os.yml"><img src="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/test-mac-os.yml/badge.svg?branch=master" alt="Production Test Mac OS"/></a>
+    <a style="display: block;" href="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/test-mac-os.yml"><img src="https://github.com/nkpetko/RbxDataStoreService/actions/workflows/test-mac-os.yml/badge.svg?branch=master" alt="Production Test Mac OS"/></a> -->
 </div>
 	<hr />
 <div align="center">
