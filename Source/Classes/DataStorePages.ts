@@ -60,6 +60,8 @@ export class DataStorePages extends Pages {
 					? this.requestUrl
 					: `${this.requestUrl.toString()}&exclusiveStartKey=${this.exclusiveStartKey.toString()}`;
 			request.requestType = RequestType.GET_SORTED_ASYNC_PAGE;
+			if (DFFlag('DataStoreUseNewEndpoints'))
+				request.method = 'GET';
 			request.owner = ods;
 			ExectionHelper.ExecuteGetSorted(request)
 				.then((r) => {
