@@ -6,6 +6,7 @@ import { ExectionHelper } from '../Helpers/ExecutionHelper';
 import { DFFlag, DYNAMIC_FASTFLAGVARIABLE } from '../Tools/FastLogTool';
 import { ErrorHelper } from '../Helpers/ErrorHelper';
 import { ErrorType } from '../Enumeration/ErrorType';
+import { KeyValueMapping } from '../Util/KeyValueMapping';
 
 DYNAMIC_FASTFLAGVARIABLE('DataStoreUseNewEndpoints', true);
 
@@ -60,14 +61,13 @@ export class DataStorePages extends Pages {
 					? this.requestUrl
 					: `${this.requestUrl.toString()}&exclusiveStartKey=${this.exclusiveStartKey.toString()}`;
 			request.requestType = RequestType.GET_SORTED_ASYNC_PAGE;
-			if (DFFlag('DataStoreUseNewEndpoints'))
-				request.method = 'GET';
+			if (DFFlag('DataStoreUseNewEndpoints')) request.method = 'GET';
 			request.owner = ods;
 			ExectionHelper.ExecuteGetSorted(request)
 				.then((r) => {
 					const [success, result] = OrderedDataStore.deserializeVariant(r.data);
 					if (!success) return errorFunction(ErrorHelper.GetErrorMessage(ErrorType.CANNOT_PARSE_RESPONSE));
-					let entries;
+					let entries: any[];
 
 					if (DFFlag('DataStoreUseNewEndpoints')) {
 						entries = result['entries'];
@@ -82,20 +82,18 @@ export class DataStorePages extends Pages {
 
 					const newValue: { Value: number; Key: string }[] = [];
 					for (let i = 0; i < entries.length; i++) {
-						const valueAsStr = entries[i]['Value'];
+						const valueAsStr = KeyValueMapping.FetchKeyFromObjectCaseInsensitive(entries[i], 'Value');
 						if (valueAsStr === undefined)
 							return errorFunction(
 								ErrorHelper.GetErrorMessage(ErrorType.MALFORMED_ORDERED_DATASTORE_RESPONSE),
 							);
 
-						const [didDeserialize, value] = OrderedDataStore.deserializeVariant<number>(
-							entries[i]['Value'],
-						);
+						const [didDeserialize, value] = OrderedDataStore.deserializeVariant<number>(valueAsStr);
 
 						if (!didDeserialize)
 							return errorFunction(ErrorHelper.GetErrorMessage(ErrorType.CANNOT_PARSE_RESPONSE));
 
-						const target = entries[i]['Target'];
+						const target = KeyValueMapping.FetchKeyFromObjectCaseInsensitive(entries[i], 'Target');
 						if (target === undefined)
 							return errorFunction(
 								ErrorHelper.GetErrorMessage(ErrorType.MALFORMED_ORDERED_DATASTORE_RESPONSE),
