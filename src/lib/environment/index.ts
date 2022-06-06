@@ -28,7 +28,7 @@ import * as fs from 'fs';
 
 /**
  * A class for loading environment variables from .env files programmatically.
- * 
+ *
  * @internal This class is only ingested internally.
  */
 export default class Environment {

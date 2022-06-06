@@ -20,4 +20,8 @@
 	Written by: Nikita Petko
 */
 
+import dirname from './lib/dirname';
+
+dirname.packageDirname = __dirname.substring(0, __dirname.lastIndexOf(process.platform === 'win32' ? '\\' : '/'));
+
 export * from './lib/logger';

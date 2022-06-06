@@ -22,7 +22,7 @@
 
 /**
  * A class that sets the root directory of this package at runtime.
- * 
+ *
  * @internal This class is only ingested internally.
  */
 export default abstract class Dirname {
