@@ -363,30 +363,34 @@ export default class Logger {
   public static tryClearLocalLog(override: boolean = false): void {
     Logger.singleton.log('Try clear local log files...');
 
-    if (environment.persistLocalLogs) {
-      if (override) {
-        Logger.singleton.warning('Override flag set. Clearing local log files.');
-      } else {
-        Logger.singleton.warning('Local log files will not be cleared because persistLocalLogs is set to true.');
-        return;
+    try {
+      if (environment.persistLocalLogs) {
+        if (override) {
+          Logger.singleton.warning('Override flag set. Clearing local log files.');
+        } else {
+          Logger.singleton.warning('Local log files will not be cleared because persistLocalLogs is set to true.');
+          return;
+        }
       }
-    }
 
-    Logger.singleton.log('Clearing local log files...');
+      Logger.singleton.log('Clearing local log files...');
 
-    for (const logger of Logger._loggers) {
-      logger._lockedFileWriteStream.end();
-    }
+      for (const logger of Logger._loggers) {
+        logger._lockedFileWriteStream.end();
+      }
 
-    if (fs.existsSync(Logger._logFileBaseDirectory)) {
-      fs.rmSync(Logger._logFileBaseDirectory, { recursive: true, force: true });
-      fs.mkdirSync(Logger._logFileBaseDirectory, { recursive: true });
-    }
+      if (fs.existsSync(Logger._logFileBaseDirectory)) {
+        fs.rmSync(Logger._logFileBaseDirectory, { recursive: true, force: true });
+        fs.mkdirSync(Logger._logFileBaseDirectory, { recursive: true });
+      }
 
-    for (const logger of Logger._loggers) {
-      Object.defineProperty(logger, '_lockedFileWriteStream', {
-        value: fs.createWriteStream(logger._fullyQualifiedLogFileName, { flags: 'a' }),
-      });
+      for (const logger of Logger._loggers) {
+        Object.defineProperty(logger, '_lockedFileWriteStream', {
+          value: fs.createWriteStream(logger._fullyQualifiedLogFileName, { flags: 'a' }),
+        });
+      }
+    } catch (error) {
+      Logger.singleton.error('Error clearing local log files: %s', error.message);
     }
   }
 
@@ -480,6 +484,49 @@ export default class Logger {
       this._lockedFileWriteStream = fs.createWriteStream(this._fullyQualifiedLogFileName, {
         flags: 'a',
       });
+      this._lockedFileWriteStream.on(
+        'error',
+        ((error: NodeJS.ErrnoException) => {
+          if (error === undefined || error === null) {
+            this.warning('File system file write stream error callback invoked, but error not actually provided.');
+            return;
+          }
+
+          switch (error.code) {
+            case 'EACCES':
+              this.warning('File system file write stream error callback invoked. Permission denied.');
+              break;
+            case 'EISDIR':
+              this.warning('File system file write stream error callback invoked. File is a directory.');
+              break;
+            case 'EMFILE':
+              this.warning('File system file write stream error callback invoked. Too many open files.');
+              break;
+            case 'ENFILE':
+              this.warning('File system file write stream error callback invoked. File table overflow.');
+              break;
+            case 'ENOENT':
+              this.warning('File system file write stream error callback invoked. File not found.');
+              break;
+            case 'ENOSPC':
+              this.warning('File system file write stream error callback invoked. No space left on device.');
+              break;
+            case 'EPERM':
+              this.warning('File system file write stream error callback invoked. Operation not permitted.');
+              break;
+            case 'EROFS':
+              this.warning('File system file write stream error callback invoked. Read-only file system.');
+              break;
+            default:
+              this.warning('File system file write stream error callback invoked. Unknown error.');
+              break;
+          }
+
+          this._logToFileSystem = false;
+          this._lockedFileWriteStream.end();
+          this._lockedFileWriteStream.destroy();
+        }).bind(this),
+      );
     }
   }
 
