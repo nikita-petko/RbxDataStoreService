@@ -11,10 +11,12 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
+
 *
 !dist
 # Reignore the dist/tests.js file (in case it exists)
 dist/tests.js
+
 # This is for default environment file
 !.env
 !package.json
