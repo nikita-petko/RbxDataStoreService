@@ -20,7 +20,7 @@
     Written by: Nikita Petko
 */
 
-import dirname from '@lib/dirname';
+import dirname from '../dirname';
 
 import * as fs from 'fs';
 import * as path from 'path';
@@ -33,11 +33,14 @@ import * as dotenv from 'dotenv';
  * @internal This class is only ingested internally.
  */
 export default class DotenvLoader {
+  /**
+   * @internal This is a private member.
+   */
   private static _dotEnvFilePath: string = path.join(dirname.packageDirname, '.env');
 
   /**
    * Loads the .env file and parses it into process.env.
-   * 
+   *
    * @returns {void} Nothing.
    * @internal This method is only ingested internally.
    * @static

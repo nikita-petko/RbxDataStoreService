@@ -22,7 +22,7 @@
 
 /**
  * Represents the log colors.
- * 
+ *
  * @enum {string} The log colors.
  */
 export enum LogColor {

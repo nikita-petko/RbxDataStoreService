@@ -22,7 +22,7 @@
 
 /**
  * Represents the log level.
- * 
+ *
  * @enum {string} The log levels.
  */
 export enum LogLevel {

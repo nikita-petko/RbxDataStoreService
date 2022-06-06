@@ -22,17 +22,17 @@
 
 /**
  * A simple helper that converts the given value to the given type.
- * 
+ *
  * @internal This class is only ingested internally.
  */
- export default abstract class TypeConverters {
+export default abstract class TypeConverters {
   /**
    * Converts the given value to a boolean.
    *
    * @example
    * ```typescript
    * import convert from '@lib/environment/type_converters';
-   * 
+   *
    * convert.toBoolean(true); // true
    * convert.toBoolean(false); // false
    * convert.toBoolean(1); // true

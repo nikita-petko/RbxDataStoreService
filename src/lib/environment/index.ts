@@ -20,16 +20,21 @@
     Written by: Nikita Petko
 */
 
-import { LogLevel } from '@lib/logger/log_level';
-import dotenvLoader from '@lib/environment/dotenv_loader';
-import typeConverters from '@lib/environment/type_converters';
+import { LogLevel } from '../logger/log_level';
+import dotenvLoader from '../environment/dotenv_loader';
+import typeConverters from '../environment/type_converters';
 
 import * as fs from 'fs';
 
 /**
  * A class for loading environment variables from .env files programmatically.
+ * 
+ * @internal This class is only ingested internally.
  */
 export default class Environment {
+  /**
+   * @internal This is a private member.
+   */
   private static _isDocker?: boolean = undefined;
 
   /**
@@ -40,7 +45,7 @@ export default class Environment {
    * @param {boolean=} [reloadEnvironment=true] Whether the environment variable is required.
    * @returns {T} The value of the environment variable.
    * @template T The type of the environment variable.
-   * @internal This method is only ingested internally.
+   * @internal This method is only ingested internally. This is a private method.
    * @private This method is a private method of the Environment class.
    * @static
    * @memberof Environment
@@ -122,7 +127,7 @@ export default class Environment {
    *
    * If true, we will also log to the file system.
    */
-   public static get logToFileSystem(): boolean {
+  public static get logToFileSystem(): boolean {
     return this._getOrDefault('LOG_TO_FILE_SYSTEM', true);
   }
 
@@ -146,17 +151,17 @@ export default class Environment {
 
   /**
    * Used by the logger.
-   * 
+   *
    * If true, then the logger will cut the prefix of the log message in order to read the log message more easily.
    * @note This is advised for use in production.
    */
-   public static get loggerCutPrefix(): boolean {
+  public static get loggerCutPrefix(): boolean {
     return this._getOrDefault('LOGGER_CUT_PREFIX', true);
   }
 
   /**
    * Used by the logger.
-   * 
+   *
    * The default name of the logger.
    */
   public static get loggerDefaultName(): string {

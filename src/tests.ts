@@ -1,8 +1,5 @@
-import './import_handler';
-
-import logger from '@lib/logger';
-import { LogLevel } from '@lib/logger/log_level';
-
+import logger from './lib/logger';
+import { LogLevel } from './lib/logger/log_level';
 
 logger.singleton.logLevel = LogLevel.Trace;
 
@@ -30,7 +27,6 @@ testFileSystemLogger.debug('This is a test debug message.');
 testFileSystemLogger.information('This is a test info message.');
 testFileSystemLogger.error('This is a test error message.');
 testFileSystemLogger.trace('This is a test trace message.');
-
 
 logger.noopSingleton.log('This is a test log message.');
 logger.noopSingleton.warning('This is a test warning message.');

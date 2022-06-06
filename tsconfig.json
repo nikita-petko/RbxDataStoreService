@@ -9,10 +9,7 @@
     "removeComments": false,
     "esModuleInterop": true,
     "declaration": true,
-    "declarationDir": "dist/types",
-    "paths": {
-      "@lib/*": ["./src/lib", "./src/lib/*"]
-    },
+    "declarationDir": "dist/types"
   },
   "include": ["src/"],
   "exclude": ["src/test/"]

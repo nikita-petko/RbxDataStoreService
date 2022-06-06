@@ -24,16 +24,16 @@
 // Project imports
 ////////////////////////////////////////////////////////////////////////////////
 
-import dirname from '@lib/dirname';
-import environment from '@lib/environment';
+import dirname from '../dirname';
+import environment from '../environment';
 
 ////////////////////////////////////////////////////////////////////////////////
 // Type imports
 ////////////////////////////////////////////////////////////////////////////////
 
-import { LogLevel } from '@lib/logger/log_level';
-import { LogColor } from '@lib/logger/log_color';
-import { thisKeywordIncorrectClosure } from '@lib/logger/logger_constants';
+import { LogLevel } from './log_level';
+import { LogColor } from './log_color';
+import { thisKeywordIncorrectClosure } from './logger_constants';
 
 ////////////////////////////////////////////////////////////////////////////////
 // Type exports
@@ -70,45 +70,102 @@ export default class Logger {
   private static readonly _logFileBaseDirectory: string = path.join(dirname.packageDirname, 'logs');
 
   /* Log String Stuff */
+  /**
+   * @internal This is a private member.
+   */
   private static readonly _localIp: string = net.getLocalIPv4();
+  /**
+   * @internal This is a private member.
+   */
   private static readonly _hostname: string = os.hostname();
+  /**
+   * @internal This is a private member.
+   */
   private static readonly _processId: string = process.pid.toString(16);
+  /**
+   * @internal This is a private member.
+   */
   private static readonly _platform: string = os.platform();
+  /**
+   * @internal This is a private member.
+   */
   private static readonly _architecture: string = os.arch();
+  /**
+   * @internal This is a private member.
+   */
   private static readonly _nodeVersion: string = process.versions.node;
+  /**
+   * @internal This is a private member.
+   */
   private static readonly _architectureFmt: string = `${Logger._platform}-${Logger._architecture}` as const;
 
+  /**
+   * @internal This is a private member.
+   */
   private static readonly _loggers: Logger[] = [];
 
   //////////////////////////////////////////////////////////////////////////////
   // Private Static Properties
   //////////////////////////////////////////////////////////////////////////////
 
+  /**
+   * @internal This is a private member.
+   */
   private static _singleton: Logger = null;
+  /**
+   * @internal This is a private member.
+   */
   private static _noopSingletonLogger: Logger = null;
 
   //////////////////////////////////////////////////////////////////////////////
   // Private Readonly Properties
   //////////////////////////////////////////////////////////////////////////////
 
+  /**
+   * @internal This is a private member.
+   */
   private readonly _name: string = undefined;
+  /**
+   * @internal This is a private member.
+   */
   private readonly _fileName: string = undefined;
+  /**
+   * @internal This is a private member.
+   */
   private readonly _fullyQualifiedLogFileName: string = undefined;
+  /**
+   * @internal This is a private member.
+   */
   private readonly _lockedFileWriteStream: fs.WriteStream = null;
 
   //////////////////////////////////////////////////////////////////////////////
   // Private Properties
   //////////////////////////////////////////////////////////////////////////////
 
+  /**
+   * @internal This is a private member.
+   */
   private _logLevel: LogLevel = undefined;
+  /**
+   * @internal This is a private member.
+   */
   private _logToConsole: boolean = true;
+  /**
+   * @internal This is a private member.
+   */
   private _logToFileSystem: boolean = true;
+  /**
+   * @internal This is a private member.
+   */
   private _cutLogPrefix: boolean = false;
 
   //////////////////////////////////////////////////////////////////////////////
   // Private Static Helper Methods
   //////////////////////////////////////////////////////////////////////////////
 
+  /**
+   * @internal This is a private member.
+   */
   private static _getFileSafeDateNowIsoString(): string {
     return new Date()
       .toISOString()
@@ -116,18 +173,30 @@ export default class Logger {
       .replace(/-/g, '');
   }
 
+  /**
+   * @internal This is a private member.
+   */
   private static _getDateNowIsoString(): string {
     return new Date().toISOString();
   }
 
+  /**
+   * @internal This is a private member.
+   */
   private static _getUptime(): string {
     return process.uptime().toFixed(7);
   }
 
+  /**
+   * @internal This is a private member.
+   */
   private static _getColorSection(content: any): string {
     return util.format('[%s%s%s]', LogColor.BrightBlack, content, LogColor.Reset);
   }
 
+  /**
+   * @internal This is a private member.
+   */
   private static _formatStackTrace(stackTrace: string): string {
     // Changes the first line from 'Error: {message}' to '{message}'
     const stackTraceLines = stackTrace.split('\n');
@@ -140,6 +209,9 @@ export default class Logger {
   // Private Helper Methods
   //////////////////////////////////////////////////////////////////////////////
 
+  /**
+   * @internal This is a private member.
+   */
   private _constructFileLoggerMessage(logLevel: LogLevel, format: string, ...args: any[]): string {
     let formattedMessage = util.format(format, ...args);
 
@@ -176,6 +248,9 @@ export default class Logger {
   }
 
   /* This method is async so it can be pushed to the task queue and not block the main one */
+  /**
+   * @internal This is a private member.
+   */
   private async _logLocally(logLevel: LogLevel, format: string, ...args: any[]): Promise<void> {
     if (!this._logToFileSystem) return;
 
@@ -184,6 +259,9 @@ export default class Logger {
 
   /* Color Logging (Console) */
 
+  /**
+   * @internal This is a private member.
+   */
   private _getSharedColorStringPrefix() {
     if (this._cutLogPrefix) {
       return util.format(
@@ -209,6 +287,9 @@ export default class Logger {
     );
   }
 
+  /**
+   * @internal This is a private member.
+   */
   private async _logConsole(logLevel: LogLevel, color: LogColor, format: string, ...args: any[]): Promise<void> {
     if (!this._logToConsole) return;
 
@@ -232,6 +313,9 @@ export default class Logger {
     console.log(message);
   }
 
+  /**
+   * @internal This is a private member.
+   */
   private _checkLogLevel(logLevelToCheck: LogLevel): boolean {
     // This is to check if the passed log level is valid
     if (Object.values(LogLevel).indexOf(this._logLevel) === -1) {

@@ -20,7 +20,15 @@
 	Written by: Nikita Petko
 */
 
+/**
+ * A class that sets the root directory of this package at runtime.
+ * 
+ * @internal This class is only ingested internally.
+ */
 export default abstract class Dirname {
+  /**
+   * @internal This is a private member.
+   */
   private static _dirname: string;
 
   /**
