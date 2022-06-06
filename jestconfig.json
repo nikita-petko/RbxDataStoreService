@@ -1,0 +1,23 @@
+{
+  "transform": {
+    "^.+\\.(t|j)sx?$": "ts-jest"
+  },
+  "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+  "moduleFileExtensions": [
+    "js",
+    "json",
+    "jsx",
+    "node",
+    "ts",
+    "tsx"
+  ],
+  "roots": [
+    "<rootDir>/src"
+  ],
+  "globals": {
+    "ts-jest": {
+      "tsconfig": "tsconfig.json"
+    }
+  },
+  "preset": "ts-jest/presets/js-with-ts"
+}
