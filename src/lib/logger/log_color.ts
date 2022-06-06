@@ -24,6 +24,7 @@
  * Represents the log colors.
  *
  * @enum {string} The log colors.
+ * @internal This enum is only ingested internally.
  */
 export enum LogColor {
   Reset = '\x1b[0m',
