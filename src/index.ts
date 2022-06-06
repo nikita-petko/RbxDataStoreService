@@ -21,3 +21,5 @@
 */
 
 import './import_handler'; // Handles @lib/xxx, @foo/bar imports instead of doing the relative path.
+
+export * from '@lib/logger';
