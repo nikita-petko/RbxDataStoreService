@@ -128,7 +128,7 @@ export const invalidConstructorNameType: string = 'The `name` argument must be a
  * @constant
  * @type {RegExp} The regex.
  */
-export const nameRegex: RegExp = /^[a-zA-Z0-9_\-]{1,15}$/;
+export const nameRegex: RegExp = /^[a-zA-Z0-9_\-]{1,25}$/;
 
 /**
  * This is an error message for when you supply a name to the constructor that does not match the regex /^[a-zA-Z0-9_\-]{1,15}$/.
@@ -138,7 +138,7 @@ export const nameRegex: RegExp = /^[a-zA-Z0-9_\-]{1,15}$/;
  * @type {string} The error message.
  */
 export const invalidConstructorNameRegex: string =
-  'Invalid logger name. Logger names can only be 15 characters long, and can only contain letters, numbers, underscores, and dashes.' as const;
+  'Invalid logger name. Logger names can only be 25 characters long, and can only contain letters, numbers, underscores, and dashes.' as const;
 
 /**
  * This is an error message for when you supply a null or undefined log level to the constructor.
