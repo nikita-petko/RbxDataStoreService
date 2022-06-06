@@ -13,6 +13,8 @@
 #  limitations under the License.
 *
 !dist
+# Reignore the dist/tests.js file (in case it exists)
+dist/tests.js
 # This is for default environment file
 !.env
 !package.json
