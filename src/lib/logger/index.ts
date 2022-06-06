@@ -478,7 +478,24 @@ export default class Logger {
       this._fullyQualifiedLogFileName = path.join(Logger._logFileBaseDirectory, this._fileName);
 
       if (!fs.existsSync(Logger._logFileBaseDirectory)) {
-        fs.mkdirSync(Logger._logFileBaseDirectory, { recursive: true });
+        try {
+          fs.mkdirSync(Logger._logFileBaseDirectory, { recursive: true });
+        } catch (error: any) {
+          if (error instanceof Error) {
+            error = error as NodeJS.ErrnoException;
+
+            if (error.code === 'EPERM' || error.code === 'EACCES') {
+              this._logToFileSystem = false;
+              this.warning(
+                'Unable to create log file directory. Please ensure that the current user has permission to create directories.',
+              );
+
+              return;
+            }
+
+            throw error; // rethrow
+          }
+        }
       }
 
       this._lockedFileWriteStream = fs.createWriteStream(this._fullyQualifiedLogFileName, {
