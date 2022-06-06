@@ -33,7 +33,27 @@ import environment from '../environment';
 
 import { LogLevel } from './log_level';
 import { LogColor } from './log_color';
-import { thisKeywordIncorrectClosure } from './logger_constants';
+import {
+  nameRegex,
+  invalidLogArgs,
+  invalidLogMessage,
+  invalidLogMessageType,
+  invalidConstructorName,
+  invalidSetterBooleanValue,
+  invalidSetterLogLevelType,
+  invalidConstructorLogLevel,
+  invalidConstructorNameType,
+  invalidConstructorNameRegex,
+  thisKeywordIncorrectClosure,
+  invalidConstructorLogToConsole,
+  invalidConstructorCutLogPrefix,
+  invalidConstructorLogLevelType,
+  invalidConstructorLogToFileSystem,
+  setterValueCannotBeUndefinedOrNull,
+  invalidConstructorLogToConsoleType,
+  invalidConstructorCutLogPrefixType,
+  invalidConstructorLogToFileSystemType,
+} from './logger_constants';
 
 ////////////////////////////////////////////////////////////////////////////////
 // Type exports
@@ -390,14 +410,51 @@ export default class Logger {
     logToConsole: boolean = true,
     cutLogPrefix: boolean = true,
   ) {
-    if (!/^[a-zA-Z0-9_\-]+$/.test(name)) {
-      throw new Error('Invalid logger name. Logger names can only contain letters, numbers, underscores, and dashes.');
+    if (name === undefined || name === null) {
+      throw new ReferenceError(invalidConstructorName);
+    }
+    if (typeof name !== 'string') {
+      throw new TypeError(invalidConstructorNameType);
+    }
+    if (!nameRegex.test(name)) {
+      throw new SyntaxError(invalidConstructorNameRegex);
+    }
+    if (Logger._loggers.some((logger) => logger._name === name)) {
+      throw new ReferenceError(`Logger with name '${name}' already exists.`);
     }
 
-    logLevel = (logLevel?.toLowerCase() as LogLevel) ?? LogLevel.Info;
-
+    if (logLevel === undefined || logLevel === null) {
+      throw new ReferenceError(invalidConstructorLogLevel);
+    }
+    if (typeof logLevel !== 'string') {
+      throw new TypeError(invalidConstructorLogLevelType);
+    }
+    logLevel = logLevel?.toLowerCase() as LogLevel;
     if (Object.values(LogLevel).indexOf(logLevel) === -1) {
-      throw new Error(`Invalid log level: ${logLevel}. Valid log levels are: ${Object.values(LogLevel).join(', ')}`);
+      throw new TypeError(
+        `Invalid log level: ${logLevel}. Valid log levels are: ${Object.values(LogLevel).join(', ')}`,
+      );
+    }
+
+    if (logToFileSystem === undefined || logToFileSystem === null) {
+      throw new ReferenceError(invalidConstructorLogToFileSystem);
+    }
+    if (typeof logToFileSystem !== 'boolean') {
+      throw new TypeError(invalidConstructorLogToFileSystemType);
+    }
+
+    if (logToConsole === undefined || logToConsole === null) {
+      throw new ReferenceError(invalidConstructorLogToConsole);
+    }
+    if (typeof logToConsole !== 'boolean') {
+      throw new TypeError(invalidConstructorLogToConsoleType);
+    }
+
+    if (cutLogPrefix === undefined || cutLogPrefix === null) {
+      throw new ReferenceError(invalidConstructorCutLogPrefix);
+    }
+    if (typeof cutLogPrefix !== 'boolean') {
+      throw new TypeError(invalidConstructorCutLogPrefixType);
     }
 
     this._name = name;
@@ -539,16 +596,24 @@ export default class Logger {
    * Sets the log level of the logger.
    * @param {LogLevel} value - The log level of the logger.
    * @note The log level is one of the following: 'none', 'error', 'warning', 'info', 'debug', 'verbose'.
-   * @throws {Error} - If the log level is invalid.
+   * @throws {ReferenceError} - Value cannot be null or undefined.
+   * @throws {TypeError} - Value supplied must of type string or LogLevel.
+   * @throws {TypeError} - Value supplied must be one of the following: 'none', 'error', 'warning', 'info', 'debug', 'verbose'.
    */
   public set logLevel(value: LogLevel) {
+    if (value === undefined || value === null) {
+      throw new ReferenceError(setterValueCannotBeUndefinedOrNull);
+    }
+    if (typeof value !== 'string') {
+      throw new TypeError(invalidSetterLogLevelType);
+    }
+
     value = value?.toLowerCase() as LogLevel;
+    if (Object.values(LogLevel).indexOf(value) === -1) {
+      throw new TypeError(`Invalid log level: ${value}. Valid log levels are: ${Object.values(LogLevel).join(', ')}`);
+    }
 
     if (this.logLevel !== value) {
-      if (Object.values(LogLevel).indexOf(value) === -1) {
-        throw new Error(`Invalid log level: ${value}. Valid log levels are: ${Object.values(LogLevel).join(', ')}`);
-      }
-
       this._logLevel = value;
     }
   }
@@ -556,8 +621,17 @@ export default class Logger {
   /**
    * Sets the value that determines if this logger will log to the file system.
    * @param {boolean} value - The value that determines if this logger will log to the file system.
+   * @throws {ReferenceError} - Value cannot be null or undefined.
+   * @throws {TypeError} - Value supplied must of type boolean.
    */
   public set logToFileSystem(value: boolean) {
+    if (value === undefined || value === null) {
+      throw new ReferenceError(setterValueCannotBeUndefinedOrNull);
+    }
+    if (typeof value !== 'boolean') {
+      throw new TypeError(invalidSetterBooleanValue);
+    }
+
     if (this._logToFileSystem !== value) {
       this._logToFileSystem = value;
     }
@@ -566,8 +640,17 @@ export default class Logger {
   /**
    * Sets the value that determines if this logger will log to the console.
    * @param {boolean} value - The value that determines if this logger will log to the console.
+   * @throws {ReferenceError} - Value cannot be null or undefined.
+   * @throws {TypeError} - Value supplied must of type boolean.
    */
   public set logToConsole(value: boolean) {
+    if (value === undefined || value === null) {
+      throw new ReferenceError(setterValueCannotBeUndefinedOrNull);
+    }
+    if (typeof value !== 'boolean') {
+      throw new TypeError(invalidSetterBooleanValue);
+    }
+
     if (this._logToConsole !== value) {
       this._logToConsole = value;
     }
@@ -576,8 +659,17 @@ export default class Logger {
   /**
    * Sets the value that determines if this logger will cut the log prefix.
    * @param {boolean} value - The value that determines if this logger will cut the log prefix.
+   * @throws {ReferenceError} - Value cannot be null or undefined.
+   * @throws {TypeError} - Value supplied must of type boolean.
    */
   public set cutLogPrefix(value: boolean) {
+    if (value === undefined || value === null) {
+      throw new ReferenceError(setterValueCannotBeUndefinedOrNull);
+    }
+    if (typeof value !== 'boolean') {
+      throw new TypeError(invalidSetterBooleanValue);
+    }
+
     if (this._cutLogPrefix !== value) {
       this._cutLogPrefix = value;
     }
@@ -592,10 +684,30 @@ export default class Logger {
    * @param {string} message - The message to log.
    * @param {any[]} ...args - The arguments to pass to the message.
    * @returns {void} - Nothing.
+   * @throws {TypeError} - The `this` keyword is the incorrect type, if you are applying this to a callback, please call this within a lambda instead of passing the method as a callback.
+   * @throws {ReferenceError} - Message cannot be null or undefined.
+   * @throws {TypeError} - Message supplied must of type string or function that returns a string.
+   * @throws {RangeError} - Message supplied must be at least 1 character long.
+   * @throws {TypeError} - Arguments supplied must be of type Array. (Spread operator will work.)
    */
-  public async log(message: string, ...args: any[]): Promise<void> {
+  public async log(message: string | (() => string), ...args: any[]): Promise<void> {
     if (!(this instanceof Logger)) {
-      throw new Error(thisKeywordIncorrectClosure);
+      throw new TypeError(thisKeywordIncorrectClosure);
+    }
+    if (message === undefined || message === null) {
+      throw new ReferenceError(invalidLogMessage);
+    }
+    if (typeof message === 'function') {
+      message = message();
+    }
+    if (typeof message !== 'string') {
+      throw new TypeError(invalidLogMessageType);
+    }
+    if (message.length === 0) {
+      throw new RangeError(invalidLogMessage);
+    }
+    if (args && !Array.isArray(args)) {
+      throw new TypeError(invalidLogArgs);
     }
 
     if (!this._checkLogLevel(LogLevel.Info)) return;
@@ -609,10 +721,30 @@ export default class Logger {
    * @param {string} message - The message to log.
    * @param {any[]} ...args - The arguments to pass to the message.
    * @returns {void} - Nothing.
+   * @throws {TypeError} - The `this` keyword is the incorrect type, if you are applying this to a callback, please call this within a lambda instead of passing the method as a callback.
+   * @throws {ReferenceError} - Message cannot be null or undefined.
+   * @throws {TypeError} - Message supplied must of type string or function that returns a string.
+   * @throws {RangeError} - Message supplied must be at least 1 character long.
+   * @throws {TypeError} - Arguments supplied must be of type Array. (Spread operator will work.)
    */
-  public async warning(message: string, ...args: any[]): Promise<void> {
+  public async warning(message: string | (() => string), ...args: any[]): Promise<void> {
     if (!(this instanceof Logger)) {
-      throw new Error(thisKeywordIncorrectClosure);
+      throw new TypeError(thisKeywordIncorrectClosure);
+    }
+    if (message === undefined || message === null) {
+      throw new ReferenceError(invalidLogMessage);
+    }
+    if (typeof message === 'function') {
+      message = message();
+    }
+    if (typeof message !== 'string') {
+      throw new TypeError(invalidLogMessageType);
+    }
+    if (message.length === 0) {
+      throw new RangeError(invalidLogMessage);
+    }
+    if (args && !Array.isArray(args)) {
+      throw new TypeError(invalidLogArgs);
     }
 
     if (!this._checkLogLevel(LogLevel.Warning)) return;
@@ -627,10 +759,30 @@ export default class Logger {
    * @param {any[]} ...args - The arguments to pass to the message.
    * @returns {void} - Nothing.
    * @remarks This will create a trace back directly from this method, not the method that called it.
+   * @throws {TypeError} - The `this` keyword is the incorrect type, if you are applying this to a callback, please call this within a lambda instead of passing the method as a callback.
+   * @throws {ReferenceError} - Message cannot be null or undefined.
+   * @throws {TypeError} - Message supplied must of type string or function that returns a string.
+   * @throws {RangeError} - Message supplied must be at least 1 character long.
+   * @throws {TypeError} - Arguments supplied must be of type Array. (Spread operator will work.)
    */
-  public async trace(message: string, ...args: any[]): Promise<void> {
+  public async trace(message: string | (() => string), ...args: any[]): Promise<void> {
     if (!(this instanceof Logger)) {
-      throw new Error(thisKeywordIncorrectClosure);
+      throw new TypeError(thisKeywordIncorrectClosure);
+    }
+    if (message === undefined || message === null) {
+      throw new ReferenceError(invalidLogMessage);
+    }
+    if (typeof message === 'function') {
+      message = message();
+    }
+    if (typeof message !== 'string') {
+      throw new TypeError(invalidLogMessageType);
+    }
+    if (message.length === 0) {
+      throw new RangeError(invalidLogMessage);
+    }
+    if (args && !Array.isArray(args)) {
+      throw new TypeError(invalidLogArgs);
     }
 
     if (!this._checkLogLevel(LogLevel.Trace)) return;
@@ -644,10 +796,30 @@ export default class Logger {
    * @param {string} message - The message to log.
    * @param {any[]} ...args - The arguments to pass to the message.
    * @returns {void} - Nothing.
+   * @throws {TypeError} - The `this` keyword is the incorrect type, if you are applying this to a callback, please call this within a lambda instead of passing the method as a callback.
+   * @throws {ReferenceError} - Message cannot be null or undefined.
+   * @throws {TypeError} - Message supplied must of type string or function that returns a string.
+   * @throws {RangeError} - Message supplied must be at least 1 character long.
+   * @throws {TypeError} - Arguments supplied must be of type Array. (Spread operator will work.)
    */
-  public async debug(message: string, ...args: any[]): Promise<void> {
+  public async debug(message: string | (() => string), ...args: any[]): Promise<void> {
     if (!(this instanceof Logger)) {
-      throw new Error(thisKeywordIncorrectClosure);
+      throw new TypeError(thisKeywordIncorrectClosure);
+    }
+    if (message === undefined || message === null) {
+      throw new ReferenceError(invalidLogMessage);
+    }
+    if (typeof message === 'function') {
+      message = message();
+    }
+    if (typeof message !== 'string') {
+      throw new TypeError(invalidLogMessageType);
+    }
+    if (message.length === 0) {
+      throw new RangeError(invalidLogMessage);
+    }
+    if (args && !Array.isArray(args)) {
+      throw new TypeError(invalidLogArgs);
     }
 
     if (!this._checkLogLevel(LogLevel.Debug)) return;
@@ -661,10 +833,30 @@ export default class Logger {
    * @param {string} message - The message to log.
    * @param {any[]} ...args - The arguments to pass to the message.
    * @returns {void} - Nothing.
+   * @throws {TypeError} - The `this` keyword is the incorrect type, if you are applying this to a callback, please call this within a lambda instead of passing the method as a callback.
+   * @throws {ReferenceError} - Message cannot be null or undefined.
+   * @throws {TypeError} - Message supplied must of type string or function that returns a string.
+   * @throws {RangeError} - Message supplied must be at least 1 character long.
+   * @throws {TypeError} - Arguments supplied must be of type Array. (Spread operator will work.)
    */
-  public async information(message: string, ...args: any[]): Promise<void> {
+  public async information(message: string | (() => string), ...args: any[]): Promise<void> {
     if (!(this instanceof Logger)) {
-      throw new Error(thisKeywordIncorrectClosure);
+      throw new TypeError(thisKeywordIncorrectClosure);
+    }
+    if (message === undefined || message === null) {
+      throw new ReferenceError(invalidLogMessage);
+    }
+    if (typeof message === 'function') {
+      message = message();
+    }
+    if (typeof message !== 'string') {
+      throw new TypeError(invalidLogMessageType);
+    }
+    if (message.length === 0) {
+      throw new RangeError(invalidLogMessage);
+    }
+    if (args && !Array.isArray(args)) {
+      throw new TypeError(invalidLogArgs);
     }
 
     if (!this._checkLogLevel(LogLevel.Info)) return;
@@ -678,10 +870,30 @@ export default class Logger {
    * @param {string} message - The message to log.
    * @param {any[]} ...args - The arguments to pass to the message.
    * @returns {void} - Nothing.
+   * @throws {TypeError} - The `this` keyword is the incorrect type, if you are applying this to a callback, please call this within a lambda instead of passing the method as a callback.
+   * @throws {ReferenceError} - Message cannot be null or undefined.
+   * @throws {TypeError} - Message supplied must of type string or function that returns a string.
+   * @throws {RangeError} - Message supplied must be at least 1 character long.
+   * @throws {TypeError} - Arguments supplied must be of type Array. (Spread operator will work.)
    */
-  public async error(message: string, ...args: any[]): Promise<void> {
+  public async error(message: string | (() => string), ...args: any[]): Promise<void> {
     if (!(this instanceof Logger)) {
-      throw new Error(thisKeywordIncorrectClosure);
+      throw new TypeError(thisKeywordIncorrectClosure);
+    }
+    if (message === undefined || message === null) {
+      throw new ReferenceError(invalidLogMessage);
+    }
+    if (typeof message === 'function') {
+      message = message();
+    }
+    if (typeof message !== 'string') {
+      throw new TypeError(invalidLogMessageType);
+    }
+    if (message.length === 0) {
+      throw new RangeError(invalidLogMessage);
+    }
+    if (args && !Array.isArray(args)) {
+      throw new TypeError(invalidLogArgs);
     }
 
     if (!this._checkLogLevel(LogLevel.Error)) return;
