@@ -467,6 +467,9 @@ export default class Logger {
     this._logToConsole = logToConsole;
     this._cutLogPrefix = cutLogPrefix;
 
+    // Check if there's a there's actually a terminal to log to
+    this._logToConsole = this._logToConsole && process.stdout.isTTY && process.stderr.isTTY;
+
     if (this._logToFileSystem) {
       this._fileName = util.format(
         'log_%s_%s_%s_%s.log',
