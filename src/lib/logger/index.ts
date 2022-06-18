@@ -507,6 +507,10 @@ export default class Logger {
       this._lockedFileWriteStream.on(
         'error',
         ((error: NodeJS.ErrnoException) => {
+          this._logToFileSystem = false;
+          this._lockedFileWriteStream.end();
+          this._lockedFileWriteStream.destroy();
+
           if (error === undefined || error === null) {
             this.warning('File system file write stream error callback invoked, but error not actually provided.');
             return;
@@ -541,10 +545,6 @@ export default class Logger {
               this.warning('File system file write stream error callback invoked. Unknown error.');
               break;
           }
-
-          this._logToFileSystem = false;
-          this._lockedFileWriteStream.end();
-          this._lockedFileWriteStream.destroy();
         }).bind(this),
       );
     }
