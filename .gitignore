@@ -17,3 +17,4 @@ node_modules
 .env.development
 logs
 first_install_output
+test_coverage
