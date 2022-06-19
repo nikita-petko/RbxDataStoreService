@@ -24,6 +24,4 @@ import dirname from './lib/dirname';
 
 dirname.packageDirname = __dirname.substring(0, __dirname.lastIndexOf(process.platform === 'win32' ? '\\' : '/'));
 
-import logger, { LogLevel } from './lib/logger';
-
-export { logger, LogLevel };
+export {};
