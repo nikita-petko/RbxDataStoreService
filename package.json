@@ -1,11 +1,11 @@
 {
   "name": "@mfdlabs/rbxdatastoreservice",
-  "version": "3.0.0-alpha.11",
+  "version": "3.0.0-alpha.12",
   "description": "A Node.js library for interacting with the Roblox DataStores API",
   "main": "dist/index.js",
   "types": "dist/types",
   "scripts": {
-    "test": "jest --config jestconfig.json --verbose --runInBand --passWithNoTests",
+    "test": "jest --config jestconfig.json --verbose --runInBand --passWithNoTests --silent=false",
     "test-full": "npm ci && npm update && npm run test",
     "build": "npm run clean && npm run compile",
     "build-full": "npm ci && npm update && npm run build",
@@ -30,6 +30,7 @@
   "author": "Nikita Petko <petko@vmminfra.net>",
   "license": "Apache-2.0",
   "devDependencies": {
+    "@types/jest": "^28.1.2",
     "@types/node": "^17.0.39",
     "jest": "^28.1.0",
     "prettier": "^2.6.2",
@@ -40,9 +41,11 @@
   },
   "dependencies": {
     "@mfdlabs/net": "^1.0.6",
+    "axios": "^0.27.2",
     "dotenv": "^16.0.1"
   },
   "files": [
-    "dist/*"
+    "dist/*",
+    "!dist/tests.js"
   ]
 }
