@@ -36,7 +36,13 @@ export default class DotenvLoader {
   /**
    * @internal This is a private member.
    */
-  private static _dotEnvFilePath: string = path.join(dirname.packageDirname, '.env');
+  private static get _dotEnvFilePath() {
+    try {
+      return path.join(dirname.packageDirname, '.env');
+    } catch (e) {
+      return path.resolve('.env');
+    }
+  }
 
   /**
    * Loads the .env file and parses it into process.env.
@@ -46,13 +52,15 @@ export default class DotenvLoader {
    * @static
    * @memberof DotenvLoader
    */
-  public static reloadEnvironment(): void {
+  public static reloadEnvironment(overwriteExisting: boolean = true): void {
     if (!fs.existsSync(this._dotEnvFilePath)) return;
 
     try {
       const data = dotenv.parse(fs.readFileSync(this._dotEnvFilePath));
 
       for (const k of Object.keys(data)) {
+        if (process.env.hasOwnProperty(k) && !overwriteExisting) continue;
+
         process.env[k] = data[k];
       }
     } catch (e) {
