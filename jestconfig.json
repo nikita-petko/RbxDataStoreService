@@ -19,5 +19,7 @@
       "tsconfig": "tsconfig.json"
     }
   },
-  "preset": "ts-jest/presets/js-with-ts"
+  "preset": "ts-jest/presets/js-with-ts",
+  "coverageDirectory": "test_coverage",
+  "collectCoverage": true
 }
