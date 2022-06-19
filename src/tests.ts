@@ -1,36 +1,48 @@
-import logger from './lib/logger';
-import { LogLevel } from './lib/logger/log_level';
+import robloxUrlConstructor, { RobloxEnvironmentType, RobloxPlatformType } from './lib/roblox_url_constructor';
 
-logger.singleton.logLevel = LogLevel.Trace;
-
-logger.singleton.log('This is a test log message.');
-logger.singleton.warning('This is a test warning message.');
-logger.singleton.debug('This is a test debug message.');
-logger.singleton.information('This is a test info message.');
-logger.singleton.error('This is a test error message.');
-logger.singleton.trace('This is a test trace message.');
-
-const testConsoleLogger = new logger('test-console-logger', LogLevel.Trace, false, true, true);
-
-testConsoleLogger.log('This is a test log message.');
-testConsoleLogger.warning('This is a test warning message.');
-testConsoleLogger.debug('This is a test debug message.');
-testConsoleLogger.information('This is a test info message.');
-testConsoleLogger.error('This is a test error message.');
-testConsoleLogger.trace('This is a test trace message.');
-
-const testFileSystemLogger = new logger('test-file-system-logger', LogLevel.Trace, true, false, true);
-
-testFileSystemLogger.log('This is a test log message.');
-testFileSystemLogger.warning('This is a test warning message.');
-testFileSystemLogger.debug('This is a test debug message.');
-testFileSystemLogger.information('This is a test info message.');
-testFileSystemLogger.error('This is a test error message.');
-testFileSystemLogger.trace('This is a test trace message.');
-
-logger.noopSingleton.log('This is a test log message.');
-logger.noopSingleton.warning('This is a test warning message.');
-logger.noopSingleton.debug('This is a test debug message.');
-logger.noopSingleton.information('This is a test info message.');
-logger.noopSingleton.error('This is a test error message.');
-logger.noopSingleton.trace('This is a test trace message.');
+console.log(
+  robloxUrlConstructor.constructServiceUrl(
+    RobloxPlatformType.BEDEV1,
+    'users',
+    'hi/{{babe}}/',
+    false,
+    true,
+    false,
+    {},
+    'momma',
+  ),
+);
+console.log(
+  robloxUrlConstructor.constructServiceUrl(
+    RobloxPlatformType.BEDEV2,
+    'captcha',
+    '/v1/{{provider}}/metadata/{{captchaId}}/rblx-dev-2',
+    false,
+    false,
+    false,
+    {},
+    'arkoselabs',
+  ),
+);
+console.log(
+  robloxUrlConstructor.constructServiceUrlByEnvironment(
+    RobloxPlatformType.BEDEV2,
+    'captcha',
+    RobloxEnvironmentType.Development,
+    '/v1/{{provider}}/metadata/{{captchaId}}/rblx-dev-2',
+    false,
+    false,
+    false,
+    {},
+    'arkoselabs',
+  ),
+);
+console.log(
+  robloxUrlConstructor.smartConstruct(
+    '{bedev1:users:v1:sitetest1.simulpong.com:true}/test/{{userId}}/{{otherArg}}',
+    {},
+    123,
+    'foo',
+  ),
+);
+console.log(robloxUrlConstructor.smartConstruct('{bedev2:develop:v1:simulpong.com}/help-me', { randomQuery: 'foo' }));
