@@ -20,9 +20,10 @@
     Written by: Nikita Petko
 */
 
+import dotenvLoader from './dotenv_loader';
+import typeConverters from './type_converters';
 import { LogLevel } from '../logger/log_level';
-import dotenvLoader from '../environment/dotenv_loader';
-import typeConverters from '../environment/type_converters';
+import { RobloxEnvironmentType } from '../roblox_url_constructor/roblox_environment_type';
 
 import * as fs from 'fs';
 
@@ -51,6 +52,11 @@ export default class Environment {
    * @memberof Environment
    */
   private static _getOrDefault<T>(key: string, defaultValue?: T | (() => T), reloadEnvironment: boolean = true): T {
+    // If default value is null, undefined or any type that cannot be inferred then throw
+    if (defaultValue === null || defaultValue === undefined) {
+      throw new Error('The default value must not be null or undefined.');
+    }
+
     if (reloadEnvironment) dotenvLoader.reloadEnvironment();
 
     const value = process.env[key];
@@ -69,6 +75,9 @@ export default class Environment {
         if (defaultValue instanceof RegExp) {
           return new RegExp(value ?? defaultValue.source, defaultValue.flags) as unknown as T;
         }
+        if (typeof defaultValue === 'object') {
+          return JSON.parse(value ?? JSON.stringify(defaultValue)) as unknown as T;
+        }
 
         return (value as unknown as T) || defaultValue;
     }
@@ -79,12 +88,9 @@ export default class Environment {
    * @returns {boolean} True if the current context has the .dockerenv file.
    */
   public static hasDockerEnv(): boolean {
-    try {
-      fs.statSync('/.dockerenv');
-      return true;
-    } catch {
-      return false;
-    }
+    if (process.platform !== 'linux') return false;
+
+    return fs.existsSync('/.dockerenv');
   }
 
   /**
@@ -106,6 +112,8 @@ export default class Environment {
    * @returns {boolean} True if the current context is running under a docker container.
    */
   public static isDocker(): boolean {
+    if (process.platform !== 'linux') return false;
+
     if (this._isDocker === undefined) {
       this._isDocker = this.hasDockerEnv() || this.hasDockerCGroup();
     }
@@ -118,7 +126,9 @@ export default class Environment {
    *
    * If you set this environment variable, the logger will persist it's log files even if a clearance is requested.
    */
+  /* istanbul ignore next */
   public static get persistLocalLogs(): boolean {
+    /* istanbul ignore next */
     return this._getOrDefault('PERSIST_LOCAL_LOGS', false);
   }
 
@@ -127,7 +137,9 @@ export default class Environment {
    *
    * If true, we will also log to the file system.
    */
+  /* istanbul ignore next */
   public static get logToFileSystem(): boolean {
+    /* istanbul ignore next */
     return this._getOrDefault('LOG_TO_FILE_SYSTEM', true);
   }
 
@@ -136,7 +148,9 @@ export default class Environment {
    *
    * If true, we will also log to the console.
    */
+  /* istanbul ignore next */
   public static get logToConsole(): boolean {
+    /* istanbul ignore next */
     return this._getOrDefault('LOG_TO_CONSOLE', true);
   }
 
@@ -145,7 +159,9 @@ export default class Environment {
    *
    * A loglevel for the logger.
    */
+  /* istanbul ignore next */
   public static get logLevel(): LogLevel {
+    /* istanbul ignore next */
     return this._getOrDefault('LOG_LEVEL', LogLevel.None); // default to none
   }
 
@@ -155,7 +171,9 @@ export default class Environment {
    * If true, then the logger will cut the prefix of the log message in order to read the log message more easily.
    * @note This is advised for use in production.
    */
+  /* istanbul ignore next */
   public static get loggerCutPrefix(): boolean {
+    /* istanbul ignore next */
     return this._getOrDefault('LOGGER_CUT_PREFIX', true);
   }
 
@@ -164,7 +182,64 @@ export default class Environment {
    *
    * The default name of the logger.
    */
+  /* istanbul ignore next */
   public static get loggerDefaultName(): string {
+    /* istanbul ignore next */
     return this._getOrDefault('LOGGER_DEFAULT_NAME', 'default-logger');
+  }
+
+  /**
+   * Used by the Roblox URL Constructor.
+   *
+   * The default environment type to use. Defaults to Production.
+   */
+  /* istanbul ignore next */
+  public static get defaultEnvironmentType(): RobloxEnvironmentType {
+    /* istanbul ignore next */
+    return this._getOrDefault('DEFAULT_ENVIRONMENT_TYPE', RobloxEnvironmentType.Production);
+  }
+
+  /**
+   * Used by the Roblox URL Constructor.
+   * 
+   * Represents the default Production Base URL. If in the format of {proto}://{host}:{port} the root hostname will be extracted.
+   */
+  /* istanbul ignore next */
+  public static get defaultProductionBaseUrl(): string {
+    /* istanbul ignore next */
+    return this._getOrDefault('DEFAULT_PRODUCTION_BASE_URL', 'https://www.roblox.com');
+  }
+
+  /**
+   * Used by the Roblox URL Constructor.
+   * 
+   * Represents the default Staging Base URL. If in the format of {proto}://{host}:{port} the root hostname will be extracted.
+   */
+  /* istanbul ignore next */
+  public static get defaultStagingBaseUrl(): string {
+    /* istanbul ignore next */
+    return this._getOrDefault('DEFAULT_STAGING_BASE_URL', 'https://www.sitetest1.robloxlabs.com');
+  }
+
+  /**
+   * Used by the Roblox URL Constructor.
+   * 
+   * Represents the default Integration Base URL. If in the format of {proto}://{host}:{port} the root hostname will be extracted.
+   */
+  /* istanbul ignore next */
+  public static get defaultIntegrationBaseUrl(): string {
+    /* istanbul ignore next */
+    return this._getOrDefault('DEFAULT_INTEGRATION_BASE_URL', 'https://www.sitetest2.robloxlabs.com');
+  }
+
+  /**
+   * Used by the Roblox URL Constructor.
+   * 
+   * Represents the default Development Base URL. If in the format of {proto}://{host}:{port} the root hostname will be extracted.
+   */
+  /* istanbul ignore next */
+  public static get defaultDevelopmentBaseUrl(): string {
+    /* istanbul ignore next */
+    return this._getOrDefault('DEFAULT_DEVELOPMENT_BASE_URL', 'https://www.sitetest3.robloxlabs.com');
   }
 }
