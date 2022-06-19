@@ -24,6 +24,7 @@
  * Represents the log level.
  *
  * @enum {string} The log levels.
+ * @internal This enum is only ingested internally.
  */
 export enum LogLevel {
   None = 'none',

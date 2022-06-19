@@ -80,6 +80,8 @@ Error.stackTraceLimit = Infinity;
 
 /**
  * A simple logger class that will log to the console and to a file.
+ * 
+ * @internal This class is only ingested internally.
  */
 export default class Logger {
   //////////////////////////////////////////////////////////////////////////////
