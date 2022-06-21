@@ -11,7 +11,7 @@
           "skipFiles": [
               "<node_internals>/**"
           ],
-          "program": "${workspaceFolder}/dist/tests.js",
+          "program": "${workspaceFolder}/lib/tests.js",
           "outFiles": [
               "${workspaceFolder}/**/*.js"
           ]
