@@ -137,10 +137,10 @@ describe('Roblox URL Constructor', () => {
 
     it('should return the production base URL as a BEDEV2 Service if it is specified as BEDEV2 and hostname is specified', () => {
       expect(
-        robloxUrlConstructor.getBaseServiceUrl(RobloxPlatformType.BEDEV2, 'foo-service', false, 'bar.com'),
+        robloxUrlConstructor.getBaseServiceUrl(RobloxPlatformType.BEDEV2, 'foo-service', false, 'apis.bar.com'),
       ).toEqual('https://apis.bar.com/foo-service/');
 
-      expect(robloxUrlConstructor.getBaseServiceUrl(RobloxPlatformType.BEDEV2, 'foo-service', true, 'bar.com')).toEqual(
+      expect(robloxUrlConstructor.getBaseServiceUrl(RobloxPlatformType.BEDEV2, 'foo-service', true, 'apis.bar.com')).toEqual(
         'http://apis.bar.com/foo-service/',
       );
     });
@@ -392,7 +392,7 @@ describe('Roblox URL Constructor', () => {
           'foo-service',
           RobloxEnvironmentType.Production,
           false,
-          'baz.com',
+          'apis.baz.com',
         ),
       ).toEqual('https://apis.baz.com/foo-service/');
 
@@ -402,7 +402,7 @@ describe('Roblox URL Constructor', () => {
           'foo-service',
           RobloxEnvironmentType.Production,
           true,
-          'baz.com',
+          'apis.baz.com',
         ),
       ).toEqual('http://apis.baz.com/foo-service/');
     });

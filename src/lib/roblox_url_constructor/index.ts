@@ -163,10 +163,14 @@ export default abstract class RobloxUrlConstructor {
   ): string {
     const proto = insecure ? 'http' : 'https';
 
+    if (hostname !== undefined) {
+      return util.format('%s://%s/%s/', proto, hostname, serviceName);
+    }
+
     return util.format(
       '%s://apis.%s/%s/',
       proto,
-      hostname || this._getBaseHostname(rblxEnvironment || environment.defaultEnvironmentType),
+      this._getBaseHostname(rblxEnvironment || environment.defaultEnvironmentType),
       serviceName,
     );
   }
