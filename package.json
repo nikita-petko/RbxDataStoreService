@@ -1,9 +1,9 @@
 {
   "name": "@mfdlabs/rbxdatastoreservice",
-  "version": "3.0.0-alpha.13",
+  "version": "3.0.0-alpha.14",
   "description": "A Node.js library for interacting with the Roblox DataStores API",
-  "main": "dist/index.js",
-  "types": "dist/types",
+  "main": "lib/index.js",
+  "types": "lib/types",
   "scripts": {
     "test": "jest --config jestconfig.json --verbose --runInBand --passWithNoTests --silent=false",
     "test-full": "npm ci && npm update && npm run test",
@@ -45,7 +45,7 @@
     "dotenv": "^16.0.1"
   },
   "files": [
-    "dist/*",
-    "!dist/tests.js"
+    "lib/*",
+    "!lib/tests.js"
   ]
 }

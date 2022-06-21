@@ -13,9 +13,9 @@
 #  limitations under the License.
 
 *
-!dist
-# Reignore the dist/tests.js file (in case it exists)
-dist/tests.js
+!./lib
+# Reignore the lib/tests.js file (in case it exists)
+./lib/tests.js
 
 # This is for default environment file
 !.env
