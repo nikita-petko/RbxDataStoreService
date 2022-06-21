@@ -35,7 +35,6 @@ import { LogLevel } from './log_level';
 import { LogColor } from './log_color';
 import {
   nameRegex,
-  invalidLogArgs,
   invalidLogMessage,
   invalidLogMessageType,
   invalidConstructorName,
@@ -43,6 +42,7 @@ import {
   invalidSetterLogLevelType,
   invalidConstructorLogLevel,
   invalidConstructorNameType,
+  invalidConstructorNameEmpty,
   invalidConstructorNameRegex,
   thisKeywordIncorrectClosure,
   invalidConstructorLogToConsole,
@@ -80,7 +80,7 @@ Error.stackTraceLimit = Infinity;
 
 /**
  * A simple logger class that will log to the console and to a file.
- * 
+ *
  * @internal This class is only ingested internally.
  */
 export default class Logger {
@@ -89,7 +89,18 @@ export default class Logger {
   //////////////////////////////////////////////////////////////////////////////
 
   /* Log File Stuff */
-  private static readonly _logFileBaseDirectory: string = path.join(dirname.packageDirname, 'logs');
+  private static _logFileBaseDirectoryBacking: string = undefined;
+  private static get _logFileBaseDirectory(): string {
+    try {
+      if (Logger._logFileBaseDirectoryBacking === undefined) {
+        Logger._logFileBaseDirectoryBacking = path.join(dirname.packageDirname, 'logs');
+      }
+
+      return Logger._logFileBaseDirectoryBacking;
+    } catch (error) {
+      return path.resolve();
+    }
+  }
 
   /* Log String Stuff */
   /**
@@ -124,7 +135,7 @@ export default class Logger {
   /**
    * @internal This is a private member.
    */
-  private static readonly _loggers: Logger[] = [];
+  private static readonly _loggers: Map<string, Logger> = new Map<string, Logger>();
 
   //////////////////////////////////////////////////////////////////////////////
   // Private Static Properties
@@ -276,7 +287,7 @@ export default class Logger {
   private async _logLocally(logLevel: LogLevel, format: string, ...args: any[]): Promise<void> {
     if (!this._logToFileSystem) return;
 
-    this._lockedFileWriteStream.write(this._constructFileLoggerMessage(logLevel, format, ...args));
+    this._lockedFileWriteStream?.write(this._constructFileLoggerMessage(logLevel, format, ...args));
   }
 
   /* Color Logging (Console) */
@@ -313,6 +324,7 @@ export default class Logger {
    * @internal This is a private member.
    */
   private async _logConsole(logLevel: LogLevel, color: LogColor, format: string, ...args: any[]): Promise<void> {
+    /* istanbul ignore if */
     if (!this._logToConsole) return;
 
     let formattedMessage = util.format(format, ...args);
@@ -339,17 +351,123 @@ export default class Logger {
    * @internal This is a private member.
    */
   private _checkLogLevel(logLevelToCheck: LogLevel): boolean {
-    // This is to check if the passed log level is valid
-    if (Object.values(LogLevel).indexOf(this._logLevel) === -1) {
-      this._logLevel = LogLevel.Info;
-    }
-
     const values = Object.values(LogLevel);
 
     const actualLogLevel = values.indexOf(this._logLevel);
     const logLevelToCheckIndex = values.indexOf(logLevelToCheck);
 
     return actualLogLevel >= logLevelToCheckIndex;
+  }
+
+  /**
+   * @internal This is a private member.
+   */
+  private _onFileStreamError(error: NodeJS.ErrnoException) {
+    this._logToFileSystem = false;
+    this._closeFileStream();
+
+    if (error === undefined || error === null) {
+      this.warning('File system file write stream error callback invoked, but error not actually provided.');
+      return;
+    }
+
+    switch (error.code) {
+      case 'EACCES':
+        this.warning('File system file write stream error callback invoked. Permission denied.');
+        break;
+      case 'EISDIR':
+        this.warning('File system file write stream error callback invoked. File is a directory.');
+        break;
+      case 'EMFILE':
+        this.warning('File system file write stream error callback invoked. Too many open files.');
+        break;
+      case 'ENFILE':
+        this.warning('File system file write stream error callback invoked. File table overflow.');
+        break;
+      case 'ENOENT':
+        this.warning('File system file write stream error callback invoked. File not found.');
+        break;
+      case 'ENOSPC':
+        this.warning('File system file write stream error callback invoked. No space left on device.');
+        break;
+      case 'EPERM':
+        this.warning('File system file write stream error callback invoked. Operation not permitted.');
+        break;
+      case 'EROFS':
+        this.warning('File system file write stream error callback invoked. Read-only file system.');
+        break;
+      default:
+        this.warning('File system file write stream error callback invoked. Unknown error.');
+        break;
+    }
+  }
+
+  /**
+   * @internal This is a private member.
+   */
+  private _createFileStream() {
+    Object.defineProperty(this, '_lockedFileWriteStream', {
+      value: fs.createWriteStream(this._fullyQualifiedLogFileName, { flags: 'a' }),
+    });
+
+    this._lockedFileWriteStream.on('error', this._onFileStreamError.bind(this));
+  }
+
+  /**
+   * @internal This is a private member.
+   */
+  private _closeFileStream() {
+    this._lockedFileWriteStream?.end();
+    this._lockedFileWriteStream?.destroy();
+    Object.defineProperty(this, '_lockedFileWriteStream', {
+      value: undefined,
+    });
+
+    Object.defineProperty(this, '_fullyQualifiedLogFileName', {
+      value: undefined,
+    });
+    Object.defineProperty(this, '_fileName', {
+      value: undefined,
+    });
+  }
+
+  /**
+   * @internal This is a private member.
+   */
+  private _createFileName() {
+    Object.defineProperty(this, '_fileName', {
+      value: util.format(
+        'log_%s_%s_%s_%s.log',
+        this._name,
+        process.version,
+        Logger._getFileSafeDateNowIsoString(),
+        process.pid.toString(16).toUpperCase(),
+      ),
+    });
+    Object.defineProperty(this, '_fullyQualifiedLogFileName', {
+      value: path.join(Logger._logFileBaseDirectory, this._fileName),
+    });
+
+    if (!fs.existsSync(Logger._logFileBaseDirectory)) {
+      try {
+        fs.mkdirSync(Logger._logFileBaseDirectory, { recursive: true });
+      } catch (error: any) {
+        if (error instanceof Error) {
+          error = error as NodeJS.ErrnoException;
+
+          if (error.code === 'EPERM' || error.code === 'EACCES') {
+            this._logToFileSystem = false;
+            this.warning(
+              'Unable to create log file directory. Please ensure that the current user has permission to create directories.',
+            );
+
+            return;
+          }
+
+          throw error; // rethrow
+        }
+      }
+    }
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -377,22 +495,46 @@ export default class Logger {
 
       Logger.singleton.log('Clearing local log files...');
 
-      for (const logger of Logger._loggers) {
-        logger._lockedFileWriteStream.end();
-      }
+      Logger._loggers.forEach((logger) => {
+        logger._closeFileStream();
+      });
 
       if (fs.existsSync(Logger._logFileBaseDirectory)) {
         fs.rmSync(Logger._logFileBaseDirectory, { recursive: true, force: true });
         fs.mkdirSync(Logger._logFileBaseDirectory, { recursive: true });
       }
 
-      for (const logger of Logger._loggers) {
-        Object.defineProperty(logger, '_lockedFileWriteStream', {
-          value: fs.createWriteStream(logger._fullyQualifiedLogFileName, { flags: 'a' }),
-        });
-      }
+      Logger._loggers.forEach((logger) => {
+        if (logger._logToFileSystem) {
+          logger._createFileName();
+          logger._createFileStream();
+        }
+      });
     } catch (error) {
-      Logger.singleton.error('Error clearing local log files: %s', error.message);
+      Logger.singleton.error('Error clearing local log files: %s', error);
+    }
+  }
+
+  /**
+   * Tries to clear out all tracked loggers.
+   * @returns {void} - Nothing.
+   */
+  public static tryClearAllLoggers(): void {
+    Logger.singleton.log('Try clear all loggers...');
+
+    try {
+      Logger._loggers.forEach((logger) => {
+        // Avoid clearing noop logger and singleton logger
+        if (logger._name !== Logger._singleton?._name && logger._name !== Logger._noopSingletonLogger?._name) {
+          logger._lockedFileWriteStream?.end?.call(logger._lockedFileWriteStream);
+          logger._lockedFileWriteStream?.destroy?.call(logger._lockedFileWriteStream);
+
+          // Remove the logger from the list of loggers
+          Logger._loggers.delete(logger._name);
+        }
+      });
+    } catch (error) {
+      Logger.singleton.error('Error clearing all loggers: %s', error);
     }
   }
 
@@ -422,10 +564,13 @@ export default class Logger {
     if (typeof name !== 'string') {
       throw new TypeError(invalidConstructorNameType);
     }
+    if (name.length === 0) {
+      throw new RangeError(invalidConstructorNameEmpty);
+    }
     if (!nameRegex.test(name)) {
       throw new SyntaxError(invalidConstructorNameRegex);
     }
-    if (Logger._loggers.some((logger) => logger._name === name)) {
+    if (Logger._loggers.has(name)) {
       throw new ReferenceError(`Logger with name '${name}' already exists.`);
     }
 
@@ -463,6 +608,8 @@ export default class Logger {
       throw new TypeError(invalidConstructorCutLogPrefixType);
     }
 
+    Logger._loggers.set(name, this);
+
     this._name = name;
     this._logLevel = logLevel;
     this._logToFileSystem = logToFileSystem;
@@ -473,82 +620,8 @@ export default class Logger {
     this._logToConsole = this._logToConsole && process.stdout.isTTY && process.stderr.isTTY;
 
     if (this._logToFileSystem) {
-      this._fileName = util.format(
-        'log_%s_%s_%s_%s.log',
-        this._name,
-        process.version,
-        Logger._getFileSafeDateNowIsoString(),
-        process.pid.toString(16).toUpperCase(),
-      );
-      this._fullyQualifiedLogFileName = path.join(Logger._logFileBaseDirectory, this._fileName);
-
-      if (!fs.existsSync(Logger._logFileBaseDirectory)) {
-        try {
-          fs.mkdirSync(Logger._logFileBaseDirectory, { recursive: true });
-        } catch (error: any) {
-          if (error instanceof Error) {
-            error = error as NodeJS.ErrnoException;
-
-            if (error.code === 'EPERM' || error.code === 'EACCES') {
-              this._logToFileSystem = false;
-              this.warning(
-                'Unable to create log file directory. Please ensure that the current user has permission to create directories.',
-              );
-
-              return;
-            }
-
-            throw error; // rethrow
-          }
-        }
-      }
-
-      this._lockedFileWriteStream = fs.createWriteStream(this._fullyQualifiedLogFileName, {
-        flags: 'a',
-      });
-      this._lockedFileWriteStream.on(
-        'error',
-        ((error: NodeJS.ErrnoException) => {
-          this._logToFileSystem = false;
-          this._lockedFileWriteStream.end();
-          this._lockedFileWriteStream.destroy();
-
-          if (error === undefined || error === null) {
-            this.warning('File system file write stream error callback invoked, but error not actually provided.');
-            return;
-          }
-
-          switch (error.code) {
-            case 'EACCES':
-              this.warning('File system file write stream error callback invoked. Permission denied.');
-              break;
-            case 'EISDIR':
-              this.warning('File system file write stream error callback invoked. File is a directory.');
-              break;
-            case 'EMFILE':
-              this.warning('File system file write stream error callback invoked. Too many open files.');
-              break;
-            case 'ENFILE':
-              this.warning('File system file write stream error callback invoked. File table overflow.');
-              break;
-            case 'ENOENT':
-              this.warning('File system file write stream error callback invoked. File not found.');
-              break;
-            case 'ENOSPC':
-              this.warning('File system file write stream error callback invoked. No space left on device.');
-              break;
-            case 'EPERM':
-              this.warning('File system file write stream error callback invoked. Operation not permitted.');
-              break;
-            case 'EROFS':
-              this.warning('File system file write stream error callback invoked. Read-only file system.');
-              break;
-            default:
-              this.warning('File system file write stream error callback invoked. Unknown error.');
-              break;
-          }
-        }).bind(this),
-      );
+      this._createFileName();
+      this._createFileStream();
     }
   }
 
@@ -583,7 +656,7 @@ export default class Logger {
   public static get noopSingleton(): Logger {
     if (Logger._noopSingletonLogger === null) {
       Logger._noopSingletonLogger = new Logger(
-        environment.loggerDefaultName,
+        environment.loggerDefaultName + '_noop',
         LogLevel.None,
         false,
         false,
@@ -703,6 +776,13 @@ export default class Logger {
 
     if (this._logToFileSystem !== value) {
       this._logToFileSystem = value;
+
+      if (value === true) {
+        this._createFileName();
+        this._createFileStream();
+      } else {
+        this._closeFileStream();
+      }
     }
   }
 
@@ -775,14 +855,11 @@ export default class Logger {
     if (message.length === 0) {
       throw new RangeError(invalidLogMessage);
     }
-    if (args && !Array.isArray(args)) {
-      throw new TypeError(invalidLogArgs);
-    }
 
     if (!this._checkLogLevel(LogLevel.Info)) return;
 
-    this._logConsole(LogLevel.Info, LogColor.BrightWhite, message, ...args);
-    this._logLocally(LogLevel.Info, message, ...args);
+    await this._logConsole(LogLevel.Info, LogColor.BrightWhite, message, ...args);
+    await this._logLocally(LogLevel.Info, message, ...args);
   }
 
   /**
@@ -812,14 +889,11 @@ export default class Logger {
     if (message.length === 0) {
       throw new RangeError(invalidLogMessage);
     }
-    if (args && !Array.isArray(args)) {
-      throw new TypeError(invalidLogArgs);
-    }
 
     if (!this._checkLogLevel(LogLevel.Warning)) return;
 
-    this._logConsole(LogLevel.Warning, LogColor.BrightYellow, message, ...args);
-    this._logLocally(LogLevel.Warning, message, ...args);
+    await this._logConsole(LogLevel.Warning, LogColor.BrightYellow, message, ...args);
+    await this._logLocally(LogLevel.Warning, message, ...args);
   }
 
   /**
@@ -850,14 +924,11 @@ export default class Logger {
     if (message.length === 0) {
       throw new RangeError(invalidLogMessage);
     }
-    if (args && !Array.isArray(args)) {
-      throw new TypeError(invalidLogArgs);
-    }
 
     if (!this._checkLogLevel(LogLevel.Trace)) return;
 
-    this._logConsole(LogLevel.Trace, LogColor.BrightMagenta, message, ...args);
-    this._logLocally(LogLevel.Trace, message, ...args);
+    await this._logConsole(LogLevel.Trace, LogColor.BrightMagenta, message, ...args);
+    await this._logLocally(LogLevel.Trace, message, ...args);
   }
 
   /**
@@ -887,14 +958,11 @@ export default class Logger {
     if (message.length === 0) {
       throw new RangeError(invalidLogMessage);
     }
-    if (args && !Array.isArray(args)) {
-      throw new TypeError(invalidLogArgs);
-    }
 
     if (!this._checkLogLevel(LogLevel.Debug)) return;
 
-    this._logConsole(LogLevel.Debug, LogColor.BrightMagenta, message, ...args);
-    this._logLocally(LogLevel.Debug, message, ...args);
+    await this._logConsole(LogLevel.Debug, LogColor.BrightMagenta, message, ...args);
+    await this._logLocally(LogLevel.Debug, message, ...args);
   }
 
   /**
@@ -924,14 +992,11 @@ export default class Logger {
     if (message.length === 0) {
       throw new RangeError(invalidLogMessage);
     }
-    if (args && !Array.isArray(args)) {
-      throw new TypeError(invalidLogArgs);
-    }
 
     if (!this._checkLogLevel(LogLevel.Info)) return;
 
-    this._logConsole(LogLevel.Info, LogColor.BrightBlue, message, ...args);
-    this._logLocally(LogLevel.Info, message, ...args);
+    await this._logConsole(LogLevel.Info, LogColor.BrightBlue, message, ...args);
+    await this._logLocally(LogLevel.Info, message, ...args);
   }
 
   /**
@@ -961,13 +1026,10 @@ export default class Logger {
     if (message.length === 0) {
       throw new RangeError(invalidLogMessage);
     }
-    if (args && !Array.isArray(args)) {
-      throw new TypeError(invalidLogArgs);
-    }
 
     if (!this._checkLogLevel(LogLevel.Error)) return;
 
-    this._logConsole(LogLevel.Error, LogColor.BrightRed, message, ...args);
-    this._logLocally(LogLevel.Error, message, ...args);
+    await this._logConsole(LogLevel.Error, LogColor.BrightRed, message, ...args);
+    await this._logLocally(LogLevel.Error, message, ...args);
   }
 }
