@@ -68,15 +68,6 @@ export const invalidLogMessageType: string =
   'The `message` argument must be a string or a function that returns a string.' as const;
 
 /**
- * This is an error message for when you supply an ...args argument to a logger method that is not an array.
- *
- * @internal This is only ingested internally.
- * @constant
- * @type {string} The error message.
- */
-export const invalidLogArgs: string = 'The `args` argument must be an array.' as const;
-
-/**
  * This is an error message for when the value you supply for a setter is undefined or null.
  *
  * @internal This is only ingested internally.
@@ -129,6 +120,15 @@ export const invalidConstructorNameType: string = 'The `name` argument must be a
  * @type {RegExp} The regex.
  */
 export const nameRegex: RegExp = /^[a-zA-Z0-9_\-]{1,25}$/;
+
+/**
+ * This is an error message for when you supply a name to the constructor that is empty.
+ * 
+ * @internal This is only ingested internally.
+ * @constant
+ * @type {string} The error message.
+ */
+export const invalidConstructorNameEmpty: string = 'The `name` argument cannot be empty.' as const;
 
 /**
  * This is an error message for when you supply a name to the constructor that does not match the regex /^[a-zA-Z0-9_\-]{1,15}$/.
