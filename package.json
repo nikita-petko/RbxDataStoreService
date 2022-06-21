@@ -1,6 +1,6 @@
 {
   "name": "@mfdlabs/rbxdatastoreservice",
-  "version": "3.0.0-alpha.12",
+  "version": "3.0.0-alpha.13",
   "description": "A Node.js library for interacting with the Roblox DataStores API",
   "main": "dist/index.js",
   "types": "dist/types",
