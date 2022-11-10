@@ -104,6 +104,7 @@ export class AuthenticationHelper {
 					authenticatedUser.id,
 				);
 				Globals.UserID = authenticatedUser.id;
+				Globals.Cookie = cookie;
 				const universeId = await UniversesHelper.GetUniverseIDFromPlaceID(placeID);
 				const universePermissionsUrl = BaseURL.ConstructServicePathFromSubDomain(
 					'develop',
@@ -192,7 +193,6 @@ export class AuthenticationHelper {
 			FASTLOG1(FLog['Auth'], '[FLog::Auth] Trying to authenticate the user with the placeID %i', placeID);
 			AuthenticationHelper.CheckCookieAndPlaceIdInternalAsync(cookie, placeID)
 				.then(() => {
-					Globals.Cookie = cookie;
 					Globals.PlaceID = placeID;
 					resumeFunction();
 				})

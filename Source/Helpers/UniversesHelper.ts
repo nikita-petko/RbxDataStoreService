@@ -11,9 +11,9 @@ export class UniversesHelper {
 			const request = new HttpRequest();
 			request.method = 'GET';
 			request.url = BaseURL.ConstructServicePathFromSubDomain(
-				'api',
-				'universes/get-universe-containing-place',
-				{ placeId: placeID },
+				'develop',
+				`v2/places/${placeID}`,
+				{},
 				true,
 				false,
 				true,
@@ -21,14 +21,14 @@ export class UniversesHelper {
 			request
 				.execute(null)
 				.then((response) => {
-					if (response.data['UniverseId'] !== undefined) {
-						Globals.UniverseID = response.data['UniverseId'];
-						return resumeFunction(response.data['UniverseId']);
+					if (response.data['universeId'] !== undefined) {
+						Globals.UniverseID = response.data['universeId'];
+						return resumeFunction(response.data['universeId']);
 					}
 					return errorFunction();
 				})
 				.catch((error) => {
-					errorFunction(error.message);
+					errorFunction(`Failed to get universe ID from place ID: ${error}`);
 				});
 		});
 	}
