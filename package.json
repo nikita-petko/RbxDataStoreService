@@ -30,7 +30,7 @@
 		"typescript": "^4.4.3"
 	},
 	"dependencies": {
-		"axios": "^0.27.2",
+		"axios": "^1.2.5",
 		"crypto-js": "^4.0.0"
 	}
 }
